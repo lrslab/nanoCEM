@@ -183,9 +183,9 @@ if __name__ == '__main__':
                         help="blow5_path")
     parser.add_argument('-c',"--control", default='/data/Ecoli_23s/IVT/file',
                         help="control_blow5_path")
-    parser.add_argument('-o',"--output", default="/data/Ecoli_23s/f5c_results_2_1617", help="output_file")
+    parser.add_argument('-o',"--output", default="/data/Ecoli_23s/f5c_results_2030", help="output_file")
     parser.add_argument("--chrom", default='NR_103073.1',help="bed file to extract special site datasets")
-    parser.add_argument("--pos", default=1617, help="position of site")
+    parser.add_argument("--pos", default=2029, help="position of site")
     parser.add_argument("--len", default=10, help="range of plot")
     parser.add_argument("--ref", default="/data/Ecoli_23s/23S_rRNA.fasta", help="range of plot")
     parser.add_argument("--strand", default="+", help="bed file to extract special site datasets")

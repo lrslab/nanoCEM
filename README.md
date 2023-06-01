@@ -33,9 +33,8 @@ python read_f5c_resquiggle.py -i wt/file -c control/file -o f5c_result --chrom N
 ```
 If you used Tombo(v1.5.0),
 ```sh
-# if fast5 is not single format 
+# if fast5 is not single format need to transfer to single format by ont-fast-api
 # single is fast5s-base-directory
-multi_to_single_fast5 -i single/ -s multi -n 1000 --recursive
 
 tombo preprocess annotate_raw_with_fastqs --fast5-basedir  single/ --fastq-filenames <reads.fastq>
 

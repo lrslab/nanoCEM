@@ -8,7 +8,7 @@ import multiprocessing
 from tqdm import tqdm
 from matplotlib import pyplot as plt
 # from ._stats import c_new_mean_stds
-from normalization import normalize_signal_with_lim
+from normalization import normalize_signal,normalize_signal_with_lim
 from plot import draw_volin,draw_boxplot
 plt.rcParams['pdf.fonttype'] = 42
 plt.rcParams['font.sans-serif'] = ['Arial']
@@ -125,10 +125,8 @@ def extract_feature(signal, event_start, length, base,start_position,end_positio
     total_feature_per_reads = []
     # if end >=event_start.shape[0]:
     #     #print(1)
-    try:
-        raw_signal_every = [norm_signal[event_start[start + x]:event_start[start + x] + length[start + x]] for x in range(end-start)]
-    except Exception:
-        print(1)
+    raw_signal_every = [norm_signal[event_start[start + x]:event_start[start + x] + length[start + x]] for x in range(end-start)]
+
     for i, element in enumerate(raw_signal_every):
         temp = [np.mean(element), np.std(element), np.median(element), length[start + i], position - FLAG.len +i]
         total_feature_per_reads.append(temp)
@@ -233,11 +231,11 @@ if __name__ == '__main__':
                         help='The attribute group to extract the training data from. e.g. RawGenomeCorrected_000')
     parser.add_argument('--basecall_subgroup', default='BaseCalled_template',
                         help='Basecall subgroup Nanoraw resquiggle into. Default is BaseCalled_template')
-    parser.add_argument('-i',"--fast5", default='/data/Ecoli_23s/L_rep1/single',
+    parser.add_argument('-i',"--fast5", default='/data/Ecoli_23s/L_rep2/single',
                         help="fast5_file")
     parser.add_argument('-c',"--control_fast5", default='/data/Ecoli_23s/IVT/single',
                         help="fast5_file")
-    parser.add_argument('-o',"--output", default="/data/Ecoli_23s/tombo_results", help="output_file")
+    parser.add_argument('-o',"--output", default="/data/Ecoli_23s/tombo_results_2030_new", help="output_file")
     parser.add_argument("--chrom", default='NR_103073.1',help="bed file to extract special site datasets")
     parser.add_argument("--pos", default=2029, help="bed file to extract special site datasets")
     parser.add_argument("--len", default=10, help="bed file to extract special site datasets")
