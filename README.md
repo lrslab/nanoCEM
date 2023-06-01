@@ -27,7 +27,7 @@ samtools index file.bam
 
 f5c resquiggle -c final.fastq file.blow5 -o file.paf
 
-# run the pipeline below for your two sample respective and keep the suffix of bam pad and blow5 is the same
+# run the pipeline below for your two sample respective and keep the suffix of bam/paf/blow5 is the same
 python read_f5c_resquiggle.py -i wt/file -c control/file -o f5c_result --chrom NC_000xxx --strand + --pos 3929 --len 5
 
 ```
@@ -41,7 +41,7 @@ tombo preprocess annotate_raw_with_fastqs --fast5-basedir  single/ --fastq-filen
 
 tombo resquiggle single/ <reference-fasta> --processes 4 --num-most-common-errors 5
 # run the pipeline below for your two sample respective, the SSD disk is recommended 
-python read_tombo_resquiggle.py -i wt/single -c control/single -o tombo_result --chrom NC_000xxx --strand + --pos 3929 --len 5 --=cpu 4
+python read_tombo_resquiggle.py -i wt/single -c control/single -o tombo_result --chrom NC_000xxx --strand + --pos 3929 --len 5 --cpu 4
 
 ```
 
