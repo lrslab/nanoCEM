@@ -22,7 +22,7 @@ slow5tools f2s multi/ -d blow5_dir
 slow5tools merge blow5_dir -o file.blow5
 slow5tools index file.blow5
 
-minimap2 -ax map-ont -t 16 <reference-fasta> <reads.fastq> | samtools view -hbS -F 260 - | samtools sort -@ 6 -o file.bam
+minimap2 -ax map-ont -t 16 --MD <reference-fasta> <reads.fastq> | samtools view -hbS -F 260 - | samtools sort -@ 6 -o file.bam
 samtools index file.bam
 
 f5c resquiggle -c final.fastq file.blow5 -o file.paf
