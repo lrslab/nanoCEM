@@ -8,9 +8,38 @@ from normalization import normalize_signal
 import os
 import argparse
 from plot import draw_boxplot,draw_volin
+from collections import OrderedDict
+def read_fasta_to_dic(filename):
+    """
+    function used to parser small fasta
+    still effective for genome level file
+    """
+    fa_dic = OrderedDict()
+
+    with open(filename, "r") as f:
+        for n, line in enumerate(f.readlines()):
+            if line.startswith(">"):
+                if n > 0:
+                    fa_dic[short_name] = "".join(seq_l)  # store previous one
+
+                full_name = line.strip().replace(">", "")
+                short_name = full_name.split(" ")[0]
+                seq_l = []
+            else:  # collect the seq lines
+                if len(line) > 8:  # min for fasta file is usually larger than 8
+                    seq_line1 = line.strip()
+                    seq_l.append(seq_line1)
+
+        fa_dic[short_name] = "".join(seq_l)  # store the last one
+    return fa_dic
+
+score_dict={}
+
 def extract_feature(line,position):
 
     read_id = line[0]
+    if read_id =='69927600-879f-428e-9ef5-bf1839027cc8':
+        print(1)
     if read_id not in info_dict:
         return None
     # tackle moves tag
@@ -90,8 +119,8 @@ def extract_pairs_pos(bam_file,position,length,chromosome):
 
     result_dict={}
     for read in bam_file.fetch(chromosome,position-length,position+length+1):
-        # if read.qname=='0eaa68b9-5989-44ca-8e00-52eba6ba3ccb':
-        #     print(1)
+        if read.qname == '69927600-879f-428e-9ef5-bf1839027cc8':
+            print(1)
         start_position=read.reference_start
         end_position=read.reference_end
         if position < start_position or position > end_position:
@@ -107,10 +136,7 @@ def extract_pairs_pos(bam_file,position,length,chromosome):
         temp['pairs']=aligned_pair
         temp['query_length'] = read.query_length
         result_dict[read.qname] = temp
-    start = read.reference_start
-    ref = read.get_reference_sequence()
-    ref = ref[position-start-length:position-start+length+1]
-    return result_dict,ref.upper()
+    return result_dict
 
 
 
@@ -118,7 +144,7 @@ def read_blow5(path,position,length,chromo=None,strand=None):
     global info_dict,s5
     bam_file=path+".bam"
     bam_file=pysam.AlignmentFile(bam_file,'rb')
-    info_dict,ref=extract_pairs_pos(bam_file,position,length,chromo)
+    info_dict=extract_pairs_pos(bam_file,position,length,chromo)
 
     slow5 = path+".blow5"
     s5 = pyslow5.Open(slow5, 'r')
@@ -134,7 +160,7 @@ def read_blow5(path,position,length,chromo=None,strand=None):
     final_feature=pd.DataFrame(final_feature)
     final_feature.columns=['Mean','STD','Median','Dwell_time','position']
     final_feature['position'] = final_feature['position'].astype(int).astype(str)
-    return final_feature,num_aligned,ref
+    return final_feature,num_aligned
 
 
 
@@ -153,26 +179,29 @@ def read_blow5(path,position,length,chromo=None,strand=None):
 # print(plot)
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("-i","--input", default='data/test_fast5/bhk/resquiggle_result/bhk',
+    parser.add_argument("-i","--input", default='/data/Ecoli_23s/L_rep2/file',
                         help="blow5_path")
-    parser.add_argument('-c',"--control", default='data/test_fast5/ivt/resquiggle_result/ivt',
+    parser.add_argument('-c',"--control", default='/data/Ecoli_23s/IVT/file',
                         help="control_blow5_path")
-    parser.add_argument('-o',"--output", default="./f5c_results", help="output_file")
-    parser.add_argument("--chrom", default='NC_001547.1',help="bed file to extract special site datasets")
-    parser.add_argument("--pos", default=3929, help="bed file to extract special site datasets")
-    parser.add_argument("--len", default=5, help="bed file to extract special site datasets")
+    parser.add_argument('-o',"--output", default="/data/Ecoli_23s/f5c_results_2_1617", help="output_file")
+    parser.add_argument("--chrom", default='NR_103073.1',help="bed file to extract special site datasets")
+    parser.add_argument("--pos", default=1617, help="position of site")
+    parser.add_argument("--len", default=10, help="range of plot")
+    parser.add_argument("--ref", default="/data/Ecoli_23s/23S_rRNA.fasta", help="range of plot")
     parser.add_argument("--strand", default="+", help="bed file to extract special site datasets")
     args = parser.parse_args()
 
+    fasta=read_fasta_to_dic(args.ref)
+    base_list = fasta[args.chrom][args.pos-args.len:args.pos+args.len+1]
 
     results_path = args.output
     if not os.path.exists(results_path):
         os.mkdir(results_path)
 
-    df_wt,aligned_num_wt,_=read_blow5(args.input,args.pos,args.len)
+    df_wt,aligned_num_wt=read_blow5(args.input,args.pos,args.len)
 
     df_wt['type']='Sample'
-    df_ivt,aligned_num_ivt,base_list=read_blow5(args.control,args.pos,args.len)
+    df_ivt,aligned_num_ivt=read_blow5(args.control,args.pos,args.len)
     df_ivt['type']='Sample'
     df_ivt['type'] = 'Control'
     df=pd.concat([df_wt,df_ivt])

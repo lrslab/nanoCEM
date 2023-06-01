@@ -13,8 +13,34 @@ from plot import draw_volin,draw_boxplot
 plt.rcParams['pdf.fonttype'] = 42
 plt.rcParams['font.sans-serif'] = ['Arial']
 
+from collections import OrderedDict
+def read_fasta_to_dic(filename):
+    """
+    function used to parser small fasta
+    still effective for genome level file
+    """
+    fa_dic = OrderedDict()
+
+    with open(filename, "r") as f:
+        for n, line in enumerate(f.readlines()):
+            if line.startswith(">"):
+                if n > 0:
+                    fa_dic[short_name] = "".join(seq_l)  # store previous one
+
+                full_name = line.strip().replace(">", "")
+                short_name = full_name.split(" ")[0]
+                seq_l = []
+            else:  # collect the seq lines
+                if len(line) > 8:  # min for fasta file is usually larger than 8
+                    seq_line1 = line.strip()
+                    seq_l.append(seq_line1)
+
+        fa_dic[short_name] = "".join(seq_l)  # store the last one
+    return fa_dic
 
 def matrix_append(total_matrix,new_matrix,index):
+    if new_matrix.shape[0]==0:
+        return total_matrix
     len_new_matrix=new_matrix.shape[0]
     if index+len_new_matrix>total_matrix.shape[0]:
         temp_matrix=np.zeros((500000,5),dtype=float)
@@ -81,14 +107,14 @@ def extract_feature(signal, event_start, length, base,start_position,end_positio
     global BASE_LIST
     position=FLAG.pos
     current_index=position-start_position
-    if current_index-FLAG.len < start_position:
-        start = start_position
+    if current_index-FLAG.len < 0:
+        start = 0
     else:
         start = current_index-FLAG.len
-    if current_index + FLAG.len > end_position:
-        end=end_position
+    if current_index + FLAG.len >= (end_position - start_position):
+        end=len(event_start)
     else:
-        end=current_index + FLAG.len
+        end=current_index + FLAG.len + 1
     seq_array = np.array(list(base))
     assert seq_array.shape == length.shape
     # uniq_arr = np.unique(signal)
@@ -97,17 +123,17 @@ def extract_feature(signal, event_start, length, base,start_position,end_positio
     norm_signal=normalize_signal_with_lim(signal)
 
     total_feature_per_reads = []
-    base_list = base[start:end+1]
-
-    raw_signal_every = [norm_signal[event_start[start + x]:event_start[start + x] + length[start + x]] for x in range(end-start+1)]
-
+    # if end >=event_start.shape[0]:
+    #     #print(1)
+    try:
+        raw_signal_every = [norm_signal[event_start[start + x]:event_start[start + x] + length[start + x]] for x in range(end-start)]
+    except Exception:
+        print(1)
     for i, element in enumerate(raw_signal_every):
-        if length[start + i] < 5:
-            continue
         temp = [np.mean(element), np.std(element), np.median(element), length[start + i], position - FLAG.len +i]
         total_feature_per_reads.append(temp)
     total_feature_per_reads=np.array(total_feature_per_reads)
-    return total_feature_per_reads,base_list
+    return total_feature_per_reads
 
 def extract_file(input_file):
     basecall_group = FLAG.basecall_group
@@ -157,7 +183,7 @@ def extract_group(args, total_fl):
     for result_per_read in results_list:
         temp= result_per_read.get()
         if temp is not None:
-            feature_per_read, base_list = temp
+            feature_per_read = temp
             aligned_num=aligned_num+1
             read_len=feature_per_read.shape[0]
             # npd_file.append(feature_per_read)
@@ -180,7 +206,7 @@ def extract_group(args, total_fl):
 
     # 转化为数值
     df['position'] = df['position'].astype(int).astype(str)
-    return df,base_list,aligned_num
+    return df,aligned_num
 
 
 def create_read_list_file(path,results_path):
@@ -207,28 +233,32 @@ if __name__ == '__main__':
                         help='The attribute group to extract the training data from. e.g. RawGenomeCorrected_000')
     parser.add_argument('--basecall_subgroup', default='BaseCalled_template',
                         help='Basecall subgroup Nanoraw resquiggle into. Default is BaseCalled_template')
-    parser.add_argument('-i',"--fast5", default='data/test_fast5/bhk/single',
+    parser.add_argument('-i',"--fast5", default='/data/Ecoli_23s/L_rep1/single',
                         help="fast5_file")
-    parser.add_argument('-c',"--control_fast5", default='data/test_fast5/ivt/single',
+    parser.add_argument('-c',"--control_fast5", default='/data/Ecoli_23s/IVT/single',
                         help="fast5_file")
-    parser.add_argument('-o',"--output", default="./tombo_results", help="output_file")
-    parser.add_argument("--chrom", default='NC_001547.1',help="bed file to extract special site datasets")
-    parser.add_argument("--pos", default=3929, help="bed file to extract special site datasets")
-    parser.add_argument("--len", default=5, help="bed file to extract special site datasets")
+    parser.add_argument('-o',"--output", default="/data/Ecoli_23s/tombo_results", help="output_file")
+    parser.add_argument("--chrom", default='NR_103073.1',help="bed file to extract special site datasets")
+    parser.add_argument("--pos", default=2029, help="bed file to extract special site datasets")
+    parser.add_argument("--len", default=10, help="bed file to extract special site datasets")
     parser.add_argument("--strand", default="+", help="bed file to extract special site datasets")
     parser.add_argument("--cpu", default=4, type=int, help="num of process")
+    parser.add_argument("--ref", default="/data/Ecoli_23s/23S_rRNA.fasta", help="range of plot")
     args = parser.parse_args()
 
+    fasta=read_fasta_to_dic(args.ref)
+    base_list = fasta[args.chrom][args.pos-args.len:args.pos+args.len+1]
 
     results_path = args.output
     if not os.path.exists(results_path):
         os.mkdir(results_path)
-    wt_file=create_read_list_file(args.fast5,results_path)
-    df_wt,_,aligned_num_wt=extract_group(args, wt_file)
-    df_wt['type']='Sample'
+
     ivt_file=create_read_list_file(args.control_fast5,results_path)
-    df_ivt,base_list,aligned_num_ivt=extract_group(args, ivt_file)
+    df_ivt,aligned_num_ivt=extract_group(args, ivt_file)
     df_ivt['type'] = 'Control'
+    wt_file=create_read_list_file(args.fast5,results_path)
+    df_wt,aligned_num_wt=extract_group(args, wt_file)
+    df_wt['type']='Sample'
     df=pd.concat([df_wt,df_ivt])
 
     category_data = [str(args.pos + x) for x in range(-args.len, args.len + 1)]
@@ -242,5 +272,5 @@ if __name__ == '__main__':
 
 
     draw_volin(df,results_path,args.pos,args.len,args.chrom,base_list,aligned_num_wt,aligned_num_ivt,strand="+")
-    draw_volin(df,results_path,args.pos,args.len,args.chrom,base_list,aligned_num_wt,aligned_num_ivt,strand="+")
+    draw_boxplot(df,results_path,args.pos,args.len,args.chrom,base_list,aligned_num_wt,aligned_num_ivt,strand="+")
     print('\nsaved as ', args.output)
