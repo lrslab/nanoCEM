@@ -4,6 +4,13 @@ It supports two re-squiggle pipeline(`Tombo` and `f5c`). From R9 to R10, Tombo/n
 If you want to view single read signal or raw signal, [Squigualiser](https://github.com/hiruna72/squigualiser) is recommended.
 
 ## Still developing
+### TO do list
+1. RNA splicing 
+2. More normalization methods
+3. Test on minus strand or reversed strand
+4. Subsample coverage
+5. single mode
+6. merge images together
 ## What is re-squiggle
 In ONT technology, "resquiggle" refers to the process of converting the raw electrical signals from the sequencer into corresponding DNA/RNA sequence information, which is then corrected and realigned. 
 This process utilizes the signal features of ONT sequencing, such as changes in electrical resistance and noisy signals, to capture information from the DNA/RNA sequence and analyze and interpret it. 
