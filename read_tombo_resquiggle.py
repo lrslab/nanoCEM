@@ -8,7 +8,7 @@ import multiprocessing
 from tqdm import tqdm
 from matplotlib import pyplot as plt
 # from ._stats import c_new_mean_stds
-from normalization import normalize_signal,normalize_signal_with_lim,get_new_means
+from normalization import normalize_signal,normalize_signal_with_lim
 from plot import draw_volin,draw_boxplot
 plt.rcParams['pdf.fonttype'] = 42
 plt.rcParams['font.sans-serif'] = ['Arial']
@@ -123,7 +123,7 @@ def extract_feature(signal, event_start, event_length, base,start_position,end_p
     signal = signal[event_start[0]:event_start[-1]+event_length[-1]]
     event_start = event_start-event_start[0]
 
-    mean=get_new_means(signal,event_start)
+
     norm_signal=normalize_signal_with_lim(signal)
 
     # filter too short or long dwell time
@@ -286,6 +286,6 @@ if __name__ == '__main__':
     df['type'] = df['type'].astype(category)
 
 
-    draw_volin(df,results_path,args.pos,args.len,args.chrom,base_list,aligned_num_wt,aligned_num_ivt,strand="+")
+    # draw_volin(df,results_path,args.pos,args.len,args.chrom,base_list,aligned_num_wt,aligned_num_ivt,strand="+")
     draw_boxplot(df,results_path,args.pos,args.len,args.chrom,base_list,aligned_num_wt,aligned_num_ivt,strand="+")
     print('\nsaved as ', args.output)
