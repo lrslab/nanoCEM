@@ -8,7 +8,7 @@ import multiprocessing
 from tqdm import tqdm
 from matplotlib import pyplot as plt
 # from ._stats import c_new_mean_stds
-from normalization import normalize_signal,normalize_signal_with_lim
+from normalization import normalize_signal,normalize_signal_with_lim,get_new_means
 from plot import draw_volin,draw_boxplot
 plt.rcParams['pdf.fonttype'] = 42
 plt.rcParams['font.sans-serif'] = ['Arial']
@@ -103,7 +103,7 @@ def get_label_raw(fast5_fn, basecall_group, basecall_subgroup ,chromosome, posit
     return (raw_dat, event_bases, event_starts, event_lengths,start_position,strand,chrome)
 
 
-def extract_feature(signal, event_start, length, base,start_position,end_position):
+def extract_feature(signal, event_start, event_length, base,start_position,end_position):
     global BASE_LIST
     position=FLAG.pos
     current_index=position-start_position
@@ -116,19 +116,37 @@ def extract_feature(signal, event_start, length, base,start_position,end_positio
     else:
         end=current_index + FLAG.len + 1
     seq_array = np.array(list(base))
-    assert seq_array.shape == length.shape
+    assert seq_array.shape == event_length.shape
     # uniq_arr = np.unique(signal)
     # signal = (signal - np.median(uniq_arr)) / float(robust.mad(uniq_arr))
     # normalization
+    signal = signal[event_start[0]:event_start[-1]+event_length[-1]]
+    event_start = event_start-event_start[0]
+
+    mean=get_new_means(signal,event_start)
     norm_signal=normalize_signal_with_lim(signal)
+
+    # filter too short or long dwell time
+    dwell_filter_pctls = (5, 95)
+    dwell_min, dwell_max = np.percentile(event_length, dwell_filter_pctls)
+    valid_bases = np.logical_and.reduce(
+        (
+            event_length > dwell_min,
+            event_length < dwell_max,
+            np.logical_not(np.isnan(event_length)),
+        )
+    )
+    event_length[~valid_bases]=0
 
     total_feature_per_reads = []
     # if end >=event_start.shape[0]:
     #     #print(1)
-    raw_signal_every = [norm_signal[event_start[start + x]:event_start[start + x] + length[start + x]] for x in range(end-start)]
+    raw_signal_every = [norm_signal[event_start[start + x]:event_start[start + x] + event_length[start + x]] for x in range(end-start)]
 
     for i, element in enumerate(raw_signal_every):
-        temp = [np.mean(element), np.std(element), np.median(element), length[start + i], position - FLAG.len +i]
+        if event_length[start + i] == 0:
+            continue
+        temp = [np.mean(element), np.std(element), np.median(element), event_length[start + i], position - FLAG.len +i]
         total_feature_per_reads.append(temp)
     total_feature_per_reads=np.array(total_feature_per_reads)
     return total_feature_per_reads
@@ -231,11 +249,11 @@ if __name__ == '__main__':
                         help='The attribute group to extract the training data from. e.g. RawGenomeCorrected_000')
     parser.add_argument('--basecall_subgroup', default='BaseCalled_template',
                         help='Basecall subgroup Nanoraw resquiggle into. Default is BaseCalled_template')
-    parser.add_argument('-i',"--fast5", default='/data/Ecoli_23s/L_rep2/single',
+    parser.add_argument('-i',"--fast5", default='/data/Ecoli_23s/data/IVT_positive/single',
                         help="fast5_file")
-    parser.add_argument('-c',"--control_fast5", default='/data/Ecoli_23s/IVT/single',
+    parser.add_argument('-c',"--control_fast5", default='/data/Ecoli_23s/data/IVT_negative/single',
                         help="fast5_file")
-    parser.add_argument('-o',"--output", default="/data/Ecoli_23s/tombo_results_2030_new", help="output_file")
+    parser.add_argument('-o',"--output", default="/data/Ecoli_23s/tombo_results_2030_positive", help="output_file")
     parser.add_argument("--chrom", default='NR_103073.1',help="bed file to extract special site datasets")
     parser.add_argument("--pos", default=2029, help="bed file to extract special site datasets")
     parser.add_argument("--len", default=10, help="bed file to extract special site datasets")
@@ -266,7 +284,6 @@ if __name__ == '__main__':
 
     category = pd.api.types.CategoricalDtype(categories=['Sample',"Control"], ordered=True)
     df['type'] = df['type'].astype(category)
-    df['Dwell_time'] = np.log10(df['Dwell_time'].values)
 
 
     draw_volin(df,results_path,args.pos,args.len,args.chrom,base_list,aligned_num_wt,aligned_num_ivt,strand="+")

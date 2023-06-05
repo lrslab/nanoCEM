@@ -4,7 +4,7 @@ import pandas as pd
 import pyslow5
 import pysam
 import plotnine as p9
-from normalization import normalize_signal
+from normalization import normalize_signal,normalize_signal_with_lim
 import os
 import argparse
 from plot import draw_boxplot,draw_volin
@@ -78,9 +78,8 @@ def extract_feature(line,position):
         print("Warning: 1 read's length of signal is not equal between blow5 and paf")
         return None
 
-    # normalized signal
+
     signal = read['signal']
-    signal=normalize_signal(signal)
 
     # create event start and flip all table
     signal = signal[start_index:end_index]
@@ -88,6 +87,23 @@ def extract_feature(line,position):
     event_length = np.flip(event_length)
     event_start = event_length.cumsum()
     event_start = np.insert(event_start, 0, 0)[:-1]
+
+    # filter too short or long dwell time
+    dwell_filter_pctls = (5, 95)
+    dwell_min, dwell_max = np.percentile(event_length, dwell_filter_pctls)
+    valid_bases = np.logical_and.reduce(
+        (
+            event_length > dwell_min,
+            event_length < dwell_max,
+            np.logical_not(np.isnan(event_length)),
+        )
+    )
+    event_length[~valid_bases] = 0
+
+    # normalized signal
+    signal = normalize_signal_with_lim(signal)
+
+
 
     # index query and reference
     aligned_pair=info_dict[read_id]['pairs']
@@ -108,9 +124,6 @@ def extract_feature(line,position):
     for i, element in enumerate(raw_signal_every):
         if event_length[read_pos[i]] == 0:
             continue
-        if ref_pos[i] == position:
-            if event_length[i] == 0:
-                return None
         temp = [np.mean(element), np.std(element), np.median(element), event_length[read_pos[i]],ref_pos[i]]
         total_feature_per_reads.append(temp)
     return total_feature_per_reads
@@ -178,10 +191,11 @@ def read_blow5(path,position,length,chromo=None,strand=None):
 #         )
 # print(plot)
 if __name__ == '__main__':
+    global base_list
     parser = argparse.ArgumentParser()
-    parser.add_argument("-i","--input", default='/data/Ecoli_23s/L_rep2/file',
+    parser.add_argument("-i","--input", default='/data/Ecoli_23s/data/L_rep2/file',
                         help="blow5_path")
-    parser.add_argument('-c',"--control", default='/data/Ecoli_23s/IVT/file',
+    parser.add_argument('-c',"--control", default='/data/Ecoli_23s/data/IVT_negative/file',
                         help="control_blow5_path")
     parser.add_argument('-o',"--output", default="/data/Ecoli_23s/f5c_results_2030", help="output_file")
     parser.add_argument("--chrom", default='NR_103073.1',help="bed file to extract special site datasets")
@@ -213,7 +227,7 @@ if __name__ == '__main__':
 
     category = pd.api.types.CategoricalDtype(categories=['Sample',"Control"], ordered=True)
     df['type'] = df['type'].astype(category)
-    df['Dwell_time'] = np.log10(df['Dwell_time'].values)
+    # df['Dwell_time'] = np.log10(df['Dwell_time'].values)
 
     draw_volin(df,results_path,args.pos,args.len,args.chrom,base_list,aligned_num_wt,aligned_num_ivt,strand="+")
     draw_boxplot(df,results_path,args.pos,args.len,args.chrom,base_list,aligned_num_wt,aligned_num_ivt,strand="+")

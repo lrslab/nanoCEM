@@ -6,7 +6,7 @@ If you want to view single read signal or raw signal, [Squigualiser](https://git
 ## Still developing
 ### TO do list
 1. RNA splicing 
-2. More normalization methods
+2. More normalization methods (tombo finished)
 3. Test on minus strand or reversed strand
 4. Subsample coverage
 5. single mode
