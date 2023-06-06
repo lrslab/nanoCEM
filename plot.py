@@ -1,10 +1,12 @@
 import plotnine as p9
 import numpy as np
-
+from matplotlib import pyplot as plt
+plt.rcParams['pdf.fonttype'] = 42
+plt.rcParams['font.sans-serif'] = ['Arial']
 SIG_PCTL_RANGE = (2.5, 97.5)
 def draw_boxplot(df,results_path,pos,leng,chrom,base_list,aligned_num_wt,aligned_num_ivt,strand="+"):
     title = chrom + ':' + str(pos - leng + 1) + '-' + str(pos + leng + 2) + ':' + strand
-    title = title + '   Sample:' + str(aligned_num_wt) + ': Control:' + str(aligned_num_ivt)
+    title = title + '   Sample:' + str(aligned_num_wt) + ' Control:' + str(aligned_num_ivt)
     item_list = ['Mean', 'STD', 'Median', 'Dwell_time']
     plot_list=[]
     for item in item_list:
@@ -32,7 +34,7 @@ def draw_boxplot(df,results_path,pos,leng,chrom,base_list,aligned_num_wt,aligned
 
 def draw_volin(df,results_path,pos,leng,chrom,base_list,aligned_num_wt,aligned_num_ivt,strand="+"):
     title = chrom + ':' + str(pos - leng + 1) + '-' + str(pos + leng + 2) + ':' + strand
-    title = title + '   Sample:' + str(aligned_num_wt) + ': Control:' + str(aligned_num_ivt)
+    title = title + '   Sample:' + str(aligned_num_wt) + '  Control:' + str(aligned_num_ivt)
     item_list = ['Mean', 'STD', 'Median', 'Dwell_time']
     for item in item_list:
 

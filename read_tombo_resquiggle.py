@@ -6,37 +6,15 @@ import argparse
 import os
 import multiprocessing
 from tqdm import tqdm
-from matplotlib import pyplot as plt
+
 # from ._stats import c_new_mean_stds
 from normalization import normalize_signal,normalize_signal_with_lim
+from cm_utils import reverse_fasta
 from plot import draw_volin,draw_boxplot
-plt.rcParams['pdf.fonttype'] = 42
-plt.rcParams['font.sans-serif'] = ['Arial']
 
-from collections import OrderedDict
-def read_fasta_to_dic(filename):
-    """
-    function used to parser small fasta
-    still effective for genome level file
-    """
-    fa_dic = OrderedDict()
+from cm_utils import read_fasta_to_dic
 
-    with open(filename, "r") as f:
-        for n, line in enumerate(f.readlines()):
-            if line.startswith(">"):
-                if n > 0:
-                    fa_dic[short_name] = "".join(seq_l)  # store previous one
 
-                full_name = line.strip().replace(">", "")
-                short_name = full_name.split(" ")[0]
-                seq_l = []
-            else:  # collect the seq lines
-                if len(line) > 8:  # min for fasta file is usually larger than 8
-                    seq_line1 = line.strip()
-                    seq_l.append(seq_line1)
-
-        fa_dic[short_name] = "".join(seq_l)  # store the last one
-    return fa_dic
 
 def matrix_append(total_matrix,new_matrix,index):
     if new_matrix.shape[0]==0:
@@ -51,6 +29,8 @@ def matrix_append(total_matrix,new_matrix,index):
 def get_label_raw(fast5_fn, basecall_group, basecall_subgroup ,chromosome, position,strand):
     ##Open file
     # fast5_fn='/media/zhguo/QUO/ivt_positive/ivt_positive/single/42/878b9de7-043b-4d5e-b194-7771c5767ff5.fast5'
+    # if '4a4438ea-fc46-42aa-9788-8d54f37471b9' not in fast5_fn:
+    #     return None
     try:
         fast5_data = h5py.File(fast5_fn, 'r')
     except IOError:
@@ -103,10 +83,13 @@ def get_label_raw(fast5_fn, basecall_group, basecall_subgroup ,chromosome, posit
     return (raw_dat, event_bases, event_starts, event_lengths,start_position,strand,chrome)
 
 
-def extract_feature(signal, event_start, event_length, base,start_position,end_position):
+def extract_feature(signal, event_start, event_length, base,start_position,end_position,strand):
     global BASE_LIST
     position=FLAG.pos
-    current_index=position-start_position
+    if strand == '+':
+        current_index = position-start_position
+    else:
+        current_index = end_position - position - 1
     if current_index-FLAG.len < 0:
         start = 0
     else:
@@ -115,6 +98,7 @@ def extract_feature(signal, event_start, event_length, base,start_position,end_p
         end=len(event_start)
     else:
         end=current_index + FLAG.len + 1
+
     seq_array = np.array(list(base))
     assert seq_array.shape == event_length.shape
     # uniq_arr = np.unique(signal)
@@ -146,7 +130,11 @@ def extract_feature(signal, event_start, event_length, base,start_position,end_p
     for i, element in enumerate(raw_signal_every):
         if event_length[start + i] == 0:
             continue
-        temp = [np.mean(element), np.std(element), np.median(element), event_length[start + i], position - FLAG.len +i]
+        if strand == '+':
+            final_position = position - FLAG.len + i
+        else:
+            final_position = position + FLAG.len - i
+        temp = [np.mean(element), np.std(element), np.median(element), event_length[start + i], final_position]
         total_feature_per_reads.append(temp)
     total_feature_per_reads=np.array(total_feature_per_reads)
     return total_feature_per_reads
@@ -170,8 +158,8 @@ def extract_file(input_file):
     # ~ print(input_file,raw_start,raw_length,raw_label)
     total_seq = "".join([x.decode() for x in raw_label])
     base_len=raw_label.shape[0]
-    end_position=start_position+base_len
-    matrix_feature = extract_feature(raw_data, raw_start, raw_length, total_seq,start_position,end_position)
+    end_position = start_position+base_len
+    matrix_feature = extract_feature(raw_data, raw_start, raw_length, total_seq,start_position,end_position,strand)
     if matrix_feature is None:
         return None
     del raw_data
@@ -181,7 +169,6 @@ def extract_group(args, total_fl):
     global FLAG,BASE_LIST
     BASE_LIST=None
     FLAG=args
-    output=args.output
     # feature_matrix = np.zeros((1000000,40))
     results_list = []
     ##########
@@ -249,22 +236,24 @@ if __name__ == '__main__':
                         help='The attribute group to extract the training data from. e.g. RawGenomeCorrected_000')
     parser.add_argument('--basecall_subgroup', default='BaseCalled_template',
                         help='Basecall subgroup Nanoraw resquiggle into. Default is BaseCalled_template')
-    parser.add_argument('-i',"--fast5", default='/data/Ecoli_23s/data/IVT_positive/single',
+    parser.add_argument('-i',"--fast5", default='/data/Ecoli_23s/data/L_rep2/single',
                         help="fast5_file")
     parser.add_argument('-c',"--control_fast5", default='/data/Ecoli_23s/data/IVT_negative/single',
                         help="fast5_file")
-    parser.add_argument('-o',"--output", default="/data/Ecoli_23s/tombo_results_2030_positive", help="output_file")
+    parser.add_argument('-o',"--output", default="/data/Ecoli_23s/tombo_results_2030_plus", help="output_file")
     parser.add_argument("--chrom", default='NR_103073.1',help="bed file to extract special site datasets")
     parser.add_argument("--pos", default=2029, help="bed file to extract special site datasets")
     parser.add_argument("--len", default=10, help="bed file to extract special site datasets")
     parser.add_argument("--strand", default="+", help="bed file to extract special site datasets")
     parser.add_argument("--cpu", default=4, type=int, help="num of process")
-    parser.add_argument("--ref", default="/data/Ecoli_23s/23S_rRNA.fasta", help="range of plot")
+    parser.add_argument("--ref", default="/data/Ecoli_23s/23S_rRNA_reverse.fasta", help="range of plot")
     args = parser.parse_args()
 
     fasta=read_fasta_to_dic(args.ref)
     base_list = fasta[args.chrom][args.pos-args.len:args.pos+args.len+1]
-
+    if args.strand == '-':
+        base_list="".join(list(reversed(base_list)))
+        base_list=reverse_fasta(base_list)
     results_path = args.output
     if not os.path.exists(results_path):
         os.mkdir(results_path)
@@ -286,6 +275,6 @@ if __name__ == '__main__':
     df['type'] = df['type'].astype(category)
 
 
-    # draw_volin(df,results_path,args.pos,args.len,args.chrom,base_list,aligned_num_wt,aligned_num_ivt,strand="+")
-    draw_boxplot(df,results_path,args.pos,args.len,args.chrom,base_list,aligned_num_wt,aligned_num_ivt,strand="+")
+    draw_volin(df,results_path,args.pos,args.len,args.chrom,base_list,aligned_num_wt,aligned_num_ivt,strand=args.strand)
+    draw_boxplot(df,results_path,args.pos,args.len,args.chrom,base_list,aligned_num_wt,aligned_num_ivt,strand=args.strand)
     print('\nsaved as ', args.output)
