@@ -7,7 +7,7 @@ from tqdm import tqdm
 from normalization import normalize_signal,normalize_signal_with_lim
 import os
 import argparse
-from plot import draw_boxplot,draw_volin
+from plot import signal_plot
 from cm_utils import read_fasta_to_dic
 from cm_utils import reverse_fasta
 score_dict={}
@@ -173,11 +173,11 @@ if __name__ == '__main__':
     parser.add_argument('-c',"--control", default='/data/Ecoli_23s/data/IVT_negative/file',
                         help="control_blow5_path")
     parser.add_argument('-o',"--output", default="/data/Ecoli_23s/f5c_results_2030_reverse", help="output_file")
-    parser.add_argument("--chrom", default='NR_103073.1',help="bed file to extract special site datasets")
-    parser.add_argument("--pos", default=874, help="position of site")
-    parser.add_argument("--len", default=10, help="range of plot")
-    parser.add_argument("--ref", default="/data/Ecoli_23s/23S_rRNA_reverse.fasta", help="range of plot")
-    parser.add_argument("--strand", default="-", help="bed file to extract special site datasets")
+    parser.add_argument("--chrom", default='NR_103073.1',help="Gene or chromosome name(head of your fasta file)")
+    parser.add_argument("--pos", default=2029, help="site of your interest")
+    parser.add_argument("--len", default=10, help="region around the position")
+    parser.add_argument("--strand", default="+", help="Strand of your interest")
+    parser.add_argument("--ref", default="/data/Ecoli_23s/23S_rRNA_reverse.fasta", help="fasta file")
     args = parser.parse_args()
     FLAG =args
     fasta=read_fasta_to_dic(args.ref)
@@ -205,6 +205,9 @@ if __name__ == '__main__':
     df['type'] = df['type'].astype(category)
     # df['Dwell_time'] = np.log10(df['Dwell_time'].values)
 
-    draw_volin(df,results_path,args.pos,args.len,args.chrom,base_list,aligned_num_wt,aligned_num_ivt,strand=args.strand)
-    draw_boxplot(df,results_path,args.pos,args.len,args.chrom,base_list,aligned_num_wt,aligned_num_ivt,strand=args.strand)
+    title = args.chrom + ':' + str(args.pos - args.len + 1) + '-' + str(args.pos + args.len + 2) + ':' + args.strand
+    title = title + '   Sample:' + str(aligned_num_wt) + '  Control:' + str(aligned_num_ivt)
+
+    signal_plot(df, results_path, args.pos, base_list, title,'boxplot')
+    signal_plot(df, results_path, args.pos, base_list, title, 'violin_plot')
     print('\nsaved as ', args.output)

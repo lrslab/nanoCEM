@@ -10,7 +10,7 @@ from tqdm import tqdm
 # from ._stats import c_new_mean_stds
 from normalization import normalize_signal,normalize_signal_with_lim
 from cm_utils import reverse_fasta
-from plot import draw_volin,draw_boxplot
+from plot import signal_plot
 
 from cm_utils import read_fasta_to_dic
 
@@ -239,14 +239,14 @@ if __name__ == '__main__':
     parser.add_argument('-i',"--fast5", default='/data/Ecoli_23s/data/L_rep2/single',
                         help="fast5_file")
     parser.add_argument('-c',"--control_fast5", default='/data/Ecoli_23s/data/IVT_negative/single',
-                        help="fast5_file")
+                        help="control_fast5_file")
     parser.add_argument('-o',"--output", default="/data/Ecoli_23s/tombo_results_2030_plus", help="output_file")
-    parser.add_argument("--chrom", default='NR_103073.1',help="bed file to extract special site datasets")
-    parser.add_argument("--pos", default=2029, help="bed file to extract special site datasets")
-    parser.add_argument("--len", default=10, help="bed file to extract special site datasets")
-    parser.add_argument("--strand", default="+", help="bed file to extract special site datasets")
+    parser.add_argument("--chrom", default='NR_103073.1',help="Gene or chromosome name(head of your fasta file)")
+    parser.add_argument("--pos", default=2029, help="site of your interest")
+    parser.add_argument("--len", default=10, help="region around the position")
+    parser.add_argument("--strand", default="+", help="Strand of your interest")
     parser.add_argument("--cpu", default=4, type=int, help="num of process")
-    parser.add_argument("--ref", default="/data/Ecoli_23s/23S_rRNA_reverse.fasta", help="range of plot")
+    parser.add_argument("--ref", default="/data/Ecoli_23s/23S_rRNA.fasta", help="fasta file")
     args = parser.parse_args()
 
     fasta=read_fasta_to_dic(args.ref)
@@ -274,7 +274,11 @@ if __name__ == '__main__':
     category = pd.api.types.CategoricalDtype(categories=['Sample',"Control"], ordered=True)
     df['type'] = df['type'].astype(category)
 
+    title = args.chrom + ':' + str(args.pos - args.len + 1) + '-' + str(args.pos + args.len + 2) + ':' + args.strand
+    title = title + '   Sample:' + str(aligned_num_wt) + '  Control:' + str(aligned_num_ivt)
 
-    draw_volin(df,results_path,args.pos,args.len,args.chrom,base_list,aligned_num_wt,aligned_num_ivt,strand=args.strand)
-    draw_boxplot(df,results_path,args.pos,args.len,args.chrom,base_list,aligned_num_wt,aligned_num_ivt,strand=args.strand)
+    # draw_volin(df,results_path,args.pos,base_list,title)
+    # draw_boxplot(df,results_path,args.pos,base_list,title)
+    signal_plot(df, results_path, args.pos, base_list, title,'boxplot')
+    signal_plot(df, results_path, args.pos, base_list, title, 'violin_plot')
     print('\nsaved as ', args.output)
