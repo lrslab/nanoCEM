@@ -174,11 +174,12 @@ if __name__ == '__main__':
                         help="control_blow5_path")
     parser.add_argument('-o',"--output", default="/data/Ecoli_23s/f5c_results_2030_reverse", help="output_file")
     parser.add_argument("--chrom", default='NR_103073.1',help="Gene or chromosome name(head of your fasta file)")
-    parser.add_argument("--pos", default=2029, help="site of your interest")
+    parser.add_argument("--pos", default=2030, help="site of your interest")
     parser.add_argument("--len", default=10, help="region around the position")
     parser.add_argument("--strand", default="+", help="Strand of your interest")
     parser.add_argument("--ref", default="/data/Ecoli_23s/23S_rRNA_reverse.fasta", help="fasta file")
     args = parser.parse_args()
+    args.pos = args.pos -1
     FLAG =args
     fasta=read_fasta_to_dic(args.ref)
     base_list = fasta[args.chrom][args.pos-args.len:args.pos+args.len+1]
@@ -188,7 +189,7 @@ if __name__ == '__main__':
     results_path = args.output
     if not os.path.exists(results_path):
         os.mkdir(results_path)
-    df_ivt,aligned_num_ivt=read_blow5(args.control,args.pos,args.len,args.chrom,args.strand)
+    df_ivt,aligned_num_ivt=read_blow5(args.control,args.pos ,args.len,args.chrom,args.strand)
     df_ivt['type'] = 'Control'
 
     df_wt,aligned_num_wt=read_blow5(args.input,args.pos,args.len,args.chrom,args.strand)
