@@ -19,7 +19,13 @@ In ONT technology, "resquiggle" refers to the process of converting the raw elec
 This process utilizes the signal features of ONT sequencing, such as changes in electrical resistance and noisy signals, to capture information from the DNA/RNA sequence and analyze and interpret it. 
 Although new basecaller program (Guppy/Boinito/Dorado) generated the bam file with move table to record the event index,but  resquiggle is a more fine alignment than the move table in most cases.
 
+## Installation
+Requirement : Python >=3.7
 
+```sh
+pip install -r requirements.txt
+conda install -c bioconda ont_vbz_hdf_plugin
+```
 ## Quick start
 ### Preprocessing
 If you used R10 or want to use the last resquiggle program(f5c v1.2.0),

@@ -2,7 +2,7 @@ import plotnine as p9
 import numpy as np
 from matplotlib import pyplot as plt
 plt.rcParams['pdf.fonttype'] = 42
-plt.rcParams['font.sans-serif'] = ['Arial']
+# plt.rcParams['font.sans-serif'] = ['Arial']
 SIG_PCTL_RANGE = (2.5, 97.5)
 # def draw_boxplot(df,results_path,pos,base_list,title):
 #     item_list = ['Mean', 'STD', 'Median', 'Dwell_time']
