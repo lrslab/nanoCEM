@@ -23,6 +23,8 @@ Although new basecaller program (Guppy/Boinito/Dorado) generated the bam file wi
 Requirement : Python >=3.7
 
 ```sh
+git clone git@github.com:lrslab/Current_Magnifier.git
+cd Current_Magnifier/
 pip install -r requirements.txt
 conda install -c bioconda ont_vbz_hdf_plugin
 ```
@@ -32,7 +34,7 @@ If you used R10 or want to use the last resquiggle program(f5c v1.2.0),
 ```sh
 # if fast5 is single format 
 # single is fast5s-base-directory
-single_to_multi_fast5 -i single/ -s multi -n 1000 --recursive
+single_to_multi_fast5 -i single/ -s multi -n 500 --recursive
 
 slow5tools f2s multi/ -d blow5_dir
 slow5tools merge blow5_dir -o file.blow5
@@ -52,10 +54,12 @@ If you used Tombo(v1.5.0),
 # if fast5 is not single format need to transfer to single format by ont-fast-api
 # single is fast5s-base-directory
 
-tombo preprocess annotate_raw_with_fastqs --fast5-basedir  single/ --fastq-filenames <reads.fastq>
+tombo preprocess annotate_raw_with_fastqs --fast5-basedir  single/ --fastq-filenames <reads.fastq> --processes 16 
+tombo resquiggle single/ <reference-fasta> --processes 16 --num-most-common-errors 5
+# Notes:
+# Tombo resquiggle will take various of time, which means subsample your aligned reads of the special region is recommended
+# Run the Tombo pipeline above for your two sample respective, the SSD disk is recommended 
 
-tombo resquiggle single/ <reference-fasta> --processes 4 --num-most-common-errors 5
-# run the pipeline below for your two sample respective, the SSD disk is recommended 
 python read_tombo_resquiggle.py -i wt/single -c control/single -o tombo_result --chrom NC_000xxx --strand + --pos 3929 --len 5 --cpu 4 --ref reference.fa
 
 ```
