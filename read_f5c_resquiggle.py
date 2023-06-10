@@ -141,12 +141,13 @@ def extract_pairs_pos(bam_file,position,length,chromosome,strand):
 
 
 
-def read_blow5(path,position,length,chromo,strand):
+def read_blow5(path,position,length,chromo,strand,subsapmle_num=500):
     global info_dict,s5,pbar
-    bam_file=path+"_RE.bam"
+    bam_file=path+".bam"
     bam_file=pysam.AlignmentFile(bam_file,'rb')
     info_dict=extract_pairs_pos(bam_file,position,length,chromo,strand)
-
+    if info_dict == {}:
+        raise Exception("There is no read aligned on this position")
     slow5 = path+".blow5"
     s5 = pyslow5.Open(slow5, 'r')
 
@@ -156,6 +157,7 @@ def read_blow5(path,position,length,chromo,strand):
     pbar.close()
     df.dropna(inplace=True)
     num_aligned = df.shape[0]
+    df=df.sample(n=subsapmle_num)
     final_feature=[]
     for item in df["feature"]:
         final_feature.extend(item)
@@ -178,8 +180,9 @@ if __name__ == '__main__':
     parser.add_argument("--len", default=10, help="region around the position")
     parser.add_argument("--strand", default="+", help="Strand of your interest")
     parser.add_argument("--ref", default="/data/Ecoli_23s/23S_rRNA_reverse.fasta", help="fasta file")
+    parser.add_argument("--overplot-number", default=500, help="Number of read will be used to plot")
     args = parser.parse_args()
-    args.pos = args.pos -1
+    args.pos = args.pos - 1
     FLAG =args
     fasta=read_fasta_to_dic(args.ref)
     base_list = fasta[args.chrom][args.pos-args.len:args.pos+args.len+1]
@@ -189,10 +192,11 @@ if __name__ == '__main__':
     results_path = args.output
     if not os.path.exists(results_path):
         os.mkdir(results_path)
-    df_ivt,aligned_num_ivt=read_blow5(args.control,args.pos ,args.len,args.chrom,args.strand)
+    subsapmle_num = args.overplot_number
+    df_ivt,aligned_num_ivt=read_blow5(args.control,args.pos ,args.len,args.chrom,args.strand,subsapmle_num)
     df_ivt['type'] = 'Control'
 
-    df_wt,aligned_num_wt=read_blow5(args.input,args.pos,args.len,args.chrom,args.strand)
+    df_wt,aligned_num_wt=read_blow5(args.input,args.pos,args.len,args.chrom,args.strand,subsapmle_num)
 
     df_wt['type']='Sample'
 

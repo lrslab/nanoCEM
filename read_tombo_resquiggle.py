@@ -6,7 +6,7 @@ import argparse
 import os
 import multiprocessing
 from tqdm import tqdm
-
+import random
 # from ._stats import c_new_mean_stds
 from normalization import normalize_signal,normalize_signal_with_lim
 from cm_utils import reverse_fasta
@@ -165,7 +165,7 @@ def extract_file(input_file):
     del raw_data
     return matrix_feature
 
-def extract_group(args, total_fl):
+def extract_group(args, total_fl,subsapmle_num=500):
     global FLAG,BASE_LIST
     BASE_LIST=None
     FLAG=args
@@ -180,32 +180,32 @@ def extract_group(args, total_fl):
     pool.close()
     ############################
     pbar = tqdm(total=len(total_fl), position=0, leave=True)
-    total_index=0
-    feature_matrix = np.zeros((500000, 5),dtype=float)
-    aligned_num=0
+
+    result_list=[]
     for result_per_read in results_list:
         temp= result_per_read.get()
         if temp is not None:
             feature_per_read = temp
-            aligned_num=aligned_num+1
-            read_len=feature_per_read.shape[0]
-            # npd_file.append(feature_per_read)
-            feature_matrix=matrix_append(feature_matrix,feature_per_read,total_index)
-            total_index=total_index+read_len
+            result_list.append(feature_per_read)
+
 
             del  feature_per_read
         pbar.update(1)
     #############################
     pool.join()
     pbar.close()
-    if total_index == 0:
+
+    aligned_num = len(result_list)
+    result_list=random.sample(result_list,subsapmle_num)
+    final_feature=[]
+    for item in result_list:
+        final_feature.extend(item)
+    df=pd.DataFrame(final_feature)
+    df.columns = ['Mean', 'STD', 'Median', 'Dwell_time', 'position']
+
+    if df.shape[0] == 0:
         raise Exception("can not find basecall_group or basecall_subgroup in fast5 files")
     print('\nextracted ',aligned_num,' aligned reads from fast5 files')
-
-    feature_matrix= feature_matrix[:total_index]
-    df=pd.DataFrame(feature_matrix)
-    df.columns=['Mean','STD','Median','Dwell_time','position']
-    # 去除非数字字符
 
     # 转化为数值
     df['position'] = df['position'].astype(int).astype(str)
@@ -247,8 +247,10 @@ if __name__ == '__main__':
     parser.add_argument("--strand", default="+", help="Strand of your interest")
     parser.add_argument("--cpu", default=4, type=int, help="num of process")
     parser.add_argument("--ref", default="/data/Ecoli_23s/23S_rRNA.fasta", help="fasta file")
+    parser.add_argument("--overplot-number", default=500, help="Number of read will be used to plot")
     args = parser.parse_args()
     args.pos = args.pos - 1
+    subsapmle_num = args.overplot_number
     fasta=read_fasta_to_dic(args.ref)
     base_list = fasta[args.chrom][args.pos-args.len:args.pos+args.len+1]
     if args.strand == '-':
@@ -259,10 +261,10 @@ if __name__ == '__main__':
         os.mkdir(results_path)
 
     ivt_file=create_read_list_file(args.control_fast5,results_path)
-    df_ivt,aligned_num_ivt=extract_group(args, ivt_file)
+    df_ivt,aligned_num_ivt=extract_group(args, ivt_file,subsapmle_num)
     df_ivt['type'] = 'Control'
     wt_file=create_read_list_file(args.fast5,results_path)
-    df_wt,aligned_num_wt=extract_group(args, wt_file)
+    df_wt,aligned_num_wt=extract_group(args, wt_file,subsapmle_num)
     df_wt['type']='Sample'
     df=pd.concat([df_wt,df_ivt])
 

@@ -11,7 +11,7 @@ Here is an example that show the difference of A2030 on 23S rRNA.
 1. RNA splicing 
 2. More normalization methods (finished)
 3. Test on minus strand or reversed strand (finished)
-4. Subsample coverage
+4. Subsample coverage (finished)
 5. single mode
 6. merge images together
 ## What is re-squiggle
