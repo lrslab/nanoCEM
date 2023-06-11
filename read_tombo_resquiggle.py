@@ -281,6 +281,7 @@ if __name__ == '__main__':
 
     # draw_volin(df,results_path,args.pos,base_list,title)
     # draw_boxplot(df,results_path,args.pos,base_list,title)
+    signal_plot(df, results_path, args.pos, base_list, title, 'test')
     signal_plot(df, results_path, args.pos, base_list, title,'boxplot')
     signal_plot(df, results_path, args.pos, base_list, title, 'violin_plot')
     print('\nsaved as ', args.output)

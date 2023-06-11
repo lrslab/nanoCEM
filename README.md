@@ -5,7 +5,7 @@ If you want to view single read signal or raw signal, [Squigualiser](https://git
 ## Example
 Here is an example that show the difference of A2030 on 23S rRNA.
 ![alt text](example/boxplot.png)
-![alt text](example/voilin.png)
+![alt text](example/violin.png)
 ## Still developing
 ### TO do list
 1. RNA splicing 

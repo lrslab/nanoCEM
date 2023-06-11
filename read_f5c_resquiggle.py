@@ -193,26 +193,32 @@ if __name__ == '__main__':
     if not os.path.exists(results_path):
         os.mkdir(results_path)
     subsapmle_num = args.overplot_number
-    df_ivt,aligned_num_ivt=read_blow5(args.control,args.pos ,args.len,args.chrom,args.strand,subsapmle_num)
-    df_ivt['type'] = 'Control'
+
 
     df_wt,aligned_num_wt=read_blow5(args.input,args.pos,args.len,args.chrom,args.strand,subsapmle_num)
 
     df_wt['type']='Sample'
+    try:
+        df_ivt,aligned_num_ivt=read_blow5(args.control,args.pos ,args.len,args.chrom,args.strand,subsapmle_num)
+        df_ivt['type'] = 'Control'
 
-    df=pd.concat([df_wt,df_ivt])
+        df=pd.concat([df_wt,df_ivt])
+        category = pd.api.types.CategoricalDtype(categories=['Sample',"Control"], ordered=True)
+        df['type'] = df['type'].astype(category)
+    except:
+        df = df_wt
 
     category_data = [str(args.pos + x) for x in range(-args.len, args.len + 1)]
     category = pd.api.types.CategoricalDtype(categories=category_data, ordered=True)
     df['position'] = df['position'].astype(category)
 
-    category = pd.api.types.CategoricalDtype(categories=['Sample',"Control"], ordered=True)
-    df['type'] = df['type'].astype(category)
+
     # df['Dwell_time'] = np.log10(df['Dwell_time'].values)
 
     title = args.chrom + ':' + str(args.pos - args.len + 1) + '-' + str(args.pos + args.len + 2) + ':' + args.strand
     title = title + '   Sample:' + str(aligned_num_wt) + '  Control:' + str(aligned_num_ivt)
 
+    signal_plot(df, results_path, args.pos, base_list, title, 'test')
     signal_plot(df, results_path, args.pos, base_list, title,'boxplot')
     signal_plot(df, results_path, args.pos, base_list, title, 'violin_plot')
     print('\nsaved as ', args.output)
