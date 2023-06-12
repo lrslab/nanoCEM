@@ -8,12 +8,12 @@ Here is an example that show the difference of A2030 on 23S rRNA.
 ![alt text](example/violin.png)
 ## Still developing
 ### TO do list
-1. RNA splicing 
-2. More normalization methods (finished)
-3. Test on minus strand or reversed strand (finished)
-4. Subsample coverage (finished)
-5. single mode
-6. merge images together
+1. More normalization methods (finished)
+2. Test on minus strand or reversed strand (finished)
+3. Subsample coverage (finished)
+4. single mode(finished)
+5. merge images together(finished)
+6. test data to github
 ## What is re-squiggle
 In ONT technology, "resquiggle" refers to the process of converting the raw electrical signals from the sequencer into corresponding DNA/RNA sequence information, which is then corrected and realigned. 
 This process utilizes the signal features of ONT sequencing, such as changes in electrical resistance and noisy signals, to capture information from the DNA/RNA sequence and analyze and interpret it. 

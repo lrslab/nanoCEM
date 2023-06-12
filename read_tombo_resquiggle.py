@@ -201,7 +201,7 @@ def extract_group(args, total_fl,subsapmle_num=500):
     for item in result_list:
         final_feature.extend(item)
     df=pd.DataFrame(final_feature)
-    df.columns = ['Mean', 'STD', 'Median', 'Dwell_time', 'position']
+    df.columns = ['Mean', 'STD', 'Median', 'Dwell time', 'position']
 
     if df.shape[0] == 0:
         raise Exception("can not find basecall_group or basecall_subgroup in fast5 files")
@@ -260,28 +260,39 @@ if __name__ == '__main__':
     if not os.path.exists(results_path):
         os.mkdir(results_path)
 
-    ivt_file=create_read_list_file(args.control_fast5,results_path)
-    df_ivt,aligned_num_ivt=extract_group(args, ivt_file,subsapmle_num)
-    df_ivt['type'] = 'Control'
+    title = args.chrom + ':' + str(args.pos - args.len + 1) + '-' + str(args.pos + args.len + 2) + ':' + args.strand
+
     wt_file=create_read_list_file(args.fast5,results_path)
     df_wt,aligned_num_wt=extract_group(args, wt_file,subsapmle_num)
     df_wt['type']='Sample'
-    df=pd.concat([df_wt,df_ivt])
+    try:
+        ivt_file=create_read_list_file(args.control_fast5,results_path)
+        df_ivt,aligned_num_ivt=extract_group(args, ivt_file,subsapmle_num)
+        df_ivt['type'] = 'Control'
+        df=pd.concat([df_wt,df_ivt])
+        title = title + '   Sample:' + str(aligned_num_wt) + '  Control:' + str(aligned_num_ivt)
+        category = pd.api.types.CategoricalDtype(categories=['Sample', "Control"], ordered=True)
+        df['type'] = df['type'].astype(category)
+    except:
+        args.control = None
+    if args.control is None:
+        df = df_wt
+        df_wt['type'] = 'Single'
+        title = title + '   Sample:' + str(aligned_num_wt)
 
     category_data = [str(args.pos + x) for x in range(-args.len, args.len + 1)]
     category = pd.api.types.CategoricalDtype(categories=category_data, ordered=True)
     df['position'] = df['position'].astype(category)
 
 
-    category = pd.api.types.CategoricalDtype(categories=['Sample',"Control"], ordered=True)
-    df['type'] = df['type'].astype(category)
 
-    title = args.chrom + ':' + str(args.pos - args.len + 1) + '-' + str(args.pos + args.len + 2) + ':' + args.strand
-    title = title + '   Sample:' + str(aligned_num_wt) + '  Control:' + str(aligned_num_ivt)
+
+
+
 
     # draw_volin(df,results_path,args.pos,base_list,title)
     # draw_boxplot(df,results_path,args.pos,base_list,title)
-    signal_plot(df, results_path, args.pos, base_list, title, 'test')
+    signal_plot(df, results_path, args.pos, base_list, title, 'merged')
     signal_plot(df, results_path, args.pos, base_list, title,'boxplot')
     signal_plot(df, results_path, args.pos, base_list, title, 'violin_plot')
     print('\nsaved as ', args.output)

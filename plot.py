@@ -61,8 +61,8 @@ SIG_PCTL_RANGE = (2.5, 97.5)
         # print(plot)
 
 def signal_plot(df,results_path,pos,base_list,title,plot_type):
-    item_list = ['Mean', 'STD', 'Median', 'Dwell_time']
-    if plot_type !='test':
+    item_list = ['Mean', 'STD', 'Median', 'Dwell time']
+    if plot_type !='merged':
 
         for item in item_list:
             sig_min, sig_max = np.percentile(df[item], SIG_PCTL_RANGE)
@@ -110,7 +110,7 @@ def signal_plot(df,results_path,pos,base_list,title,plot_type):
 
         plot = p9.ggplot(new_df, p9.aes(x='position', y="value", fill='type')) \
                + p9.theme_bw() \
-               + p9.scale_fill_manual(values={"Sample": "#ff6f91", "Control": "#7389af"}) \
+               + p9.scale_fill_manual(values={"Sample": "#ff6f91", "Control": "#7389af", "Single": "#a3abbd"}) \
                + p9.scale_x_discrete(labels=list(base_list)) \
                + p9.theme(
             figure_size=(8, 8),
@@ -124,8 +124,14 @@ def signal_plot(df,results_path,pos,base_list,title,plot_type):
         ) \
                + p9.facet_grid('stats ~', scales='free_y')
         plot = plot + p9.labs(title=title, x=str(pos + 1), y='')
-        plot1 = plot + p9.geom_boxplot(outlier_shape='', position=p9.position_dodge(0.9), size=0.2,width=0.75)
-        plot1.save(filename=results_path + "/merged_boxplot.pdf", dpi=300)
-        plot2 = plot + p9.geom_violin(style='left-right',position=p9.position_dodge(0),color='none',width=1.5)
-        plot2.save(filename=results_path + "/merged_violin.pdf", dpi=300)
+
+        if new_df['type'].drop_duplicates().shape[0]==1:
+            plot2 = plot + p9.geom_violin(color='none', position=p9.position_dodge(0.9),width=1)
+            plot2 = plot2 + p9.geom_boxplot(outlier_shape='', position=p9.position_dodge(0.9), size=0.2, width=0.1)
+            plot2.save(filename=results_path + "/merged_single.pdf", dpi=300)
+        else:
+            plot1 = plot + p9.geom_boxplot(outlier_shape='', position=p9.position_dodge(0.9), size=0.2, width=0.75)
+            plot1.save(filename=results_path + "/merged_boxplot.pdf", dpi=300)
+            plot2 = plot + p9.geom_violin(style='left-right',position=p9.position_dodge(0),color='none',width=1.5)
+            plot2.save(filename=results_path + "/merged_violin.pdf", dpi=300)
         print(1)
