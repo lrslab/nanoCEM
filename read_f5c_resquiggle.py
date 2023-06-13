@@ -174,7 +174,7 @@ if __name__ == '__main__':
                         help="blow5_path")
     parser.add_argument('-c',"--control", default='/data/Ecoli_23s/data/IVT_negative/file',
                         help="control_blow5_path")
-    parser.add_argument('-o',"--output", default="/data/Ecoli_23s/f5c_results_2030_reverse", help="output_file")
+    parser.add_argument('-o',"--output", default="/data/Ecoli_23s/f5c_results_2030_plus", help="output_file")
     parser.add_argument("--chrom", default='NR_103073.1',help="Gene or chromosome name(head of your fasta file)")
     parser.add_argument("--pos", default=2030, help="site of your interest")
     parser.add_argument("--len", default=10, help="region around the position")

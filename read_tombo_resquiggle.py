@@ -125,6 +125,8 @@ def extract_feature(signal, event_start, event_length, base,start_position,end_p
     total_feature_per_reads = []
     # if end >=event_start.shape[0]:
     #     #print(1)
+    # draw_signal(norm_signal[event_start[start]:event_start[end]], event_start[start:end] - event_start[start],
+    #             base[start:end])
     raw_signal_every = [norm_signal[event_start[start + x]:event_start[start + x] + event_length[start + x]] for x in range(end-start)]
 
     for i, element in enumerate(raw_signal_every):
@@ -163,6 +165,7 @@ def extract_file(input_file):
     if matrix_feature is None:
         return None
     del raw_data
+
     return matrix_feature
 
 def extract_group(args, total_fl,subsapmle_num=500):
@@ -275,7 +278,7 @@ if __name__ == '__main__':
         df['type'] = df['type'].astype(category)
     except:
         args.control = None
-    if args.control is None:
+    if args.control_fast5 is None:
         df = df_wt
         df_wt['type'] = 'Single'
         title = title + '   Sample:' + str(aligned_num_wt)
@@ -283,12 +286,6 @@ if __name__ == '__main__':
     category_data = [str(args.pos + x) for x in range(-args.len, args.len + 1)]
     category = pd.api.types.CategoricalDtype(categories=category_data, ordered=True)
     df['position'] = df['position'].astype(category)
-
-
-
-
-
-
 
     # draw_volin(df,results_path,args.pos,base_list,title)
     # draw_boxplot(df,results_path,args.pos,base_list,title)
