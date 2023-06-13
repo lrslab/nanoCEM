@@ -199,7 +199,8 @@ def extract_group(args, total_fl,subsapmle_num=500):
     pbar.close()
 
     aligned_num = len(result_list)
-    result_list=random.sample(result_list,subsapmle_num)
+    if subsapmle_num < aligned_num:
+        result_list=random.sample(result_list,subsapmle_num)
     final_feature=[]
     for item in result_list:
         final_feature.extend(item)
@@ -245,12 +246,12 @@ if __name__ == '__main__':
                         help="control_fast5_file")
     parser.add_argument('-o',"--output", default="/data/Ecoli_23s/tombo_results_2030_plus", help="output_file")
     parser.add_argument("--chrom", default='NR_103073.1',help="Gene or chromosome name(head of your fasta file)")
-    parser.add_argument("--pos", default=2030, help="site of your interest")
-    parser.add_argument("--len", default=10, help="region around the position")
+    parser.add_argument("--pos", default=2030, type=int,help="site of your interest")
+    parser.add_argument("--len", default=10, type=int, help="region around the position")
     parser.add_argument("--strand", default="+", help="Strand of your interest")
     parser.add_argument("--cpu", default=4, type=int, help="num of process")
     parser.add_argument("--ref", default="/data/Ecoli_23s/23S_rRNA.fasta", help="fasta file")
-    parser.add_argument("--overplot-number", default=500, help="Number of read will be used to plot")
+    parser.add_argument("--overplot-number", default=500, type=int, help="Number of read will be used to plot")
     args = parser.parse_args()
     args.pos = args.pos - 1
     subsapmle_num = args.overplot_number

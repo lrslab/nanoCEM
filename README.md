@@ -34,9 +34,10 @@ If you used R10 or want to use the last resquiggle program(f5c v1.2.0),
 ```sh
 # if fast5 is single format 
 # single is fast5s-base-directory
-single_to_multi_fast5 -i single/ -s multi -n 500 --recursive
+#single_to_multi_fast5 -i single/ -s multi -n 500 --recursive
+#slow5tools f2s multi/ -d blow5_dir
 
-slow5tools f2s multi/ -d blow5_dir
+slow5tools f2s single -d blow5_dir
 slow5tools merge blow5_dir -o file.blow5
 slow5tools index file.blow5
 

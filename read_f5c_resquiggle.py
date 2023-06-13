@@ -157,7 +157,8 @@ def read_blow5(path,position,length,chromo,strand,subsapmle_num=500):
     pbar.close()
     df.dropna(inplace=True)
     num_aligned = df.shape[0]
-    df=df.sample(n=subsapmle_num)
+    if subsapmle_num < df.shape[0]:
+        df=df.sample(n=subsapmle_num)
     final_feature=[]
     for item in df["feature"]:
         final_feature.extend(item)
@@ -176,11 +177,11 @@ if __name__ == '__main__':
                         help="control_blow5_path")
     parser.add_argument('-o',"--output", default="/data/Ecoli_23s/f5c_results_2030_plus", help="output_file")
     parser.add_argument("--chrom", default='NR_103073.1',help="Gene or chromosome name(head of your fasta file)")
-    parser.add_argument("--pos", default=2030, help="site of your interest")
-    parser.add_argument("--len", default=10, help="region around the position")
+    parser.add_argument("--pos", default=2030, type=int, help="site of your interest")
+    parser.add_argument("--len", default=10, type=int, help="region around the position")
     parser.add_argument("--strand", default="+", help="Strand of your interest")
     parser.add_argument("--ref", default="/data/Ecoli_23s/23S_rRNA.fasta", help="fasta file")
-    parser.add_argument("--overplot-number", default=500, help="Number of read will be used to plot")
+    parser.add_argument("--overplot-number", default=500, type=int, help="Number of read will be used to plot")
     args = parser.parse_args()
     args.pos = args.pos - 1
     FLAG =args
