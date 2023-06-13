@@ -236,21 +236,37 @@ def create_read_list_file(path,results_path):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    # parser.add_argument('--basecall_group', default="RawGenomeCorrected_000",
+    #                     help='The attribute group to extract the training data from. e.g. RawGenomeCorrected_000')
+    # parser.add_argument('--basecall_subgroup', default='BaseCalled_template',
+    #                     help='Basecall subgroup Nanoraw resquiggle into. Default is BaseCalled_template')
+    # parser.add_argument('-i',"--fast5", default='/data/Ecoli_23s/data/L_rep2/single',
+    #                     help="fast5_file")
+    # parser.add_argument('-c',"--control_fast5", default='/data/Ecoli_23s/data/IVT_negative/single',
+    #                     help="control_fast5_file")
+    # parser.add_argument('-o',"--output", default="/data/Ecoli_23s/tombo_results_2030_plus", help="output_file")
+    # parser.add_argument("--chrom", default='NR_103073.1',help="Gene or chromosome name(head of your fasta file)")
+    # parser.add_argument("--pos", default=2030, type=int,help="site of your interest")
+    # parser.add_argument("--len", default=10, type=int, help="region around the position")
+    # parser.add_argument("--strand", default="+", help="Strand of your interest")
+    # parser.add_argument('-t',"--cpu", default=4, type=int, help="num of process")
+    # parser.add_argument("--ref", default="/data/Ecoli_23s/23S_rRNA.fasta", help="fasta file")
+    # parser.add_argument("--overplot-number", default=500, type=int, help="Number of read will be used to plot")
     parser.add_argument('--basecall_group', default="RawGenomeCorrected_000",
                         help='The attribute group to extract the training data from. e.g. RawGenomeCorrected_000')
     parser.add_argument('--basecall_subgroup', default='BaseCalled_template',
                         help='Basecall subgroup Nanoraw resquiggle into. Default is BaseCalled_template')
-    parser.add_argument('-i',"--fast5", default='/data/Ecoli_23s/data/L_rep2/single',
+    parser.add_argument('-i',"--fast5", required=True,
                         help="fast5_file")
-    parser.add_argument('-c',"--control_fast5", default='/data/Ecoli_23s/data/IVT_negative/single',
+    parser.add_argument('-c',"--control_fast5",
                         help="control_fast5_file")
-    parser.add_argument('-o',"--output", default="/data/Ecoli_23s/tombo_results_2030_plus", help="output_file")
-    parser.add_argument("--chrom", default='NR_103073.1',help="Gene or chromosome name(head of your fasta file)")
-    parser.add_argument("--pos", default=2030, type=int,help="site of your interest")
+    parser.add_argument('-o',"--output", default="tombo_result", help="output_file")
+    parser.add_argument("--chrom", required=True, help="Gene or chromosome name(head of your fasta file)")
+    parser.add_argument("--pos", required=True, type=int,help="site of your interest")
     parser.add_argument("--len", default=10, type=int, help="region around the position")
     parser.add_argument("--strand", default="+", help="Strand of your interest")
-    parser.add_argument("--cpu", default=4, type=int, help="num of process")
-    parser.add_argument("--ref", default="/data/Ecoli_23s/23S_rRNA.fasta", help="fasta file")
+    parser.add_argument('-t',"--cpu", default=4, type=int, help="num of process")
+    parser.add_argument("--ref", required=True, help="fasta file")
     parser.add_argument("--overplot-number", default=500, type=int, help="Number of read will be used to plot")
     args = parser.parse_args()
     args.pos = args.pos - 1

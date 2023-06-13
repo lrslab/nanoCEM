@@ -28,6 +28,51 @@ cd Current_Magnifier/
 pip install -r requirements.txt
 conda install -c bioconda ont_vbz_hdf_plugin
 ```
+## Options
+### read_tombo_resquiggle
+```sh
+python read_tombo_resquiggle.py -h
+optional arguments:
+  -h, --help            show this help message and exit
+  --basecall_group BASECALL_GROUP
+                        The attribute group to extract the training data from. e.g. RawGenomeCorrected_000
+  --basecall_subgroup BASECALL_SUBGROUP
+                        Basecall subgroup Nanoraw resquiggle into. Default is BaseCalled_template
+  -i FAST5, --fast5 FAST5
+                        fast5_file
+  -c CONTROL_FAST5, --control_fast5 CONTROL_FAST5
+                        control_fast5_file
+  -o OUTPUT, --output OUTPUT
+                        output_file
+  --chrom CHROM         Gene or chromosome name(head of your fasta file)
+  --pos POS             site of your interest
+  --len LEN             region around the position (default:10)
+  --strand STRAND       Strand of your interest (default:+)
+  -t CPU, --cpu CPU     num of process (default:8)
+  --ref REF             fasta file
+  --overplot-number OVERPLOT_NUMBER (default:500)
+                        Number of read will be used to plot
+```
+### read_f5c_resquiggle
+```sh
+python read_f5c_resquiggle.py -h
+optional arguments:
+  -h, --help            show this help message and exit
+  -i INPUT, --input INPUT
+                        path and suffix of blow5, bam file and paf files
+  -c CONTROL, --control CONTROL
+                        control path and suffix of blow5, bam file and paf files
+  -o OUTPUT, --output OUTPUT
+                        output_file
+  --chrom CHROM         Gene or chromosome name(head of your fasta file)
+  --pos POS             site of your interest
+  --len LEN             region around the position (default:10)
+  --strand STRAND       Strand of your interest (default:+)
+  --ref REF             fasta file
+  --overplot-number OVERPLOT_NUMBER (default:500)
+                        Number of read will be used to plot
+
+```
 ## Quick start
 ### Preprocessing
 If you used R10 or want to use the last resquiggle program(f5c v1.2.0),
