@@ -31,7 +31,7 @@ conda install -c bioconda ont_vbz_hdf_plugin
 ## Options
 ### read_tombo_resquiggle
 ```sh
-python main.py tombo -h
+python CE_magnifier.py tombo -h
 optional arguments:
   -h, --help            show this help message and exit
   --basecall_group BASECALL_GROUP
@@ -55,7 +55,7 @@ optional arguments:
 ```
 ### read_f5c_resquiggle
 ```sh
-python main.py f5c -h
+python CE_magnifier.py f5c -h
 optional arguments:
   -h, --help            show this help message and exit
   -i INPUT, --input INPUT
@@ -92,7 +92,7 @@ samtools index file.bam
 f5c resquiggle -c final.fastq file.blow5 -o file.paf
 
 # run the pipeline below for your two sample respective and keep the suffix of bam/paf/blow5 is the same
-python main.py f5c -i wt/file -c control/file -o f5c_result --chrom NC_000xxx --strand + --pos 3929 --len 5 --ref reference.fa
+python CE_magnifier.py f5c -i wt/file -c control/file -o f5c_result --chrom NC_000xxx --strand + --pos 3929 --len 5 --ref reference.fa
 
 ```
 If you used Tombo(v1.5.0),
@@ -106,7 +106,7 @@ tombo resquiggle single/ <reference-fasta> --processes 16 --num-most-common-erro
 # Tombo resquiggle will take various of time, which means subsample your aligned reads of the special region is recommended
 # Run the Tombo pipeline above for your two sample respective, the SSD disk is recommended 
 
-python main.py tombo -i wt/single -c control/single -o tombo_result --chrom NC_000xxx --strand + --pos 3929 --len 5 --cpu 4 --ref reference.fa
+python CE_magnifier.py tombo -i wt/single -c control/single -o tombo_result --chrom NC_000xxx --strand + --pos 3929 --len 5 --cpu 4 --ref reference.fa
 
 ```
 

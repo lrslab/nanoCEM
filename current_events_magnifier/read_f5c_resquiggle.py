@@ -4,12 +4,9 @@ import pandas as pd
 import pyslow5
 import pysam
 from tqdm import tqdm
-from normalization import normalize_signal,normalize_signal_with_lim
+from current_events_magnifier.normalization import normalize_signal,normalize_signal_with_lim
 import os
 import argparse
-from plot import signal_plot,draw_signal
-from cm_utils import read_fasta_to_dic
-from cm_utils import reverse_fasta
 score_dict={}
 
 def extract_feature(line,strand):

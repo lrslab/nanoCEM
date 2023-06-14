@@ -1,8 +1,9 @@
+#!/usr/bin/env python
 import argparse
 import os
-from cm_utils import read_fasta_to_dic,reverse_fasta
+from current_events_magnifier.cem_utils import read_fasta_to_dic,reverse_fasta
 import pandas as pd
-from plot import signal_plot
+from current_events_magnifier.plot import signal_plot
 def init_parser():
     def add_public_argument(parser_input):
         parser_input.add_argument("--chrom", required=True, help="Gene or chromosome name(head of your fasta file)")
@@ -60,7 +61,7 @@ if __name__ == '__main__':
     if args.function == 'tombo' :
 
         from  read_tombo_resquiggle import create_read_list_file,extract_group
-        wt_file = create_read_list_file(args.fast5, results_path)
+        wt_file = create_read_list_file(args.input_fast5, results_path)
         df_wt, aligned_num_wt = extract_group(args, wt_file, subsample_num)
         df_wt['type'] = 'Sample'
         try:
@@ -77,7 +78,7 @@ if __name__ == '__main__':
             df = df_wt
             df_wt['type'] = 'Single'
             title = title + '   Sample:' + str(aligned_num_wt)
-    else:
+    elif args.function == 'f5c':
         from read_f5c_resquiggle import read_blow5
         df_wt, aligned_num_wt = read_blow5(args.input, args.pos, args.len, args.chrom, args.strand, subsample_num)
         df_wt['type'] = 'Sample'

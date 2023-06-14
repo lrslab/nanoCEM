@@ -8,11 +8,7 @@ import multiprocessing
 from tqdm import tqdm
 import random
 # from ._stats import c_new_mean_stds
-from normalization import normalize_signal,normalize_signal_with_lim
-from cm_utils import reverse_fasta
-from plot import signal_plot
-
-from cm_utils import read_fasta_to_dic
+from current_events_magnifier.normalization import normalize_signal,normalize_signal_with_lim
 
 
 
@@ -221,7 +217,7 @@ def create_read_list_file(path,results_path):
     if path[0] == '/':
         path = path
     else:
-        path = os.path.abspath('.') + '/' + path
+        path = os.path.abspath('..') + '/' + path
     if path[-1] == '/':
         path = path[:-1]
     total_fl = []

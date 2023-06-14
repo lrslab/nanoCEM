@@ -134,7 +134,6 @@ def signal_plot(df,results_path,pos,base_list,title,plot_type):
             plot1.save(filename=results_path + "/merged_boxplot.pdf", dpi=300)
             plot2 = plot + p9.geom_violin(style='left-right',position=p9.position_dodge(0),color='none',width=1.5)
             plot2.save(filename=results_path + "/merged_violin.pdf", dpi=300)
-        print(1)
 
 def draw_signal(df,start,base):
     df=pd.DataFrame(df)
