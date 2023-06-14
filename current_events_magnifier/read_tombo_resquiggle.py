@@ -214,10 +214,6 @@ def extract_group(args, total_fl,subsapmle_num=500):
 
 
 def create_read_list_file(path,results_path):
-    if path[0] == '/':
-        path = path
-    else:
-        path = os.path.abspath('..') + '/' + path
     if path[-1] == '/':
         path = path[:-1]
     total_fl = []
