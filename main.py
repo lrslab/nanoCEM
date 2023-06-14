@@ -18,7 +18,6 @@ def init_parser():
 
     # tombo subparser
     parser_tombo = subparsers.add_parser('tombo', help='tackle tombo re-squiggle')
-    parser_tombo.add_argument('--input', type=str, help='Input for Function1')
     parser_tombo.add_argument('--basecall_group', default="RawGenomeCorrected_000",
                         help='The attribute group to extract the training data from. e.g. RawGenomeCorrected_000')
     parser_tombo.add_argument('--basecall_subgroup', default='BaseCalled_template',
