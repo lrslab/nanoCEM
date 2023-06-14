@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="current_events_magnifier",
-    version="0.2.3.2",
+    version="0.0.1",
     author="GUO Zhihao",
     author_email="qhuozhihao@icloud.com",
     description='A sample tool designed to visualize the features that distinguish between two groups of ONT data at the site level.\
