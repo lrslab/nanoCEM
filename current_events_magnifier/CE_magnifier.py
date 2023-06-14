@@ -60,7 +60,7 @@ if __name__ == '__main__':
     title = args.chrom + ':' + str(args.pos - args.len + 1) + '-' + str(args.pos + args.len + 2) + ':' + args.strand
     if args.function == 'tombo' :
 
-        from  read_tombo_resquiggle import create_read_list_file,extract_group
+        from  current_events_magnifier.read_tombo_resquiggle import create_read_list_file,extract_group
         wt_file = create_read_list_file(args.input_fast5, results_path)
         df_wt, aligned_num_wt = extract_group(args, wt_file, subsample_num)
         df_wt['type'] = 'Sample'
@@ -73,13 +73,13 @@ if __name__ == '__main__':
             category = pd.api.types.CategoricalDtype(categories=['Sample', "Control"], ordered=True)
             df['type'] = df['type'].astype(category)
         except:
-            args.control = None
+            args.control_fast5 = None
         if args.control_fast5 is None:
             df = df_wt
             df_wt['type'] = 'Single'
             title = title + '   Sample:' + str(aligned_num_wt)
     elif args.function == 'f5c':
-        from read_f5c_resquiggle import read_blow5
+        from current_events_magnifier.read_f5c_resquiggle import read_blow5
         df_wt, aligned_num_wt = read_blow5(args.input, args.pos, args.len, args.chrom, args.strand, subsample_num)
         df_wt['type'] = 'Sample'
         try:

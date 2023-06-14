@@ -90,6 +90,8 @@ def signal_plot(df,results_path,pos,base_list,title,plot_type):
             else:
                 raise Exception("Unsupported figure type!")
             # plot.render_matplotlib()
+            if item=='Dwell time':
+                item='Dwell_time'
             plot.save(filename=results_path + "/" + item + "_"+plot_type+".pdf", dpi=300)
     else:
         new_df=None
