@@ -22,8 +22,8 @@ def init_parser():
                         help='The attribute group to extract the training data from. e.g. RawGenomeCorrected_000')
     parser_tombo.add_argument('--basecall_subgroup', default='BaseCalled_template',
                         help='Basecall subgroup Nanoraw resquiggle into. Default is BaseCalled_template')
-    parser_tombo.add_argument('-i', "--fast5", required=True,
-                        help="fast5_file")
+    parser_tombo.add_argument('-i', "--input_fast5", required=True,
+                        help="input_fast5_file")
     parser_tombo.add_argument('-c', "--control_fast5",
                         help="control_fast5_file")
     parser_tombo.add_argument('-o', "--output", default="tombo_result", help="output_file")
