@@ -7,12 +7,12 @@ from tqdm import tqdm
 from normalization import normalize_signal,normalize_signal_with_lim
 import os
 import argparse
-from plot import signal_plot
+from plot import signal_plot,draw_signal
 from cm_utils import read_fasta_to_dic
 from cm_utils import reverse_fasta
 score_dict={}
 
-def extract_feature(line):
+def extract_feature(line,strand):
     pbar.update(1)
     read_id = line[0]
     # if read_id !='562eeb47-2b86-4fc7-abfc-5dce62f511ed':
@@ -85,7 +85,8 @@ def extract_feature(line):
     # index query and reference
     aligned_pair=info_dict[read_id]['pairs']
     qlen = info_dict[read_id]['query_length']
-    if FLAG.strand =='+':
+
+    if strand =='+':
         gap = qlen - event_length.shape[0]
         aligned_pair[0] = aligned_pair[0] - gap
         aligned_pair = aligned_pair[aligned_pair[0] >= 0]
@@ -101,6 +102,8 @@ def extract_feature(line):
     try:
         raw_signal_every = [signal[event_starts[x]:event_starts[x] + event_length[x]] for x in
                             read_pos]
+        # if aligned_pair.shape[0] < 11:
+        #     draw_signal(signal[event_starts[read_pos[0]]:event_starts[read_pos[-1]+1]], event_starts[read_pos[0]:read_pos[-1]+1]-event_starts[read_pos[0]], base_list)
     except Exception:
         print(1)
     # calculate mean median and dwell time
@@ -153,7 +156,7 @@ def read_blow5(path,position,length,chromo,strand,subsapmle_num=500):
 
     df=pd.read_csv(path+".paf",sep='\t',header=None)
     pbar = tqdm(total=df.shape[0], position=0, leave=True)
-    df["feature"] = df.apply(extract_feature,axis=1)
+    df["feature"] = df.apply(extract_feature,strand=strand,axis=1)
     pbar.close()
     df.dropna(inplace=True)
     num_aligned = df.shape[0]
@@ -168,61 +171,59 @@ def read_blow5(path,position,length,chromo,strand,subsapmle_num=500):
     print('\nextracted ', num_aligned, ' aligned reads from fast5 files')
     return final_feature,num_aligned
 
-if __name__ == '__main__':
-    global FLAG
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-i","--input", default='/data/Ecoli_23s/data/L_rep2/file',
-                        help="blow5_path")
-    parser.add_argument('-c',"--control", default='/data/Ecoli_23s/data/IVT_negative/file',
-                        help="control_blow5_path")
-    parser.add_argument('-o',"--output", default="/data/Ecoli_23s/f5c_results_2030_plus", help="output_file")
-    parser.add_argument("--chrom", default='NR_103073.1',help="Gene or chromosome name(head of your fasta file)")
-    parser.add_argument("--pos", default=2030, type=int, help="site of your interest")
-    parser.add_argument("--len", default=10, type=int, help="region around the position")
-    parser.add_argument("--strand", default="+", help="Strand of your interest")
-    parser.add_argument("--ref", default="/data/Ecoli_23s/23S_rRNA.fasta", help="fasta file")
-    parser.add_argument("--overplot-number", default=500, type=int, help="Number of read will be used to plot")
-    args = parser.parse_args()
-    args.pos = args.pos - 1
-    FLAG =args
-    fasta=read_fasta_to_dic(args.ref)
-    base_list = fasta[args.chrom][args.pos-args.len:args.pos+args.len+1]
-    if args.strand == '-':
-        base_list="".join(list(reversed(base_list)))
-        base_list=reverse_fasta(base_list)
-    results_path = args.output
-    if not os.path.exists(results_path):
-        os.mkdir(results_path)
-    subsample_num = args.overplot_number
-
-    title = args.chrom + ':' + str(args.pos - args.len + 1) + '-' + str(args.pos + args.len + 2) + ':' + args.strand
-    df_wt,aligned_num_wt=read_blow5(args.input,args.pos,args.len,args.chrom,args.strand,subsample_num)
-
-    df_wt['type']='Sample'
-    try:
-        df_ivt,aligned_num_ivt=read_blow5(args.control,args.pos ,args.len,args.chrom,args.strand,subsample_num)
-        df_ivt['type'] = 'Control'
-
-        df=pd.concat([df_wt,df_ivt])
-        category = pd.api.types.CategoricalDtype(categories=['Sample',"Control"], ordered=True)
-        df['type'] = df['type'].astype(category)
-
-        title = title + '   Sample:' + str(aligned_num_wt) + '  Control:' + str(aligned_num_ivt)
-    except:
-        args.control=None
-    if args.control is None:
-        df = df_wt
-        df_wt['type'] = 'Single'
-        title = title + '   Sample:' + str(aligned_num_wt)
-
-    category_data = [str(args.pos + x) for x in range(-args.len, args.len + 1)]
-    category = pd.api.types.CategoricalDtype(categories=category_data, ordered=True)
-    df['position'] = df['position'].astype(category)
-
-
-    # df['Dwell_time'] = np.log10(df['Dwell_time'].values)
-
-    signal_plot(df, results_path, args.pos, base_list, title, 'merged')
-    signal_plot(df, results_path, args.pos, base_list, title,'boxplot')
-    signal_plot(df, results_path, args.pos, base_list, title, 'violin_plot')
-    print('\nsaved as ', args.output)
+# if __name__ == '__main__':
+#     parser = argparse.ArgumentParser()
+#     parser.add_argument("-i","--input", default='/data/Ecoli_23s/data/L_rep2/file',
+#                         help="blow5_path")
+#     parser.add_argument('-c',"--control", default='/data/Ecoli_23s/data/IVT_negative/file',
+#                         help="control_blow5_path")
+#     parser.add_argument('-o',"--output", default="/data/Ecoli_23s/f5c_results_2030_plus", help="output_file")
+#     parser.add_argument("--chrom", default='NR_103073.1',help="Gene or chromosome name(head of your fasta file)")
+#     parser.add_argument("--pos", default=2030, type=int, help="site of your interest")
+#     parser.add_argument("--len", default=5, type=int, help="region around the position")
+#     parser.add_argument("--strand", default="+", help="Strand of your interest")
+#     parser.add_argument("--ref", default="/data/Ecoli_23s/23S_rRNA.fasta", help="fasta file")
+#     parser.add_argument("--overplot-number", default=500, type=int, help="Number of read will be used to plot")
+#     args = parser.parse_args()
+#     args.pos = args.pos - 1
+#     fasta=read_fasta_to_dic(args.ref)
+#     base_list = fasta[args.chrom][args.pos-args.len:args.pos+args.len+1]
+#     if args.strand == '-':
+#         base_list="".join(list(reversed(base_list)))
+#         base_list=reverse_fasta(base_list)
+#     results_path = args.output
+#     if not os.path.exists(results_path):
+#         os.mkdir(results_path)
+#     subsample_num = args.overplot_number
+#
+#     title = args.chrom + ':' + str(args.pos - args.len + 1) + '-' + str(args.pos + args.len + 2) + ':' + args.strand
+#     df_wt,aligned_num_wt=read_blow5(args.input,args.pos,args.len,args.chrom,args.strand,subsample_num)
+#
+#     df_wt['type']='Sample'
+#     try:
+#         df_ivt,aligned_num_ivt=read_blow5(args.control,args.pos ,args.len,args.chrom,args.strand,subsample_num)
+#         df_ivt['type'] = 'Control'
+#
+#         df=pd.concat([df_wt,df_ivt])
+#         category = pd.api.types.CategoricalDtype(categories=['Sample',"Control"], ordered=True)
+#         df['type'] = df['type'].astype(category)
+#
+#         title = title + '   Sample:' + str(aligned_num_wt) + '  Control:' + str(aligned_num_ivt)
+#     except:
+#         args.control=None
+#     if args.control is None:
+#         df = df_wt
+#         df_wt['type'] = 'Single'
+#         title = title + '   Sample:' + str(aligned_num_wt)
+#
+#     category_data = [str(args.pos + x) for x in range(-args.len, args.len + 1)]
+#     category = pd.api.types.CategoricalDtype(categories=category_data, ordered=True)
+#     df['position'] = df['position'].astype(category)
+#
+#
+#     # df['Dwell_time'] = np.log10(df['Dwell_time'].values)
+#
+#     signal_plot(df, results_path, args.pos, base_list, title, 'merged')
+#     signal_plot(df, results_path, args.pos, base_list, title,'boxplot')
+#     signal_plot(df, results_path, args.pos, base_list, title, 'violin_plot')
+#     print('\nsaved as ', args.output)

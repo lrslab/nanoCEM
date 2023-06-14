@@ -157,6 +157,6 @@ def draw_signal(df,start,base):
     for item in start:
         plot=plot+p9.geom_vline(xintercept=item, linetype='dashed', color='red')
     print(base)
-    plot.save(filename="/home/zhguo/Dropbox/@labfiles/projects/GUO/ONT_showcase_tool/plot/norm_signal_aligned.pdf", dpi=300)
+    # plot.save(filename="/home/zhguo/Dropbox/@labfiles/projects/GUO/ONT_showcase_tool/plot/norm_signal_aligned.pdf", dpi=300)
 
     print(1)
