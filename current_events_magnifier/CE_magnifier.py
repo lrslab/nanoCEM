@@ -4,6 +4,10 @@ import os
 from current_events_magnifier.cem_utils import read_fasta_to_dic,reverse_fasta
 import pandas as pd
 from current_events_magnifier.plot import signal_plot
+from plotnine.exceptions import PlotnineWarning
+import warnings
+warnings.filterwarnings("ignore", category=PlotnineWarning)
+
 def init_parser():
     def add_public_argument(parser_input):
         parser_input.add_argument("--chrom", required=True, help="Gene or chromosome name(head of your fasta file)")
@@ -49,7 +53,12 @@ if __name__ == '__main__':
     args.pos = args.pos - 1
     subsample_num = args.overplot_number
     fasta = read_fasta_to_dic(args.ref)
+    # length filter
+    length_gene = len(fasta[args.chrom])
+    if args.pos + args.len + 1 >= length_gene or args.pos - args.len <= 0:
+        raise Exception("The position requested is too close to the border (pos-len>0 and pos+len<length of fasta)")
     base_list = fasta[args.chrom][args.pos - args.len:args.pos + args.len + 1]
+
     if args.strand == '-':
         base_list = "".join(list(reversed(base_list)))
         base_list = reverse_fasta(base_list)
