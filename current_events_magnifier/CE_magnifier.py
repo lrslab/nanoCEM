@@ -114,7 +114,8 @@ if __name__ == '__main__':
 
     # draw_volin(df,results_path,args.pos,base_list,title)
     # draw_boxplot(df,results_path,args.pos,base_list,title)
+    print("Start to generate plots and save  in "+ results_path)
     signal_plot(df, results_path, args.pos, base_list, title, 'merged')
     signal_plot(df, results_path, args.pos, base_list, title, 'boxplot')
     signal_plot(df, results_path, args.pos, base_list, title, 'violin_plot')
-    print('\nsaved as ', args.output)
+    print('finished')

@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="current_events_magnifier",
-    version="0.0.3.4",
+    version="0.0.3.5",
     author="GUO Zhihao",
     author_email="qhuozhihao@icloud.com",
     description='A sample tool designed to visualize the features that distinguish between two groups of ONT data at the site level.\
@@ -19,7 +19,7 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.7',
+    python_requires='>=3.7,<3.10',
     install_requires=[
         'h5py==3.8.0',
         'numpy>=1.23.0',

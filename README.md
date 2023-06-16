@@ -20,18 +20,16 @@ This process utilizes the signal features of ONT sequencing, such as changes in 
 Although new basecaller program (Guppy/Boinito/Dorado) generated the bam file with move table to record the event index,but  resquiggle is a more fine alignment than the move table in most cases.
 
 ## Installation
-Requirement : Python >=3.7
+Requirement : Python >=3.7, <3.10
 
 ```sh
-git clone git@github.com:lrslab/Current_Magnifier.git
-cd Current_Magnifier/
-pip install -r requirements.txt
-conda install -c bioconda ont_vbz_hdf_plugin
+pip install current_events_magnifier==0.0.3.5
+conda install -c bioconda ont_vbz_hdf_plugin f5c slow5tools
 ```
 ## Options
 ### read_tombo_resquiggle
 ```sh
-python CE_magnifier.py tombo -h
+CE_magnifier.py tombo -h
 optional arguments:
   -h, --help            show this help message and exit
   --basecall_group BASECALL_GROUP
@@ -55,7 +53,7 @@ optional arguments:
 ```
 ### read_f5c_resquiggle
 ```sh
-python CE_magnifier.py f5c -h
+CE_magnifier.py f5c -h
 optional arguments:
   -h, --help            show this help message and exit
   -i INPUT, --input INPUT

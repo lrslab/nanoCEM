@@ -13,7 +13,7 @@ tombo preprocess annotate_raw_with_fastqs --fast5-basedir single/ --fastq-filena
 tombo resquiggle single/ ../23S_rRNA.fasta --processes 16 --num-most-common-errors 5 --overwrite
 cd ../../
 
-python read_tombo_resquiggle.py -i data/wt/single -c data/ivt/single -o tombo_result --chrom NR_103073.1 --strand '+' --pos 2030 --len 10 --cpu 4 --ref data/23S_rRNA.fasta
+CE_magnifier.py tombo -i data/wt/single -c data/ivt/single -o tombo_result --chrom NR_103073.1 --strand '+' --pos 2030 --len 10 --cpu 4 --ref data/23S_rRNA.fasta
 
 ## read f5c pipeline
 cd data/ivt/
@@ -34,4 +34,4 @@ samtools index file.bam
 f5c resquiggle -c final.fastq file.blow5 -o file.paf
 cd ../../
 
-python read_f5c_resquiggle.py -i data/wt/file -c data/ivt/file -o f5c_result --chrom NR_103073.1 --strand '+' --pos 2030 --len 10 --ref data/23S_rRNA.fasta
+CE_magnifier.py f5c -i data/wt/file -c data/ivt/file -o f5c_result --chrom NR_103073.1 --strand '+' --pos 2030 --len 10 --ref data/23S_rRNA.fasta
