@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="current_events_magnifier",
-    version="0.0.3.5",
+    version="0.0.3.6",
     author="GUO Zhihao",
     author_email="qhuozhihao@icloud.com",
     description='A sample tool designed to visualize the features that distinguish between two groups of ONT data at the site level.\
@@ -29,5 +29,5 @@ setup(
         "pysam>=0.21.0",
         "pyslow5>=1.0.0"
     ],
-    scripts=['current_events_magnifier/CE_magnifier.py']
+    scripts=['current_events_magnifier/CE_magnifier.py','current_events_magnifier/extract_sub_fast5_from_bam.py']
 )
