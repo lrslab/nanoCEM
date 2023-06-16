@@ -5,6 +5,7 @@ If you want to view single read signal or raw signal, [Squigualiser](https://git
 ## Data format
 Since the release of the R10, ONT's data formats have become more diverse, including the initial fast5 format, the new pod5 format, and community-provided slow5/blow5 formats. The relationship between them and conversion tools are shown in the following figure.
 ![alt text](example/data_format.png)
+
 In our program, we assume that the input provided by the user is in the multi-fast5 format by default.
 ## Example
 Here is an example that show the difference of A2030 on 23S rRNA.
