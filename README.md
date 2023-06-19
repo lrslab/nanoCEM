@@ -23,6 +23,7 @@ Although new basecaller program (Guppy/Boinito/Dorado) generated the bam file wi
 ### Data format
 Since the release of the R10, ONT's data formats have become more diverse, including the initial fast5 format, the new pod5 format, and community-provided slow5/blow5 formats. The relationship between them and conversion tools are shown in the following figure.
 ![alt text](example/data_format.png)
+
 In our program, we assume that the input provided by the user is in the **multi-fast5** format by default.
 ### Reference and alignment
 For RNA showcase, the expected input for the vast majority of species is a fasta file of transcripts, rather than the genome. This is because RNA undergoes splicing and other phenomena after transcription, allowing a single gene to produce multiple different transcripts with varying splicing forms and exon compositions.
