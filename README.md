@@ -84,8 +84,8 @@ cat guppy_out/*/*.fastq > all.fastq
 Option ```-c``` means config file ,which will depend on your data
 ### Decide the chrom or transcript name and region of your interest
 In this sample, I plot the 23s rRNA whose header in fasta file is NR_103073.1 and I am intereted in A2030 on the plus strand.
-So for the following command , I used ```--chrom NR_103073.1  --pos A2030 --strand +```
-### 1. F5c resquiggle (v1.2)
+So for the following command , I used ```--chrom NR_103073.1  --pos A2030 --strand +```.
+### 1. F5c resquiggle (v1.2) (support R10)
 Step 1 and 2 should run on your two sample respectively, before the step 3.
 1. Data format conversion.
 ```sh
