@@ -128,7 +128,7 @@ After obtaining the single-format fast5 files and bam files , we provide a scrip
 ```sh
 minimap2 -ax map-ont -t 16 --MD reference.fasta all.fastq | samtools view -hbS -F 260 - | samtools sort -@ 6 -o file.bam
 samtools index file.bam
-extract_sub_fast5_from_bam.py -i single/ -o subsample_single/ --chrom NR_103073.1 --pos 2030 
+extract_sub_fast5_from_bam.py -i single/ -o subsample_single/ -b file.bam --chrom NR_103073.1 --pos 2030 
 ```
 3. Run tombo resquiggle
 ```sh
