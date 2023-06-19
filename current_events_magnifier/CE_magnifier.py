@@ -107,6 +107,8 @@ if __name__ == '__main__':
             df = df_wt
             df_wt['type'] = 'Single'
             title = title + '   Sample:' + str(aligned_num_wt)
+    else:
+        raise Exception("Wrong work flow")
 
     category_data = [str(args.pos + x) for x in range(-args.len, args.len + 1)]
     category = pd.api.types.CategoricalDtype(categories=category_data, ordered=True)
