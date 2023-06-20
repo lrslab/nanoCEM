@@ -97,7 +97,7 @@ slow5tools index file.blow5
 ```sh
 minimap2 -ax map-ont -t 16 --MD reference.fasta all.fastq | samtools view -hbS -F 260 - | samtools sort -@ 6 -o file.bam
 samtools index file.bam
-f5c resquiggle -c final.fastq file.blow5 -o file.paf
+f5c resquiggle -c all.fastq file.blow5 -o file.paf
 ```
 3. Run current_events_magnifier to plot
 ```sh
