@@ -132,12 +132,12 @@ def signal_plot(df, results_path, pos, base_list, title, plot_type):
         if new_df['type'].drop_duplicates().shape[0] == 1:
             plot2 = plot + p9.geom_violin(color='none', position=p9.position_dodge(0.9), width=1)
             plot2 = plot2 + p9.geom_boxplot(outlier_shape='', position=p9.position_dodge(0.9), size=0.2, width=0.1)
-            plot2.save(filename=results_path + "/merged_single.pdf", dpi=300)
+            plot2.save(filename=results_path + "/Merged_single.pdf", dpi=300)
         else:
             plot1 = plot + p9.geom_boxplot(outlier_shape='', position=p9.position_dodge(0.9), size=0.2, width=0.75)
-            plot1.save(filename=results_path + "/merged_boxplot.pdf", dpi=300)
+            plot1.save(filename=results_path + "/Merged_boxplot.pdf", dpi=300)
             plot2 = plot + p9.geom_violin(style='left-right', position=p9.position_dodge(0), color='none', width=1.5)
-            plot2.save(filename=results_path + "/merged_violin.pdf", dpi=300)
+            plot2.save(filename=results_path + "/Merged_violin.pdf", dpi=300)
 
 
 def draw_signal(df, start, base):

@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 import argparse
 import os
-from current_events_magnifier.cem_utils import read_fasta_to_dic,reverse_fasta
+from cem_utils import read_fasta_to_dic,reverse_fasta
 import pandas as pd
-from current_events_magnifier.plot import signal_plot
+from plot import signal_plot
 from plotnine.exceptions import PlotnineWarning
 import warnings
 import time
@@ -44,7 +44,7 @@ def init_parser():
     parser_f5c.add_argument('-c', "--control",
                         help="control_blow5_path")
     parser_f5c.add_argument('-o', "--output", default="f5c_result", help="output_file")
-    parser_f5c.add_argument('--kmer_model', type=int, default=5, help="output_file")
+    parser_f5c.add_argument('--kmer_model',type=int, default=5, help="output_file")
     add_public_argument(parser_f5c)
 
     return parser
@@ -61,27 +61,31 @@ if __name__ == '__main__':
     # length filter
     length_gene = len(fasta[args.chrom])
     if args.pos + args.len + 1 >= length_gene or args.pos - args.len <= 0:
-        raise Exception("The position requested is too close to the border (pos-len>0 and pos+len<length of fasta)")
+        raise RuntimeError("The position requested is too close to the border (pos-len>0 and pos+len<length of fasta)")
     base_list = fasta[args.chrom][args.pos - args.len:args.pos + args.len + 1].upper()
 
     if args.strand == '-':
         base_list = "".join(list(reversed(base_list)))
         base_list = reverse_fasta(base_list)
 
+    title = args.chrom + ':' + str(args.pos - args.len + 1) + '-' + str(args.pos + args.len + 2) + ':' + args.strand
     if args.rna:
         base_list = base_list.replace("T", "U")
         print("Running RNA mode ...")
+        title ='RNA  ' + title
     else:
         print("Running DNA mode ...")
+        title = 'DNA  ' + title
 
     results_path = args.output
     if not os.path.exists(results_path):
         os.mkdir(results_path)
     else:
-        print("Output file existed! It will be overwrite after 5 secs")
+        print("Output file existed! It will be overwrite after 5 secs ...")
         time.sleep(5)
+        print("Continue ...")
 
-    title = args.chrom + ':' + str(args.pos - args.len + 1) + '-' + str(args.pos + args.len + 2) + ':' + args.strand
+
     if args.function == 'tombo' :
 
         from  current_events_magnifier.read_tombo_resquiggle import create_read_list_file,extract_group
@@ -104,26 +108,26 @@ if __name__ == '__main__':
             title = title + '   Sample:' + str(aligned_num_wt)
     elif args.function == 'f5c':
         from current_events_magnifier.read_f5c_resquiggle import read_blow5
-        df_wt, aligned_num_wt,nucleotide_type = read_blow5(args.input, args.pos, args.len, args.chrom, args.strand,\
-                                                           args.rna, args.kmer_model, subsample_num)
+        df_wt, aligned_num_wt,nucleotide_type = read_blow5(args.input, args.pos, args.len, args.chrom, args.strand,args.rna,args.kmer_model,subsample_num)
         df_wt['type'] = 'Sample'
+        if nucleotide_type=='RNA' and not args.rna:
+            raise RuntimeError("You need to add --rna to turn on the rna mode")
         try:
-            df_ivt, aligned_num_ivt,_ = read_blow5(args.control, args.pos, args.len, args.chrom, args.strand,\
-                                                 args.rna, args.kmer_model, subsample_num)
+            df_ivt, aligned_num_ivt,_ = read_blow5(args.control, args.pos, args.len, args.chrom, args.strand,
+                                                 args.rna,args.kmer_model,subsample_num)
             df_ivt['type'] = 'Control'
 
             df = pd.concat([df_wt, df_ivt])
             category = pd.api.types.CategoricalDtype(categories=['Sample', "Control"], ordered=True)
             df['type'] = df['type'].astype(category)
 
-            title = nucleotide_type+" "+title + '   Sample:' + str(aligned_num_wt) + '  Control:' + str(aligned_num_ivt)
+            title = title + '   Sample:' + str(aligned_num_wt) + '  Control:' + str(aligned_num_ivt)
         except:
             args.control = None
         if args.control is None:
             df = df_wt
             df_wt['type'] = 'Single'
             title = title + '   Sample:' + str(aligned_num_wt)
-
 
     category_data = [str(args.pos + x) for x in range(-args.len, args.len + 1)]
     category = pd.api.types.CategoricalDtype(categories=category_data, ordered=True)

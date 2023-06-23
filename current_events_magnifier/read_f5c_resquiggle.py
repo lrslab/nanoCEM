@@ -86,7 +86,7 @@ def extract_feature(line,strand):
     event_length[~valid_bases] = 0
 
     # normalized signal
-    # signal = normalize_signal_with_lim(signal)
+    signal = normalize_signal_with_lim(signal)
 
     # index query and reference
     aligned_pair=info_dict[read_id]['pairs']
@@ -192,7 +192,7 @@ def read_blow5(path,position,length,chromo,strand,rna_mode,kmer_model=5,subsapml
             final_feature['position']=final_feature['position'] + (kmer_model-1)
 
     final_feature['position'] = final_feature['position'].astype(int).astype(str)
-    print('\nextracted ', num_aligned, ' aligned reads from fast5 files')
+    print('\nextracted ', num_aligned, ' aligned reads from blow5 files')
     return final_feature,num_aligned,nucleotide_type
 
 # if __name__ == '__main__':
