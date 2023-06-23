@@ -44,6 +44,7 @@ def init_parser():
     parser_f5c.add_argument('-c', "--control",
                         help="control_blow5_path")
     parser_f5c.add_argument('-o', "--output", default="f5c_result", help="output_file")
+    parser_f5c.add_argument('--kmer_model', type=int, default=5, help="output_file")
     add_public_argument(parser_f5c)
 
     return parser
@@ -103,11 +104,12 @@ if __name__ == '__main__':
             title = title + '   Sample:' + str(aligned_num_wt)
     elif args.function == 'f5c':
         from current_events_magnifier.read_f5c_resquiggle import read_blow5
-        df_wt, aligned_num_wt,nucleotide_type = read_blow5(args.input, args.pos, args.len, args.chrom, args.strand,args.rna,subsample_num)
+        df_wt, aligned_num_wt,nucleotide_type = read_blow5(args.input, args.pos, args.len, args.chrom, args.strand,\
+                                                           args.rna, args.kmer_model, subsample_num)
         df_wt['type'] = 'Sample'
         try:
-            df_ivt, aligned_num_ivt,_ = read_blow5(args.control, args.pos, args.len, args.chrom, args.strand,
-                                                 args.rna,subsample_num)
+            df_ivt, aligned_num_ivt,_ = read_blow5(args.control, args.pos, args.len, args.chrom, args.strand,\
+                                                 args.rna, args.kmer_model, subsample_num)
             df_ivt['type'] = 'Control'
 
             df = pd.concat([df_wt, df_ivt])

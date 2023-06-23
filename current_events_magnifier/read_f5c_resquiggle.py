@@ -157,15 +157,15 @@ def extract_pairs_pos(bam_file,position,length,chromosome,strand):
 
 
 
-def read_blow5(path,position,length,chromo,strand,rna_mode,subsapmle_num=500):
+def read_blow5(path,position,length,chromo,strand,rna_mode,kmer_model=5,subsapmle_num=500):
     global info_dict,s5,pbar
     bam_file=path+".bam"
     bam_file=pysam.AlignmentFile(bam_file,'rb')
     if rna_mode:
         if strand =='+':
-            position=position+4
+            position=position+ (kmer_model-1)
         else:
-            position=position-4
+            position=position- (kmer_model-1)
     info_dict=extract_pairs_pos(bam_file,position,length,chromo,strand)
     if info_dict == {}:
         raise Exception("There is no read aligned on this position")
@@ -187,9 +187,9 @@ def read_blow5(path,position,length,chromo,strand,rna_mode,subsapmle_num=500):
     final_feature.columns=['Mean','STD','Median','Dwell time','position']
     if rna_mode:
         if strand == '+':
-            final_feature['position']=final_feature['position'] - 4
+            final_feature['position']=final_feature['position'] - (kmer_model-1)
         else:
-            final_feature['position']=final_feature['position'] + 4
+            final_feature['position']=final_feature['position'] + (kmer_model-1)
 
     final_feature['position'] = final_feature['position'].astype(int).astype(str)
     print('\nextracted ', num_aligned, ' aligned reads from fast5 files')
