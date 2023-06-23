@@ -161,11 +161,11 @@ def read_blow5(path,position,length,chromo,strand,rna_mode,kmer_model=5,subsapml
     global info_dict,s5,pbar
     bam_file=path+".bam"
     bam_file=pysam.AlignmentFile(bam_file,'rb')
-    if rna_mode:
-        if strand =='+':
-            position=position+ (kmer_model-1)
-        else:
-            position=position- (kmer_model-1)
+    # if rna_mode:
+    #     if strand =='+':
+    #         position=position+ (kmer_model-1)
+    #     else:
+    #         position=position- (kmer_model-1)
     info_dict=extract_pairs_pos(bam_file,position,length,chromo,strand)
     if info_dict == {}:
         raise Exception("There is no read aligned on this position")
@@ -185,11 +185,11 @@ def read_blow5(path,position,length,chromo,strand,rna_mode,kmer_model=5,subsapml
         final_feature.extend(item)
     final_feature=pd.DataFrame(final_feature)
     final_feature.columns=['Mean','STD','Median','Dwell time','position']
-    if rna_mode:
-        if strand == '+':
-            final_feature['position']=final_feature['position'] - (kmer_model-1)
-        else:
-            final_feature['position']=final_feature['position'] + (kmer_model-1)
+    # if rna_mode:
+    #     if strand == '+':
+    #         final_feature['position']=final_feature['position'] - (kmer_model-1)
+    #     else:
+    #         final_feature['position']=final_feature['position'] + (kmer_model-1)
 
     final_feature['position'] = final_feature['position'].astype(int).astype(str)
     print('\nextracted ', num_aligned, ' aligned reads from blow5 files')
