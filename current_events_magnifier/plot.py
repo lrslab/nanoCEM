@@ -112,7 +112,6 @@ def signal_plot(df, results_path, pos, base_list, title, plot_type):
                 new_df = temp
             else:
                 new_df = pd.concat([new_df, temp], axis=0)
-
         plot = p9.ggplot(new_df, p9.aes(x='position', y="value", fill='type')) \
                + p9.theme_bw() \
                + p9.scale_fill_manual(values={"Sample": "#ff6f91", "Control": "#7389af", "Single": "#a3abbd"}) \

@@ -6,6 +6,7 @@ import pandas as pd
 from current_events_magnifier.plot import signal_plot
 from plotnine.exceptions import PlotnineWarning
 import warnings
+import time
 warnings.filterwarnings("ignore", category=PlotnineWarning)
 
 def init_parser():
@@ -17,6 +18,7 @@ def init_parser():
         parser_input.add_argument("--ref", required=True, help="fasta file")
         parser_input.add_argument("--overplot-number", default=500, type=int,
                                   help="Number of read will be used to plot")
+        parser_input.add_argument('--rna', action='store_true', help='RNA mode')
     # Define the argument parser
     parser = argparse.ArgumentParser(description='A sample tool designed to visualize the features that distinguish between two groups of ONT data at the site level. It supports two re-squiggle pipeline(Tombo and f5c).')
     subparsers = parser.add_subparsers(dest='function')
@@ -39,10 +41,11 @@ def init_parser():
     parser_f5c = subparsers.add_parser('f5c', help='tackle f5c re-squiggle')
     parser_f5c.add_argument("-i", "--input", required=True,
                         help="blow5_path")
-    parser_f5c.add_argument('-c', "--control", required=True,
+    parser_f5c.add_argument('-c', "--control",
                         help="control_blow5_path")
     parser_f5c.add_argument('-o', "--output", default="f5c_result", help="output_file")
     add_public_argument(parser_f5c)
+
     return parser
 
 if __name__ == '__main__':
@@ -50,6 +53,7 @@ if __name__ == '__main__':
     parser = init_parser()
     args = parser.parse_args()
 
+    # read reference
     args.pos = args.pos - 1
     subsample_num = args.overplot_number
     fasta = read_fasta_to_dic(args.ref)
@@ -57,14 +61,24 @@ if __name__ == '__main__':
     length_gene = len(fasta[args.chrom])
     if args.pos + args.len + 1 >= length_gene or args.pos - args.len <= 0:
         raise Exception("The position requested is too close to the border (pos-len>0 and pos+len<length of fasta)")
-    base_list = fasta[args.chrom][args.pos - args.len:args.pos + args.len + 1]
+    base_list = fasta[args.chrom][args.pos - args.len:args.pos + args.len + 1].upper()
 
     if args.strand == '-':
         base_list = "".join(list(reversed(base_list)))
         base_list = reverse_fasta(base_list)
+
+    if args.rna:
+        base_list = base_list.replace("T", "U")
+        print("Running RNA mode ...")
+    else:
+        print("Running DNA mode ...")
+
     results_path = args.output
     if not os.path.exists(results_path):
         os.mkdir(results_path)
+    else:
+        print("Output file existed! It will be overwrite after 5 secs")
+        time.sleep(5)
 
     title = args.chrom + ':' + str(args.pos - args.len + 1) + '-' + str(args.pos + args.len + 2) + ':' + args.strand
     if args.function == 'tombo' :
@@ -89,26 +103,25 @@ if __name__ == '__main__':
             title = title + '   Sample:' + str(aligned_num_wt)
     elif args.function == 'f5c':
         from current_events_magnifier.read_f5c_resquiggle import read_blow5
-        df_wt, aligned_num_wt = read_blow5(args.input, args.pos, args.len, args.chrom, args.strand, subsample_num)
+        df_wt, aligned_num_wt,nucleotide_type = read_blow5(args.input, args.pos, args.len, args.chrom, args.strand,args.rna,subsample_num)
         df_wt['type'] = 'Sample'
         try:
-            df_ivt, aligned_num_ivt = read_blow5(args.control, args.pos, args.len, args.chrom, args.strand,
-                                                 subsample_num)
+            df_ivt, aligned_num_ivt,_ = read_blow5(args.control, args.pos, args.len, args.chrom, args.strand,
+                                                 args.rna,subsample_num)
             df_ivt['type'] = 'Control'
 
             df = pd.concat([df_wt, df_ivt])
             category = pd.api.types.CategoricalDtype(categories=['Sample', "Control"], ordered=True)
             df['type'] = df['type'].astype(category)
 
-            title = title + '   Sample:' + str(aligned_num_wt) + '  Control:' + str(aligned_num_ivt)
+            title = nucleotide_type+" "+title + '   Sample:' + str(aligned_num_wt) + '  Control:' + str(aligned_num_ivt)
         except:
             args.control = None
         if args.control is None:
             df = df_wt
             df_wt['type'] = 'Single'
             title = title + '   Sample:' + str(aligned_num_wt)
-    else:
-        raise Exception("Wrong work flow")
+
 
     category_data = [str(args.pos + x) for x in range(-args.len, args.len + 1)]
     category = pd.api.types.CategoricalDtype(categories=category_data, ordered=True)

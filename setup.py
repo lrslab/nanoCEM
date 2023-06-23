@@ -27,7 +27,8 @@ setup(
         'plotnine>=0.8.0',
         'tqdm>=4.62.0',
         "pysam>=0.21.0",
-        "pyslow5>=1.0.0"
+        "pyslow5>=1.0.0",
+        "vbz_h5py_plugin>=1.0.1"
     ],
     scripts=['current_events_magnifier/CE_magnifier.py','current_events_magnifier/extract_sub_fast5_from_bam.py']
 )
