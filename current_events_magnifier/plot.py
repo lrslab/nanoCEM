@@ -63,7 +63,7 @@ SIG_PCTL_RANGE = (2.5, 97.5)
 #         plot.save(filename=results_path + "/" + item + "_violin.pdf", dpi=300)
 # print(plot)
 
-def signal_plot(df, results_path, pos, base_list, title, plot_type):
+def signal_plot(df, results_path, pos, base_list, title, plot_type,filter=False):
     item_list = ['Mean', 'STD', 'Median', 'Dwell time']
 
 
@@ -107,11 +107,11 @@ def signal_plot(df, results_path, pos, base_list, title, plot_type):
             temp = df[[item, 'position', 'type']].copy()
             temp.columns = ['value', 'position', 'type']
             temp.loc[:, 'stats'] = item
-            # if df[df['position'] == pos].shape[0] > 50:
-            #     sig_min, sig_max = np.percentile(temp['value'], SIG_PCTL_RANGE)
-            #     sig_diff = sig_max - sig_min
-            #     ylim_tuple = [sig_min - sig_diff * 0.1, sig_max + sig_diff * 0.1]
-            #     temp = temp[(temp['value'] >= ylim_tuple[0]) & (temp['value'] <= ylim_tuple[1])]
+            if filter and item!='Dwell time':
+                sig_min, sig_max = np.percentile(temp['value'], SIG_PCTL_RANGE)
+                sig_diff = sig_max - sig_min
+                ylim_tuple = [sig_min - sig_diff * 0.1, sig_max + sig_diff * 0.1]
+                temp = temp[(temp['value'] >= ylim_tuple[0]) & (temp['value'] <= ylim_tuple[1])]
             if new_df is None:
                 new_df = temp
             else:

@@ -44,7 +44,7 @@ def init_parser():
     parser_f5c.add_argument('-c', "--control",
                         help="control_blow5_path")
     parser_f5c.add_argument('-o', "--output", default="f5c_result", help="output_file")
-    parser_f5c.add_argument('--base_shift',type=int, default=0, help="base shift if required")
+    parser_f5c.add_argument('--base_shift',type=int, default=0, help="output_file")
     add_public_argument(parser_f5c)
 
     return parser
@@ -149,7 +149,11 @@ if __name__ == '__main__':
             args.pos = args.pos - args.base_shift
         else:
             args.pos = args.pos + args.base_shift
-    signal_plot(df, results_path, args.pos, base_list, title, 'merged')
+    percentile_filter=False
+    if aligned_num_wt>50 and aligned_num_ivt>50:
+        percentile_filter=True
+
+    signal_plot(df, results_path, args.pos, base_list, title, 'merged',percentile_filter)
     signal_plot(df, results_path, args.pos, base_list, title, 'boxplot')
     signal_plot(df, results_path, args.pos, base_list, title, 'violin_plot')
     print('finished')
