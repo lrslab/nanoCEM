@@ -8,7 +8,7 @@ from plotnine.exceptions import PlotnineWarning
 import warnings
 import time
 warnings.filterwarnings("ignore", category=PlotnineWarning)
-
+import numpy as np
 def init_parser():
     def add_public_argument(parser_input):
         parser_input.add_argument("--chrom", required=True, help="Gene or chromosome name(head of your fasta file)")
@@ -108,13 +108,13 @@ if __name__ == '__main__':
             title = title + '   Sample:' + str(aligned_num_wt)
     elif args.function == 'f5c':
         from current_events_magnifier.read_f5c_resquiggle import read_blow5
-        df_wt, aligned_num_wt,nucleotide_type = read_blow5(args.input, args.pos, args.len, args.chrom, args.strand,args.rna,args.kmer_model,subsample_num)
+        df_wt, aligned_num_wt,nucleotide_type = read_blow5(args.input, args.pos, args.len, args.chrom, args.strand,args.kmer_model,subsample_num)
         df_wt['type'] = 'Sample'
         if nucleotide_type=='RNA' and not args.rna:
             raise RuntimeError("You need to add --rna to turn on the rna mode")
         try:
             df_ivt, aligned_num_ivt,_ = read_blow5(args.control, args.pos, args.len, args.chrom, args.strand,
-                                                 args.rna,args.kmer_model,subsample_num)
+                                                 args.kmer_model,subsample_num)
             df_ivt['type'] = 'Control'
 
             df = pd.concat([df_wt, df_ivt])

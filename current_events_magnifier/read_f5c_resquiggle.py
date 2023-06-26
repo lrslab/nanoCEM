@@ -74,16 +74,16 @@ def extract_feature(line,strand):
     event_starts = np.insert(event_starts, 0, 0)[:-1]
 
     # filter too short or long dwell time
-    dwell_filter_pctls = (2.5, 97.5)
-    dwell_min, dwell_max = np.percentile(event_length, dwell_filter_pctls)
-    valid_bases = np.logical_and.reduce(
-        (
-            event_length > dwell_min,
-            event_length < dwell_max,
-            np.logical_not(np.isnan(event_length)),
-        )
-    )
-    event_length[~valid_bases] = 0
+    # dwell_filter_pctls = (0.5, 99.5)
+    # dwell_min, dwell_max = np.percentile(event_length, dwell_filter_pctls)
+    # valid_bases = np.logical_and.reduce(
+    #     (
+    #         event_length > dwell_min,
+    #         event_length < dwell_max,
+    #         np.logical_not(np.isnan(event_length)),
+    #     )
+    # )
+    # event_length[~valid_bases] = 0
 
     # normalized signal
     signal = normalize_signal_with_lim(signal)
@@ -157,7 +157,7 @@ def extract_pairs_pos(bam_file,position,length,chromosome,strand):
 
 
 
-def read_blow5(path,position,length,chromo,strand,rna_mode,kmer_model=5,subsapmle_num=500):
+def read_blow5(path,position,length,chromo,strand,kmer_model=5,subsapmle_num=500):
     global info_dict,s5,pbar
     bam_file=path+".bam"
     bam_file=pysam.AlignmentFile(bam_file,'rb')
@@ -193,6 +193,12 @@ def read_blow5(path,position,length,chromo,strand,rna_mode,kmer_model=5,subsapml
 
     final_feature['position'] = final_feature['position'].astype(int).astype(str)
     print('\nextracted ', num_aligned, ' aligned reads from blow5 files')
+
+    if num_aligned>50:
+        dwell_filter_pctls = (2.5, 97.5)
+        dwell_min, dwell_max = np.percentile(final_feature['Dwell time'].values, dwell_filter_pctls)
+        final_feature = final_feature[(final_feature['Dwell time'] > dwell_min) & (final_feature['Dwell time'] < dwell_max)]
+
     return final_feature,num_aligned,nucleotide_type
 
 # if __name__ == '__main__':

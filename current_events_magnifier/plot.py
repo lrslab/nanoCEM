@@ -65,6 +65,8 @@ SIG_PCTL_RANGE = (2.5, 97.5)
 
 def signal_plot(df, results_path, pos, base_list, title, plot_type):
     item_list = ['Mean', 'STD', 'Median', 'Dwell time']
+
+
     if plot_type != 'merged':
 
         for item in item_list:
@@ -98,20 +100,23 @@ def signal_plot(df, results_path, pos, base_list, title, plot_type):
             plot.save(filename=results_path + "/" + item + "_" + plot_type + ".pdf", dpi=300)
     else:
         new_df = None
+
+
         for item in item_list:
             # collect data
             temp = df[[item, 'position', 'type']].copy()
             temp.columns = ['value', 'position', 'type']
             temp.loc[:, 'stats'] = item
-
-            sig_min, sig_max = np.percentile(temp['value'], SIG_PCTL_RANGE)
-            sig_diff = sig_max - sig_min
-            ylim_tuple = [sig_min - sig_diff * 0.1, sig_max + sig_diff * 0.1]
-            temp = temp[(temp['value'] >= ylim_tuple[0]) & (temp['value'] <= ylim_tuple[1])]
+            # if df[df['position'] == pos].shape[0] > 50:
+            #     sig_min, sig_max = np.percentile(temp['value'], SIG_PCTL_RANGE)
+            #     sig_diff = sig_max - sig_min
+            #     ylim_tuple = [sig_min - sig_diff * 0.1, sig_max + sig_diff * 0.1]
+            #     temp = temp[(temp['value'] >= ylim_tuple[0]) & (temp['value'] <= ylim_tuple[1])]
             if new_df is None:
                 new_df = temp
             else:
                 new_df = pd.concat([new_df, temp], axis=0)
+
         plot = p9.ggplot(new_df, p9.aes(x='position', y="value", fill='type')) \
                + p9.theme_bw() \
                + p9.scale_fill_manual(values={"Sample": "#ff6f91", "Control": "#7389af", "Single": "#a3abbd"}) \
@@ -134,9 +139,9 @@ def signal_plot(df, results_path, pos, base_list, title, plot_type):
             plot2 = plot2 + p9.geom_boxplot(outlier_shape='', position=p9.position_dodge(0.9), size=0.2, width=0.1)
             plot2.save(filename=results_path + "/Merged_single.pdf", dpi=300)
         else:
-            plot1 = plot + p9.geom_boxplot(outlier_shape='', position=p9.position_dodge(0.9), size=0.2, width=0.75)
+            plot1 = plot + p9.geom_boxplot(outlier_shape='', position=p9.position_dodge(0.9), size=0.2, width=0.75,alpha = 0.8)
             plot1.save(filename=results_path + "/Merged_boxplot.pdf", dpi=300)
-            plot2 = plot + p9.geom_violin(style='left-right', position=p9.position_dodge(0), color='none', width=1.5)
+            plot2 = plot + p9.geom_violin(style='left-right', position=p9.position_dodge(0), color='none', width=1.5,alpha = 0.8)
             plot2.save(filename=results_path + "/Merged_violin.pdf", dpi=300)
 
 

@@ -100,30 +100,30 @@ def extract_feature(signal, event_start, event_length, base,start_position,end_p
     # uniq_arr = np.unique(signal)
     # signal = (signal - np.median(uniq_arr)) / float(robust.mad(uniq_arr))
     # normalization
-    signal = signal[event_start[0]:event_start[-1]+event_length[-1]]
+
+    signal = signal[event_start[0]:event_start[-1] + event_length[-1]]
     event_start = event_start-event_start[0]
-
-
-    norm_signal=normalize_signal_with_lim(signal)
+    signal = normalize_signal_with_lim(signal)
 
     # filter too short or long dwell time
-    dwell_filter_pctls = (5, 95)
-    dwell_min, dwell_max = np.percentile(event_length, dwell_filter_pctls)
-    valid_bases = np.logical_and.reduce(
-        (
-            event_length > dwell_min,
-            event_length < dwell_max,
-            np.logical_not(np.isnan(event_length)),
-        )
-    )
-    event_length[~valid_bases]=0
+    # dwell_filter_pctls = (5, 95)
+    # dwell_min, dwell_max = np.percentile(event_length, dwell_filter_pctls)
+    # valid_bases = np.logical_and.reduce(
+    #     (
+    #         event_length > dwell_min,
+    #         event_length < dwell_max,
+    #         np.logical_not(np.isnan(event_length)),
+    #     )
+    # )
+    # event_length[~valid_bases]=0
+
 
     total_feature_per_reads = []
     # if end >=event_start.shape[0]:
     #     #print(1)
     # draw_signal(norm_signal[event_start[start]:event_start[end]], event_start[start:end] - event_start[start],
     #             base[start:end])
-    raw_signal_every = [norm_signal[event_start[start + x]:event_start[start + x] + event_length[start + x]] for x in range(end-start)]
+    raw_signal_every = [signal[event_start[start + x]:event_start[start + x] + event_length[start + x]] for x in range(end-start)]
 
     for i, element in enumerate(raw_signal_every):
         if event_length[start + i] == 0:
@@ -137,7 +137,7 @@ def extract_feature(signal, event_start, event_length, base,start_position,end_p
     total_feature_per_reads=np.array(total_feature_per_reads)
     return total_feature_per_reads
 
-def extract_file(input_file):
+def extract_file(input_file,mode):
     basecall_group = FLAG.basecall_group
     basecall_subgroup = FLAG.basecall_subgroup
 
@@ -152,7 +152,8 @@ def extract_file(input_file):
     except Exception as e:
         # print(str(e))
         return None
-    raw_data = raw_data[::-1]
+    if mode:
+        raw_data = raw_data[::-1]
     # ~ print(input_file,raw_start,raw_length,raw_label)
     total_seq = "".join([x.decode() for x in raw_label])
     base_len=raw_label.shape[0]
@@ -174,7 +175,7 @@ def extract_group(args, total_fl,subsapmle_num=500):
     pool = multiprocessing.Pool(processes=int(args.cpu))
     ##########
     for fl in total_fl:
-        result_per_read = pool.apply_async(extract_file, (fl,))
+        result_per_read = pool.apply_async(extract_file, (fl,args.rna))
         results_list.append(result_per_read)
     pool.close()
     ############################
@@ -187,15 +188,14 @@ def extract_group(args, total_fl,subsapmle_num=500):
             feature_per_read = temp
             result_list.append(feature_per_read)
 
-
             del  feature_per_read
         pbar.update(1)
     #############################
     pool.join()
     pbar.close()
 
-    aligned_num = len(result_list)
-    if subsapmle_num < aligned_num:
+    num_aligned = len(result_list)
+    if subsapmle_num < num_aligned:
         result_list=random.sample(result_list,subsapmle_num)
     final_feature=[]
     for item in result_list:
@@ -205,12 +205,25 @@ def extract_group(args, total_fl,subsapmle_num=500):
 
     if df.shape[0] == 0:
         raise Exception("can not find basecall_group or basecall_subgroup in fast5 files or there is no read aligned on the position")
-    print('\nextracted ',aligned_num,' aligned reads from fast5 files')
+    print('\nextracted ',num_aligned,' aligned reads from fast5 files')
     df.columns = ['Mean', 'STD', 'Median', 'Dwell time', 'position']
 
     # 转化为数值
     df['position'] = df['position'].astype(int).astype(str)
-    return df,aligned_num
+
+    if num_aligned > 50:
+        dwell_filter_pctls = (5, 95)
+        dwell_min, dwell_max = np.percentile(df['Dwell time'].values, dwell_filter_pctls)
+        df = df[(df['Dwell time'] > dwell_min) & (df['Dwell time'] < dwell_max)]
+        df.reset_index(inplace=True,drop=True)
+        item_list = ['Mean', 'STD']
+        for item in item_list:
+            # collect data
+            dwell_filter_pctls = (2.5, 97.5)
+            dwell_min, dwell_max = np.percentile(df[item].values, dwell_filter_pctls)
+            df = df[(df[item] > dwell_min) & (df[item] < dwell_max)]
+            df.reset_index(inplace=True,drop=True)
+    return df,num_aligned
 
 
 def create_read_list_file(path,results_path):
