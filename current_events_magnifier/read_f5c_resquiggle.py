@@ -157,7 +157,7 @@ def extract_pairs_pos(bam_file,position,length,chromosome,strand):
 
 
 
-def read_blow5(path,position,length,chromo,strand,kmer_model=5,subsapmle_num=500):
+def read_blow5(path,position,length,chromo,strand,subsapmle_num=500):
     global info_dict,s5,pbar
     bam_file=path+".bam"
     bam_file=pysam.AlignmentFile(bam_file,'rb')
@@ -195,7 +195,7 @@ def read_blow5(path,position,length,chromo,strand,kmer_model=5,subsapmle_num=500
     print('\nextracted ', num_aligned, ' aligned reads from blow5 files')
 
     if num_aligned>50:
-        dwell_filter_pctls = (2.5, 97.5)
+        dwell_filter_pctls = (0.5, 99.5)
         dwell_min, dwell_max = np.percentile(final_feature['Dwell time'].values, dwell_filter_pctls)
         final_feature = final_feature[(final_feature['Dwell time'] > dwell_min) & (final_feature['Dwell time'] < dwell_max)]
 

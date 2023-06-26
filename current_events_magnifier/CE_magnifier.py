@@ -44,9 +44,8 @@ def init_parser():
     parser_f5c.add_argument('-c', "--control",
                         help="control_blow5_path")
     parser_f5c.add_argument('-o', "--output", default="f5c_result", help="output_file")
-    parser_f5c.add_argument('--kmer_model',type=int, default=5, help="output_file")
+    parser_f5c.add_argument('--base_shift',type=int, default=0, help="base shift of f5c")
     add_public_argument(parser_f5c)
-
     return parser
 
 if __name__ == '__main__':
@@ -55,10 +54,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # read reference
-    args.pos = args.pos - 1
     subsample_num = args.overplot_number
     fasta = read_fasta_to_dic(args.ref)
     # length filter
+    args.pos = args.pos - 1
     length_gene = len(fasta[args.chrom])
     if args.pos + args.len + 1 >= length_gene or args.pos - args.len <= 0:
         raise RuntimeError("The position requested is too close to the border (pos-len>0 and pos+len<length of fasta)")
@@ -108,13 +107,15 @@ if __name__ == '__main__':
             title = title + '   Sample:' + str(aligned_num_wt)
     elif args.function == 'f5c':
         from current_events_magnifier.read_f5c_resquiggle import read_blow5
-        df_wt, aligned_num_wt,nucleotide_type = read_blow5(args.input, args.pos, args.len, args.chrom, args.strand,args.kmer_model,subsample_num)
+
+        args.pos = args.pos + args.base_shift
+        df_wt, aligned_num_wt,nucleotide_type = read_blow5(args.input, args.pos, args.len, args.chrom, args.strand,subsample_num)
         df_wt['type'] = 'Sample'
         if nucleotide_type=='RNA' and not args.rna:
             raise RuntimeError("You need to add --rna to turn on the rna mode")
         try:
             df_ivt, aligned_num_ivt,_ = read_blow5(args.control, args.pos, args.len, args.chrom, args.strand,
-                                                 args.kmer_model,subsample_num)
+                                                 subsample_num)
             df_ivt['type'] = 'Control'
 
             df = pd.concat([df_wt, df_ivt])
@@ -129,13 +130,17 @@ if __name__ == '__main__':
             df_wt['type'] = 'Single'
             title = title + '   Sample:' + str(aligned_num_wt)
 
+
     category_data = [str(args.pos + x) for x in range(-args.len, args.len + 1)]
     category = pd.api.types.CategoricalDtype(categories=category_data, ordered=True)
     df['position'] = df['position'].astype(category)
 
+
     # draw_volin(df,results_path,args.pos,base_list,title)
     # draw_boxplot(df,results_path,args.pos,base_list,title)
     print("Start to generate plots and save  in "+ results_path)
+    if args.function == 'f5c':
+        args.pos = args.pos - args.base_shift
     signal_plot(df, results_path, args.pos, base_list, title, 'merged')
     signal_plot(df, results_path, args.pos, base_list, title, 'boxplot')
     signal_plot(df, results_path, args.pos, base_list, title, 'violin_plot')

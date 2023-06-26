@@ -102,6 +102,7 @@ def extract_feature(signal, event_start, event_length, base,start_position,end_p
     # normalization
 
     signal = signal[event_start[0]:event_start[-1] + event_length[-1]]
+
     event_start = event_start-event_start[0]
     signal = normalize_signal_with_lim(signal)
 
@@ -152,12 +153,14 @@ def extract_file(input_file,mode):
     except Exception as e:
         # print(str(e))
         return None
-    if mode:
-        raw_data = raw_data[::-1]
+
+
     # ~ print(input_file,raw_start,raw_length,raw_label)
     total_seq = "".join([x.decode() for x in raw_label])
     base_len=raw_label.shape[0]
     end_position = start_position+base_len
+    if mode:
+        raw_data = np.flip(raw_data)
     matrix_feature = extract_feature(raw_data, raw_start, raw_length, total_seq,start_position,end_position,strand)
     if matrix_feature is None:
         return None
@@ -212,17 +215,17 @@ def extract_group(args, total_fl,subsapmle_num=500):
     df['position'] = df['position'].astype(int).astype(str)
 
     if num_aligned > 50:
-        dwell_filter_pctls = (5, 95)
+        dwell_filter_pctls = (0.5, 99.5)
         dwell_min, dwell_max = np.percentile(df['Dwell time'].values, dwell_filter_pctls)
         df = df[(df['Dwell time'] > dwell_min) & (df['Dwell time'] < dwell_max)]
         df.reset_index(inplace=True,drop=True)
-        item_list = ['Mean', 'STD']
-        for item in item_list:
-            # collect data
-            dwell_filter_pctls = (2.5, 97.5)
-            dwell_min, dwell_max = np.percentile(df[item].values, dwell_filter_pctls)
-            df = df[(df[item] > dwell_min) & (df[item] < dwell_max)]
-            df.reset_index(inplace=True,drop=True)
+    #     item_list = ['Mean', 'STD']
+    #     for item in item_list:
+    #         # collect data
+    #         dwell_filter_pctls = (2.5, 97.5)
+    #         dwell_min, dwell_max = np.percentile(df[item].values, dwell_filter_pctls)
+    #         df = df[(df[item] > dwell_min) & (df[item] < dwell_max)]
+    #         df.reset_index(inplace=True,drop=True)
     return df,num_aligned
 
 
