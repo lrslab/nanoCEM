@@ -28,7 +28,7 @@ For example, in CTAT**G**, f5c will only return the last **G**'s current event.S
 Requirement : Python >=3.7, <3.10
 
 ```sh
-pip install current_events_magnifier==0.0.3.8
+pip install current_events_magnifier==0.0.4.1
 pip install ont-fast5-api
 conda install -c bioconda ont_vbz_hdf_plugin f5c slow5tools
 ```
@@ -88,7 +88,7 @@ optional arguments:
 # assumed your fast5 file folder name is fast5/ and reference is reference.fasta
 guppy_basecaller -i fast5/ -s ./guppy_out --recursive --device auto -c rna_r9.4.1_70bps_hac.cfg  &
 cat guppy_out/*/*.fastq > all.fastq
-minimap2 -ax map-ont -t 16 --MD reference.fasta all.fastq | samtools view -hbS -F 260 - | samtools sort -@ 6 -o file.bam
+minimap2 -ax map-ont -t 16 --MD reference.fasta all.fastq | samtools view -hbS -F 260 - | samtools sort -@ 16 -o file.bam
 samtools index file.bam
 ```
 Option ```-c``` means config file ,which will depend on your data
