@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 import argparse
 import os
-from cem_utils import read_fasta_to_dic,reverse_fasta
+from current_events_magnifier.cem_utils import read_fasta_to_dic,reverse_fasta
 import pandas as pd
-from plot import signal_plot
+from current_events_magnifier.plot import signal_plot
 from plotnine.exceptions import PlotnineWarning
 import warnings
 import time

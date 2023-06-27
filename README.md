@@ -141,8 +141,10 @@ slow5tools merge blow5_dir -o file.blow5
 slow5tools index file.blow5
 ```
 2. Run f5c resquiggle
+
+Use ```--rna``` to turn to the rna mode and ```--pore r10``` to re-squiggle reads from R10
 ```sh
-f5c resquiggle -c all.fastq file.blow5 -o file.paf
+f5c resquiggle -c all.fastq file.blow5 -o file.paf --rna --pore r9
 ```
 3. Run current_events_magnifier to plot
 ```sh
