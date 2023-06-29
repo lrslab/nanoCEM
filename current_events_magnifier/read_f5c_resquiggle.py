@@ -169,10 +169,16 @@ def read_blow5(path,position,length,chromo,strand,subsapmle_num=500):
     info_dict=extract_pairs_pos(bam_file,position,length,chromo,strand)
     if info_dict == {}:
         raise Exception("There is no read aligned on this position")
+    info_df = pd.DataFrame(list(info_dict.keys()))
     slow5 = path+".blow5"
     s5 = pyslow5.Open(slow5, 'r')
 
     df=pd.read_csv(path+".paf",sep='\t',header=None)
+    df=pd.merge(df,info_df,how='inner',on=0)
+    if df.shape[0] == 0:
+        raise RuntimeError("cannot found the record from bam in your paf file. Please check your f5c command ... ")
+    if df.shape[0] / info_df.shape[0] < 0.8:
+        print('There are '+str(info_df.shape[0]-df.shape[0])+" reads not found in your paf file ...")
     pbar = tqdm(total=df.shape[0], position=0, leave=True)
     df["feature"] = df.apply(extract_feature,strand=strand,axis=1)
     pbar.close()

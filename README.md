@@ -1,5 +1,5 @@
 # Current_events_magnifier
-`Current_events_magnifier` is a python command line to facilitate the analysis of DNA/RNA modification sites by visualizing statistical features of current events. 
+The `current_events_magnifier` is a python command line to facilitate the analysis of DNA/RNA modification sites by visualizing statistical features of current events. 
 CEM can be used to showcase high confidence sites and observe the difference based on the modification sample and the low or no modification sample.
 
 It supports two re-squiggle pipeline(`Tombo` and `f5c`) and support `R9` and `R10`.
@@ -11,7 +11,7 @@ Here is an example that show the difference of A2030 on 23S rRNA.
 ![alt text](example/violin.png)
 
 ## Before start, you should know
-### What is re-squiggle
+### Re-squiggle
 In ONT technology, "resquiggle" refers to the process of converting the raw electrical signals from the sequencer into corresponding DNA/RNA sequence information, which is then corrected and realigned. 
 This process utilizes the signal features of ONT sequencing, such as changes in electrical resistance and noisy signals, to capture information from the DNA/RNA sequence and analyze and interpret it. 
 Although new basecaller program (Guppy/Boinito/Dorado) generated the bam file with move table to record the event index,but  resquiggle is a more fine alignment than the move table in most cases.
@@ -60,7 +60,7 @@ optional arguments:
   --ref REF             fasta file
   --overplot-number OVERPLOT_NUMBER (default:500)
                         Number of read will be used to plot
-  --rna                 Turn on the RNA mode
+  --rna                 Turn on the RNA mode 
 ```
 ### read_f5c_resquiggle
 ```sh
