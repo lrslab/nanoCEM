@@ -32,9 +32,9 @@ In order to make the results of the two methods comparable and draw similar conc
 Requirement : Python >=3.7, <3.10
 
 ```sh
-pip install current_events_magnifier==0.0.4.1
+pip install current_events_magnifier==0.0.4.4
 pip install ont-fast5-api
-conda install -c bioconda ont_vbz_hdf_plugin f5c slow5tools
+conda install -c bioconda f5c slow5tools
 ```
 ## Options
 ### read_tombo_resquiggle
