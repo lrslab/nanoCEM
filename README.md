@@ -39,7 +39,7 @@ conda install -c bioconda f5c slow5tools
 ## Options
 ### read_tombo_resquiggle
 ```sh
-nanoCEM.py tombo -h
+current_events_magnifier.py tombo -h
 optional arguments:
   -h, --help            show this help message and exit
   --basecall_group BASECALL_GROUP
@@ -64,7 +64,7 @@ optional arguments:
 ```
 ### read_f5c_resquiggle
 ```sh
-nanoCEM.py f5c -h
+current_events_magnifier.py f5c -h
 optional arguments:
   -h, --help            show this help message and exit
   -i INPUT, --input INPUT
