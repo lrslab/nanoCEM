@@ -1,4 +1,4 @@
-name: current_events_magnifier
+name: nanoCEM
 channels:
   - bioconda
   - defaults
@@ -59,4 +59,4 @@ dependencies:
     - tqdm==4.65.0
     - tzdata==2023.3
     - zipp==3.15.0
-prefix: /home/zhguo/Program/anaconda3/envs/current_events_magnifier
+prefix: /home/zhguo/Program/anaconda3/envs/nanoCEM

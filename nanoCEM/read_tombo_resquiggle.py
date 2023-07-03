@@ -8,7 +8,7 @@ import multiprocessing
 from tqdm import tqdm
 import random
 # from ._stats import c_new_mean_stds
-from current_events_magnifier.normalization import normalize_signal,normalize_signal_with_lim
+from nanoCEM.normalization import normalize_signal,normalize_signal_with_lim
 
 
 

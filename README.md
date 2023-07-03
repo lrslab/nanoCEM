@@ -1,5 +1,5 @@
-# Current_events_magnifier
-The `current_events_magnifier` is a python command line to facilitate the analysis of DNA/RNA modification sites by visualizing statistical features of current events. 
+# nanoCEM
+The nanopore_current_events_magnifier(`nanoCEM`) is a python command line to facilitate the analysis of DNA/RNA modification sites by visualizing statistical features of current events. 
 CEM can be used to showcase high confidence sites and observe the difference based on the modification sample and the low or no modification sample.
 
 It supports two re-squiggle pipeline(`Tombo` and `f5c`) and support `R9` and `R10`.
@@ -32,14 +32,14 @@ In order to make the results of the two methods comparable and draw similar conc
 Requirement : Python >=3.7, <3.10
 
 ```sh
-pip install current_events_magnifier==0.0.4.4
+pip install nanoCEM==0.0.4.4
 pip install ont-fast5-api
 conda install -c bioconda f5c slow5tools
 ```
 ## Options
 ### read_tombo_resquiggle
 ```sh
-CE_magnifier.py tombo -h
+nanoCEM.py tombo -h
 optional arguments:
   -h, --help            show this help message and exit
   --basecall_group BASECALL_GROUP
@@ -64,7 +64,7 @@ optional arguments:
 ```
 ### read_f5c_resquiggle
 ```sh
-CE_magnifier.py f5c -h
+nanoCEM.py f5c -h
 optional arguments:
   -h, --help            show this help message and exit
   -i INPUT, --input INPUT
@@ -131,7 +131,7 @@ tombo resquiggle single/ reference.fasta --processes 16 --num-most-common-errors
 ```
 3. Run current_events_magnifier to plot
 ```sh
-CE_magnifier.py tombo -i sample1/single -c sample2/single -o tombo_result\
+nanoCEM.py tombo -i sample1/single -c sample2/single -o tombo_result\
  --chrom NR_103073.1 --strand + --pos 2030 \
  --len 5 --cpu 4 --ref reference.fasta --rna
 ```
@@ -150,10 +150,10 @@ Use ```--rna``` to turn to the rna mode and ```--pore r10``` to re-squiggle read
 ```sh
 f5c resquiggle -c all.fastq file.blow5 -o file.paf --rna --pore r9
 ```
-3. Run current_events_magnifier to plot
+3. Run nanoCEM to plot
 ```sh
 # run the pipeline below for your two sample respective and keep the suffix of bam/paf/blow5 is the same
-CE_magnifier.py f5c -i sample1/file -c sample2/file -o f5c_result \
+nanoCEM.py f5c -i sample1/file -c sample2/file -o f5c_result \
 --chrom NR_103073.1 --strand + \
 --pos 3929 --len 10 \
 --ref reference.fasta --base_shift 2 --rna

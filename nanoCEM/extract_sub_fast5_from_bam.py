@@ -90,19 +90,19 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    # parser.add_argument("-f","--fast5", required=True,
-    #                     help="fast5_path")
-    # parser.add_argument('-b',"--bam", required=True,
-    #                     help="bam_path")
-    # parser.add_argument('-o',"--output", default='subsample_single', help="output_file")
-    # parser.add_argument("--chrom",help="Gene or chromosome name(head of your fasta file)")
-    # parser.add_argument("--pos", type=int, help="site of your interest")
-    parser.add_argument("-f","--fast5", default='/data/Ecoli_23s/data/L_rep2/single/',
+    parser.add_argument("-f","--fast5", required=True,
                         help="fast5_path")
-    parser.add_argument('-b',"--bam", default="/data/Ecoli_23s/data/L_rep2/file.bam",
+    parser.add_argument('-b',"--bam", required=True,
                         help="bam_path")
-    parser.add_argument('-o',"--output", default='/data/Ecoli_23s/data/L_rep2/subsample2', help="output_file")
-    parser.add_argument("--chrom", default='NR_103073.1',help="Gene or chromosome name(head of your fasta file)")
-    parser.add_argument("--pos", default=2029, type=int, help="site of your interest")
+    parser.add_argument('-o',"--output", default='subsample_single', help="output_file")
+    parser.add_argument("--chrom",help="Gene or chromosome name(head of your fasta file)")
+    parser.add_argument("--pos", type=int, help="site of your interest")
+    # parser.add_argument("-f","--fast5", default='/data/Ecoli_23s/data/L_rep2/single/',
+    #                     help="fast5_path")
+    # parser.add_argument('-b',"--bam", default="/data/Ecoli_23s/data/L_rep2/file.bam",
+    #                     help="bam_path")
+    # parser.add_argument('-o',"--output", default='/data/Ecoli_23s/data/L_rep2/subsample2', help="output_file")
+    # parser.add_argument("--chrom", default='NR_103073.1',help="Gene or chromosome name(head of your fasta file)")
+    # parser.add_argument("--pos", default=2029, type=int, help="site of your interest")
     args = parser.parse_args()
     main(args)

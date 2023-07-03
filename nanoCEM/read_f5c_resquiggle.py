@@ -4,7 +4,7 @@ import pandas as pd
 import pyslow5
 import pysam
 from tqdm import tqdm
-from current_events_magnifier.normalization import normalize_signal,normalize_signal_with_lim
+from nanoCEM.normalization import normalize_signal,normalize_signal_with_lim
 import os
 import argparse
 score_dict={}

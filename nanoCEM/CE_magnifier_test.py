@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 import argparse
 import os
-from current_events_magnifier.cem_utils import read_fasta_to_dic,reverse_fasta
+from cem_utils import read_fasta_to_dic,reverse_fasta
 import pandas as pd
-from current_events_magnifier.plot import signal_plot
+from plot import signal_plot
 from plotnine.exceptions import PlotnineWarning
 import warnings
 import time
@@ -46,6 +46,20 @@ def init_parser():
     parser_f5c.add_argument('-o', "--output", default="f5c_result", help="output_file")
     parser_f5c.add_argument('--base_shift',type=int, default=0, help="output_file")
     add_public_argument(parser_f5c)
+    # parser.set_defaults(function='tombo', chrom="1", pos=150280972, len=10, strand='+', cpu=1,input_fast5='/data/current_test_data/samp/cem_test_dna/WGS/single/',\
+    #                     control_fast5='/data/current_test_data/samp/cem_test_dna/WGA/single/',output='tombo_result_dna',\
+    #                     overplot_number=300,ref="/data/current_test_data/samp/cem_test_dna/hg.fa",\
+    #                     basecall_group="RawGenomeCorrected_000", basecall_subgroup="BaseCalled_template",rna=False)
+    # parser.set_defaults(function='tombo', chrom="NR_103073.1", pos=2030, len=10, strand='+', cpu=8,input_fast5='/data/Ecoli_23s/data/L_rep2/single/',\
+    #                     control_fast5='/data/Ecoli_23s/data/IVT_negative/single/',output='tombo_result_rna',overplot_number=500,\
+    #                     ref="/data/Ecoli_23s/23S_rRNA.fasta",\
+    #                      basecall_group="RawGenomeCorrected_000", basecall_subgroup="BaseCalled_template",rna=True)
+    parser.set_defaults(function='f5c', chrom="NR_103073.1", pos=2030, len=10, strand='+', cpu=4,input='/data/Ecoli_23s/data/L_rep2/file',\
+                        control='/data/Ecoli_23s/data/IVT_negative/file',\
+                        output='f5c_result_rna',overplot_number=1000,ref="/data/Ecoli_23s/23S_rRNA.fasta",rna=True,base_shift=2)
+    # parser.set_defaults(function='f5c', chrom="1", pos=150280972, len=10, strand='+', cpu=4,input='/data/current_test_data/samp/cem_test_dna/WGS/file',\
+    #                     control='/data/current_test_data/samp/cem_test_dna/WGA/file',\
+    #                     output='f5c_result_dna',overplot_number=1000,ref="/data/current_test_data/samp/cem_test_dna/hg.fa",rna=False,base_shift=2)
 
     return parser
 
@@ -88,7 +102,7 @@ if __name__ == '__main__':
 
     if args.function == 'tombo' :
 
-        from  current_events_magnifier.read_tombo_resquiggle import create_read_list_file,extract_group
+        from  nanoCEM.read_tombo_resquiggle import create_read_list_file,extract_group
         wt_file = create_read_list_file(args.input_fast5, results_path)
         df_wt, aligned_num_wt = extract_group(args, wt_file, subsample_num)
         df_wt['type'] = 'Sample'
@@ -107,7 +121,7 @@ if __name__ == '__main__':
             df_wt['type'] = 'Single'
             title = title + '   Sample:' + str(aligned_num_wt)
     elif args.function == 'f5c':
-        from current_events_magnifier.read_f5c_resquiggle import read_blow5
+        from nanoCEM.read_f5c_resquiggle import read_blow5
         if args.base_shift < 0:
             raise RuntimeError("base_shift should not less than 0")
         if (args.rna and args.strand=='+') or (not args.rna and args.strand=='-'):
