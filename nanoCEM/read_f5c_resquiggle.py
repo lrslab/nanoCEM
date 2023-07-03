@@ -104,7 +104,7 @@ def extract_feature(line,strand,base_shift=2):
             aligned_pair[0] = qlen - aligned_pair[0] - 1
         aligned_pair=aligned_pair[aligned_pair[0] < event_length.shape[0]]
     # base shift
-    if (strand == '+' and nucleotide_type == 'RNA') or (strand == '-' and nucleotide_type == 'DNA'):
+    if nucleotide_type == 'RNA':
         aligned_pair[0]=aligned_pair[0].values + base_shift
         aligned_pair = aligned_pair[aligned_pair[0] < event_length.shape[0]]
     else:

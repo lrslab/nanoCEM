@@ -54,9 +54,9 @@ def init_parser():
     #                     control_fast5='/data/Ecoli_23s/data/IVT_negative/single/',output='tombo_result_rna',overplot_number=500,\
     #                     ref="/data/Ecoli_23s/23S_rRNA.fasta",\
     #                      basecall_group="RawGenomeCorrected_000", basecall_subgroup="BaseCalled_template",rna=True)
-    parser.set_defaults(function='f5c', chrom="NR_103073.1", pos=2030, len=10, strand='+', cpu=4,input='/data/Ecoli_23s/data/L_rep2/file',\
+    parser.set_defaults(function='f5c', chrom="NR_103073.1", pos=875, len=10, strand='-', cpu=4,input='/data/Ecoli_23s/data/L_rep2/file',\
                         control='/data/Ecoli_23s/data/IVT_negative/file',\
-                        output='f5c_result_rna_new',overplot_number=1000,ref="/data/Ecoli_23s/23S_rRNA.fasta",rna=True,base_shift=2)
+                        output='f5c_result_rna_new_re',overplot_number=1000,ref="/data/Ecoli_23s/23S_rRNA_reverse.fasta",rna=True,base_shift=2)
     # parser.set_defaults(function='f5c', chrom="1", pos=150280972, len=10, strand='+', cpu=4,input='/data/current_test_data/samp/cem_test_dna/WGS/file',\
     #                     control='/data/current_test_data/samp/cem_test_dna/WGA/file',\
     #                     output='f5c_result_dna_new',overplot_number=1000,ref="/data/current_test_data/samp/cem_test_dna/hg.fa",rna=False,base_shift=2)
