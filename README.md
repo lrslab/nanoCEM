@@ -1,5 +1,5 @@
 # nanoCEM
-The nanopore_current_events_magnifier(`nanoCEM`) is a python command line to facilitate the analysis of DNA/RNA modification sites by visualizing statistical features of current events. 
+The nanopore current events magnifier (`nanoCEM`) is a python command line to facilitate the analysis of DNA/RNA modification sites by visualizing statistical features of current events. 
 CEM can be used to showcase high confidence sites and observe the difference based on the modification sample and the low or no modification sample.
 
 It supports two re-squiggle pipeline(`Tombo` and `f5c`) and support `R9` and `R10`.
@@ -153,7 +153,7 @@ f5c resquiggle -c all.fastq file.blow5 -o file.paf --rna --pore r9
 3. Run nanoCEM to plot
 ```sh
 # run the pipeline below for your two sample respective and keep the suffix of bam/paf/blow5 is the same
-nanoCEM.py f5c -i sample1/file -c sample2/file -o f5c_result \
+current_events_magnifier.py f5c -i sample1/file -c sample2/file -o f5c_result \
 --chrom NR_103073.1 --strand + \
 --pos 3929 --len 10 \
 --ref reference.fasta --base_shift 2 --rna
