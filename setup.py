@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="nanoCEM",
-    version="0.0.4.4",
+    version="0.0.1.1",
     author="GUO Zhihao",
     author_email="qhuozhihao@icloud.com",
     description='A sample tool designed to visualize the features that distinguish between two groups of ONT data at the site level.\
@@ -30,5 +30,5 @@ setup(
         "pyslow5>=1.0.0",
         "vbz_h5py_plugin>=1.0.1"
     ],
-    scripts=['nanoCEM/nanoCEM.py','nanoCEM/extract_sub_fast5_from_bam.py']
+    scripts=['nanoCEM/current_events_magnifier.py','nanoCEM/extract_sub_fast5_from_bam.py']
 )

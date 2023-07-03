@@ -55,6 +55,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # read reference
+    if args.function is None:
+        raise RuntimeError("Please use -h to view help")
     subsample_num = args.overplot_number
     fasta = read_fasta_to_dic(args.ref)
     # length filter
