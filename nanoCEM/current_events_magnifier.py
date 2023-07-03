@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 import argparse
 import os
-from nanoCEM.cem_utils import read_fasta_to_dic,reverse_fasta
+from cem_utils import read_fasta_to_dic,reverse_fasta
 import pandas as pd
-from nanoCEM.plot import signal_plot
+from plot import signal_plot
 from plotnine.exceptions import PlotnineWarning
 import warnings
 import time
@@ -46,17 +46,15 @@ def init_parser():
     parser_f5c.add_argument('-o', "--output", default="f5c_result", help="output_file")
     parser_f5c.add_argument('--base_shift',type=int, default=0, help="output_file")
     add_public_argument(parser_f5c)
-
     return parser
 
 if __name__ == '__main__':
     # Parse the arguments
     parser = init_parser()
     args = parser.parse_args()
-
+    aligned_num_wt = 0
+    aligned_num_ivt = 0
     # read reference
-    if args.function is None:
-        raise RuntimeError("Please use -h to view help")
     subsample_num = args.overplot_number
     fasta = read_fasta_to_dic(args.ref)
     # length filter
@@ -112,11 +110,11 @@ if __name__ == '__main__':
         from nanoCEM.read_f5c_resquiggle import read_blow5
         if args.base_shift < 0:
             raise RuntimeError("base_shift should not less than 0")
-        if (args.rna and args.strand=='+') or (not args.rna and args.strand=='-'):
-            args.pos = args.pos + args.base_shift
-        else:
-            args.pos = args.pos - args.base_shift
-        df_wt, aligned_num_wt,nucleotide_type = read_blow5(args.input, args.pos, args.len, args.chrom, args.strand,subsample_num)
+        # if (args.rna and args.strand=='+') or (not args.rna and args.strand=='-'):
+        #     args.pos = args.pos + args.base_shift
+        # else:
+        #     args.pos = args.pos - args.base_shift
+        df_wt, aligned_num_wt,nucleotide_type = read_blow5(args.input, args.pos, args.len, args.chrom, args.strand,subsample_num,args.base_shift)
         df_wt['type'] = 'Sample'
         if nucleotide_type=='RNA' and not args.rna:
             raise RuntimeError("You need to add --rna to turn on the rna mode")
@@ -146,13 +144,13 @@ if __name__ == '__main__':
     # draw_volin(df,results_path,args.pos,base_list,title)
     # draw_boxplot(df,results_path,args.pos,base_list,title)
     print("Start to generate plots and save  in "+ results_path)
-    if args.function == 'f5c':
-        if (args.rna and args.strand == '+') or (not args.rna and args.strand == '-'):
-            args.pos = args.pos - args.base_shift
-        else:
-            args.pos = args.pos + args.base_shift
+    # if args.function == 'f5c':
+    #     if (args.rna and args.strand == '+') or (not args.rna and args.strand == '-'):
+    #         args.pos = args.pos - args.base_shift
+    #     else:
+    #         args.pos = args.pos + args.base_shift
     percentile_filter=False
-    if aligned_num_wt>50 and aligned_num_ivt>50:
+    if aligned_num_wt > 50 and aligned_num_ivt > 50:
         percentile_filter=True
 
     signal_plot(df, results_path, args.pos, base_list, title, 'merged',percentile_filter)

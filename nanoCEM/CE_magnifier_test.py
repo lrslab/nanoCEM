@@ -56,10 +56,10 @@ def init_parser():
     #                      basecall_group="RawGenomeCorrected_000", basecall_subgroup="BaseCalled_template",rna=True)
     parser.set_defaults(function='f5c', chrom="NR_103073.1", pos=2030, len=10, strand='+', cpu=4,input='/data/Ecoli_23s/data/L_rep2/file',\
                         control='/data/Ecoli_23s/data/IVT_negative/file',\
-                        output='f5c_result_rna',overplot_number=1000,ref="/data/Ecoli_23s/23S_rRNA.fasta",rna=True,base_shift=2)
+                        output='f5c_result_rna_new',overplot_number=1000,ref="/data/Ecoli_23s/23S_rRNA.fasta",rna=True,base_shift=2)
     # parser.set_defaults(function='f5c', chrom="1", pos=150280972, len=10, strand='+', cpu=4,input='/data/current_test_data/samp/cem_test_dna/WGS/file',\
     #                     control='/data/current_test_data/samp/cem_test_dna/WGA/file',\
-    #                     output='f5c_result_dna',overplot_number=1000,ref="/data/current_test_data/samp/cem_test_dna/hg.fa",rna=False,base_shift=2)
+    #                     output='f5c_result_dna_new',overplot_number=1000,ref="/data/current_test_data/samp/cem_test_dna/hg.fa",rna=False,base_shift=2)
 
     return parser
 
@@ -67,7 +67,8 @@ if __name__ == '__main__':
     # Parse the arguments
     parser = init_parser()
     args = parser.parse_args()
-
+    aligned_num_wt = 0
+    aligned_num_ivt = 0
     # read reference
     subsample_num = args.overplot_number
     fasta = read_fasta_to_dic(args.ref)
@@ -124,11 +125,11 @@ if __name__ == '__main__':
         from nanoCEM.read_f5c_resquiggle import read_blow5
         if args.base_shift < 0:
             raise RuntimeError("base_shift should not less than 0")
-        if (args.rna and args.strand=='+') or (not args.rna and args.strand=='-'):
-            args.pos = args.pos + args.base_shift
-        else:
-            args.pos = args.pos - args.base_shift
-        df_wt, aligned_num_wt,nucleotide_type = read_blow5(args.input, args.pos, args.len, args.chrom, args.strand,subsample_num)
+        # if (args.rna and args.strand=='+') or (not args.rna and args.strand=='-'):
+        #     args.pos = args.pos + args.base_shift
+        # else:
+        #     args.pos = args.pos - args.base_shift
+        df_wt, aligned_num_wt,nucleotide_type = read_blow5(args.input, args.pos, args.len, args.chrom, args.strand,subsample_num,args.base_shift)
         df_wt['type'] = 'Sample'
         if nucleotide_type=='RNA' and not args.rna:
             raise RuntimeError("You need to add --rna to turn on the rna mode")
@@ -158,13 +159,13 @@ if __name__ == '__main__':
     # draw_volin(df,results_path,args.pos,base_list,title)
     # draw_boxplot(df,results_path,args.pos,base_list,title)
     print("Start to generate plots and save  in "+ results_path)
-    if args.function == 'f5c':
-        if (args.rna and args.strand == '+') or (not args.rna and args.strand == '-'):
-            args.pos = args.pos - args.base_shift
-        else:
-            args.pos = args.pos + args.base_shift
+    # if args.function == 'f5c':
+    #     if (args.rna and args.strand == '+') or (not args.rna and args.strand == '-'):
+    #         args.pos = args.pos - args.base_shift
+    #     else:
+    #         args.pos = args.pos + args.base_shift
     percentile_filter=False
-    if aligned_num_wt>50 and aligned_num_ivt>50:
+    if aligned_num_wt > 50 and aligned_num_ivt > 50:
         percentile_filter=True
 
     signal_plot(df, results_path, args.pos, base_list, title, 'merged',percentile_filter)

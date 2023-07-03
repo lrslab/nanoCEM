@@ -9,7 +9,7 @@ import os
 import argparse
 score_dict={}
 nucleotide_type=None
-def extract_feature(line,strand):
+def extract_feature(line,strand,base_shift=2):
     global nucleotide_type
     pbar.update(1)
     read_id = line[0]
@@ -91,7 +91,7 @@ def extract_feature(line,strand):
     # index query and reference
     aligned_pair=info_dict[read_id]['pairs']
     qlen = info_dict[read_id]['query_length']
-
+    # correct index about DNA and RNA
     if nucleotide_type == 'RNA':
         if strand == '+':
             gap = qlen - event_length.shape[0]
@@ -102,8 +102,14 @@ def extract_feature(line,strand):
     else:
         if strand == '-':
             aligned_pair[0] = qlen - aligned_pair[0] - 1
-        aligned_pair=aligned_pair[aligned_pair[0] <= event_length.shape[0]]
-
+        aligned_pair=aligned_pair[aligned_pair[0] < event_length.shape[0]]
+    # base shift
+    if (strand == '+' and nucleotide_type == 'RNA') or (strand == '-' and nucleotide_type == 'DNA'):
+        aligned_pair[0]=aligned_pair[0].values + base_shift
+        aligned_pair = aligned_pair[aligned_pair[0] < event_length.shape[0]]
+    else:
+        aligned_pair[0] = aligned_pair[0].values - base_shift
+        aligned_pair = aligned_pair[aligned_pair[0] >= 0]
 
     if aligned_pair.shape[0]==0:
         return None
@@ -157,7 +163,7 @@ def extract_pairs_pos(bam_file,position,length,chromosome,strand):
 
 
 
-def read_blow5(path,position,length,chromo,strand,subsapmle_num=500):
+def read_blow5(path,position,length,chromo,strand,subsapmle_num=500,base_shift=2):
     global info_dict,s5,pbar
     bam_file=path+".bam"
     bam_file=pysam.AlignmentFile(bam_file,'rb')
@@ -180,7 +186,7 @@ def read_blow5(path,position,length,chromo,strand,subsapmle_num=500):
     if df.shape[0] / info_df.shape[0] < 0.8:
         print('There are '+str(info_df.shape[0]-df.shape[0])+" reads not found in your paf file ...")
     pbar = tqdm(total=df.shape[0], position=0, leave=True)
-    df["feature"] = df.apply(extract_feature,strand=strand,axis=1)
+    df["feature"] = df.apply(extract_feature,strand=strand,base_shift=base_shift,axis=1)
     pbar.close()
     df.dropna(inplace=True)
     num_aligned = df.shape[0]
