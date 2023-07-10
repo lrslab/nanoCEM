@@ -5,11 +5,12 @@ import pyslow5
 import pysam
 from tqdm import tqdm
 from nanoCEM.normalization import normalize_signal,normalize_signal_with_lim
+# from nanoCEM.plot import draw_signal
 import os
 import argparse
 score_dict={}
 nucleotide_type=None
-def extract_feature(line,strand,base_shift=2):
+def extract_feature(line,strand,base_shift=2,norm=True):
     global nucleotide_type
     pbar.update(1)
     read_id = line[0]
@@ -72,6 +73,8 @@ def extract_feature(line,strand,base_shift=2):
 
     event_starts = event_length.cumsum()
     event_starts = np.insert(event_starts, 0, 0)[:-1]
+    if norm:
+        signal = normalize_signal_with_lim(signal)
 
     # filter too short or long dwell time
     # dwell_filter_pctls = (0.5, 99.5)
@@ -86,7 +89,8 @@ def extract_feature(line,strand,base_shift=2):
     # event_length[~valid_bases] = 0
 
     # normalized signal
-    signal = normalize_signal_with_lim(signal)
+    # draw_signal(signal, event_starts,None, 8850,8855)
+
 
     # index query and reference
     aligned_pair=info_dict[read_id]['pairs']
@@ -141,8 +145,8 @@ def extract_pairs_pos(bam_file,position,length,chromosome,strand):
             continue
         if strand == '-' and not read.is_reverse:
             continue
-        if read.qname == '5f8b9471-64e7-4dd8-b80c-5f88b77edbbe':
-            print(1)
+        # if read.qname == '7dcec2bc-65f3-41fe-8981-dd3af9fa6e67':
+        #     print(1)
         start_position=read.reference_start
         end_position=read.reference_end
         if position < start_position or position > end_position:
@@ -163,9 +167,15 @@ def extract_pairs_pos(bam_file,position,length,chromosome,strand):
 
 
 
-def read_blow5(path,position,length,chromo,strand,subsapmle_num=500,base_shift=2):
+def read_blow5(path,position,length,chromo,strand,subsapmle_num=500,base_shift=2,norm=True):
     global info_dict,s5,pbar
-    bam_file=path+".bam"
+    bam_file = path+".bam"
+    if not os.path.exists(path+'.bam'):
+        raise RuntimeError(path+'.bam' +"is not exist in your path!")
+    if not os.path.exists(path+'.paf'):
+        raise RuntimeError(path+'.paf' +"is not exist in your path!")
+    if not os.path.exists(path+'.blow5'):
+        raise RuntimeError(path+'.blow5' +"is not exist in your path!")
     bam_file=pysam.AlignmentFile(bam_file,'rb')
     # if rna_mode:
     #     if strand =='+':
@@ -174,7 +184,7 @@ def read_blow5(path,position,length,chromo,strand,subsapmle_num=500,base_shift=2
     #         position=position- (kmer_model-1)
     info_dict=extract_pairs_pos(bam_file,position,length,chromo,strand)
     if info_dict == {}:
-        raise Exception("There is no read aligned on this position")
+        raise RuntimeError("There is no read aligned on this position")
     info_df = pd.DataFrame(list(info_dict.keys()))
     slow5 = path+".blow5"
     s5 = pyslow5.Open(slow5, 'r')
@@ -186,7 +196,7 @@ def read_blow5(path,position,length,chromo,strand,subsapmle_num=500,base_shift=2
     if df.shape[0] / info_df.shape[0] < 0.8:
         print('There are '+str(info_df.shape[0]-df.shape[0])+" reads not found in your paf file ...")
     pbar = tqdm(total=df.shape[0], position=0, leave=True)
-    df["feature"] = df.apply(extract_feature,strand=strand,base_shift=base_shift,axis=1)
+    df["feature"] = df.apply(extract_feature,strand=strand,base_shift=base_shift,norm=norm,axis=1)
     pbar.close()
     df.dropna(inplace=True)
     num_aligned = df.shape[0]
@@ -204,7 +214,7 @@ def read_blow5(path,position,length,chromo,strand,subsapmle_num=500,base_shift=2
     #         final_feature['position']=final_feature['position'] + (kmer_model-1)
 
     final_feature['position'] = final_feature['position'].astype(int).astype(str)
-    print('\nextracted ', num_aligned, ' aligned reads from blow5 files')
+    print('Extracted ', num_aligned, ' aligned reads from blow5 files')
 
     if num_aligned>50:
         dwell_filter_pctls = (0.5, 99.5)

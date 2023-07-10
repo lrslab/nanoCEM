@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 import argparse
 import os
-from cem_utils import read_fasta_to_dic,reverse_fasta
+from nanoCEM.cem_utils import read_fasta_to_dic,reverse_fasta
 import pandas as pd
-from plot import signal_plot
+from nanoCEM.plot import signal_plot
 from plotnine.exceptions import PlotnineWarning
 import warnings
 import time
@@ -16,6 +16,7 @@ def init_parser():
         parser_input.add_argument("--len", default=10, type=int, help="region around the position")
         parser_input.add_argument("--strand", default="+", help="Strand of your interest")
         parser_input.add_argument("--ref", required=True, help="fasta file")
+        parser_input.add_argument('--norm', action='store_true', help='normalization mode')
         parser_input.add_argument("--overplot-number", default=500, type=int,
                                   help="Number of read will be used to plot")
         parser_input.add_argument('--rna', action='store_true', help='RNA mode')
@@ -44,6 +45,7 @@ def init_parser():
     parser_f5c.add_argument('-c', "--control",
                         help="control_blow5_path")
     parser_f5c.add_argument('-o', "--output", default="f5c_result", help="output_file")
+
     parser_f5c.add_argument('--base_shift',type=int, default=0, help="output_file")
     add_public_argument(parser_f5c)
     return parser
@@ -114,13 +116,13 @@ if __name__ == '__main__':
         #     args.pos = args.pos + args.base_shift
         # else:
         #     args.pos = args.pos - args.base_shift
-        df_wt, aligned_num_wt,nucleotide_type = read_blow5(args.input, args.pos, args.len, args.chrom, args.strand,subsample_num,args.base_shift)
+        df_wt, aligned_num_wt,nucleotide_type = read_blow5(args.input, args.pos, args.len, args.chrom, args.strand,subsample_num,args.base_shift,args.norm)
         df_wt['type'] = 'Sample'
         if nucleotide_type=='RNA' and not args.rna:
             raise RuntimeError("You need to add --rna to turn on the rna mode")
         try:
             df_ivt, aligned_num_ivt,_ = read_blow5(args.control, args.pos, args.len, args.chrom, args.strand,
-                                                 subsample_num)
+                                                 subsample_num,args.base_shift,args.norm)
             df_ivt['type'] = 'Control'
 
             df = pd.concat([df_wt, df_ivt])

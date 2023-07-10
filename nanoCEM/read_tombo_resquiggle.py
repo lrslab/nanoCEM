@@ -79,7 +79,7 @@ def get_label_raw(fast5_fn, basecall_group, basecall_subgroup ,chromosome, posit
     return (raw_dat, event_bases, event_starts, event_lengths,start_position,strand,chrome)
 
 
-def extract_feature(signal, event_start, event_length, base,start_position,end_position,strand):
+def extract_feature(signal, event_start, event_length, base,start_position,end_position,strand,norm=True):
     global BASE_LIST
     position=FLAG.pos
     if strand == '+':
@@ -104,7 +104,8 @@ def extract_feature(signal, event_start, event_length, base,start_position,end_p
     signal = signal[event_start[0]:event_start[-1] + event_length[-1]]
 
     event_start = event_start-event_start[0]
-    signal = normalize_signal_with_lim(signal)
+    if norm:
+        signal = normalize_signal_with_lim(signal)
 
     # filter too short or long dwell time
     # dwell_filter_pctls = (5, 95)
@@ -154,14 +155,13 @@ def extract_file(input_file,mode):
         # print(str(e))
         return None
 
-
     # ~ print(input_file,raw_start,raw_length,raw_label)
     total_seq = "".join([x.decode() for x in raw_label])
     base_len=raw_label.shape[0]
     end_position = start_position+base_len
     if mode:
         raw_data = np.flip(raw_data)
-    matrix_feature = extract_feature(raw_data, raw_start, raw_length, total_seq,start_position,end_position,strand)
+    matrix_feature = extract_feature(raw_data, raw_start, raw_length, total_seq,start_position,end_position,strand,FLAG.norm)
     if matrix_feature is None:
         return None
     del raw_data

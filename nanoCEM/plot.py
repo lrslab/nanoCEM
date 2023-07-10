@@ -145,9 +145,11 @@ def signal_plot(df, results_path, pos, base_list, title, plot_type,filter=False)
             plot2.save(filename=results_path + "/Merged_violin.pdf", dpi=300)
 
 
-def draw_signal(df, start, base):
+def draw_signal(df, start, base,start_index,end_index):
     df = pd.DataFrame(df)
     df.columns = ['raw']
+    start=start[start_index:end_index]
+    df=df[start[0]:start[-1]]
     df = df.reset_index()
     plot = p9.ggplot(df, p9.aes(x='index', y="raw")) \
            + p9.theme_bw() \
@@ -165,7 +167,7 @@ def draw_signal(df, start, base):
     # plot.save(filename="/home/zhguo/Dropbox/@labfiles/projects/GUO/ONT_showcase_tool/plot/signal.pdf", dpi=300)
     for item in start:
         plot = plot + p9.geom_vline(xintercept=item, linetype='dashed', color='red')
-    print(base)
+    print(plot)
     # plot.save(filename="/home/zhguo/Dropbox/@labfiles/projects/GUO/ONT_showcase_tool/plot/norm_signal_aligned.pdf", dpi=300)
 
     print(1)
