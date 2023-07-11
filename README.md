@@ -49,13 +49,13 @@ In order to make the results of the two methods comparable and draw similar conc
 ## Installation
 Requirement : Python >=3.7, <3.10
 ```sh
-pip install nanoCEM==0.0.1.8
+pip install nanoCEM==0.0.2.0
 ```
 
 Other tools if you needed
 ```sh
-pip install ont-fast5-api pod
-conda install -c bioconda f5c slow5tools minimap2 
+pip install ont-fast5-api pod5
+conda install -c bioconda f5c slow5tools minimap2 samtools
 ```
 ## Options
 ### read_tombo_resquiggle
@@ -112,9 +112,10 @@ optional arguments:
 ### 1. Run Basecaller and alignment on your ONT data
 ```sh
 # assumed your fast5 file folder name is fast5/ and reference is reference.fasta
+# q 30 is recommended but you can try other filter in your data
 guppy_basecaller -i fast5/ -s ./guppy_out --recursive --device auto -c rna_r9.4.1_70bps_hac.cfg  &
 cat guppy_out/*/*.fastq > all.fastq
-minimap2 -ax map-ont -t 16 --MD reference.fasta all.fastq | samtools view -hbS -F 260 - | samtools sort -@ 16 -o file.bam
+minimap2 -ax map-ont -t 16 --MD reference.fasta all.fastq | samtools view -hbS -F 260 -q 30 - | samtools sort -@ 16 -o file.bam
 samtools index file.bam
 ```
 Option ```-c``` means config file ,which will depend on your data
