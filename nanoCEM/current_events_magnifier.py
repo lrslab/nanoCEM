@@ -16,10 +16,10 @@ def init_parser():
         parser_input.add_argument("--len", default=10, type=int, help="region around the position")
         parser_input.add_argument("--strand", default="+", help="Strand of your interest")
         parser_input.add_argument("--ref", required=True, help="fasta file")
-        parser_input.add_argument('--norm', action='store_true', help='normalization mode')
+        parser_input.add_argument('--norm', action='store_true', help='Turn on the normalization mode')
         parser_input.add_argument("--overplot-number", default=500, type=int,
                                   help="Number of read will be used to plot")
-        parser_input.add_argument('--rna', action='store_true', help='RNA mode')
+        parser_input.add_argument('--rna', action='store_true', help='Turn on the RNA mode')
     # Define the argument parser
     parser = argparse.ArgumentParser(description='A sample tool designed to visualize the features that distinguish between two groups of ONT data at the site level. It supports two re-squiggle pipeline(Tombo and f5c).')
     subparsers = parser.add_subparsers(dest='function')
@@ -57,6 +57,9 @@ if __name__ == '__main__':
     aligned_num_wt = 0
     aligned_num_ivt = 0
     # read reference
+    # print(args)
+    if args.function is None:
+        raise RuntimeError("Please choose function from f5c or tombo, or use -h to view the help document")
     subsample_num = args.overplot_number
     fasta = read_fasta_to_dic(args.ref)
     # length filter
