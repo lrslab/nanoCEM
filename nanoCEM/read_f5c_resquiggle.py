@@ -217,7 +217,7 @@ def read_blow5(path,position,length,chromo,strand,subsapmle_num=500,base_shift=2
     print('Extracted ', num_aligned, ' aligned reads from blow5 files')
 
     if num_aligned>50:
-        dwell_filter_pctls = (0.5, 99.5)
+        dwell_filter_pctls = (2.5, 97.5)
         dwell_min, dwell_max = np.percentile(final_feature['Dwell time'].values, dwell_filter_pctls)
         final_feature = final_feature[(final_feature['Dwell time'] > dwell_min) & (final_feature['Dwell time'] < dwell_max)]
 
