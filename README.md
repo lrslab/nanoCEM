@@ -6,7 +6,25 @@ It supports two re-squiggle pipeline(`Tombo` and `f5c`) and support `R9` and `R1
 If you want to view single read signal or raw signal, [Squigualiser](https://github.com/hiruna72/squigualiser) is recommended.
 
 ## Example
-Here is an example that show the difference of A2030 on 23S rRNA.
+Here is an example to help the user confirm the installation of A2030 on 23S rRNA:
+```sh
+pip install nanoCEM
+git clone https://github.com/lrslab/nanoCEM
+cd nanoCEM/example
+# tackle f5c result
+current_events_magnifier.py f5c -i data/wt/file -c data/ivt/file -o f5c_result \
+--chrom NR_103073.1 --strand + \
+--pos 2030 \
+--ref data/23S_rRNA.fasta \
+--base_shift 2 --rna --norm
+# tackle tombo result
+current_events_magnifier.py tombo -i data/wt/single -c data/ivt/single -o tombo_result \
+--chrom NR_103073.1 --strand + \
+--pos 2030 \
+--ref data/23S_rRNA.fasta \
+--rna --cpu 4 --norm
+```
+Then you can generate the following pdf files.
 ![alt text](example/boxplot.png)
 ![alt text](example/violin.png)
 
@@ -30,11 +48,14 @@ For example, in CTAT**G**, f5c will only return the last **G**'s current event.S
 In order to make the results of the two methods comparable and draw similar conclusions, we recommend using an offset of **2** maintained a distance no greater than **1** base compared with Tombo. However, if you trust the original input, you can set the offset to **0**.
 ## Installation
 Requirement : Python >=3.7, <3.10
-
 ```sh
-pip install nanoCEM==0.0.4.4
-pip install ont-fast5-api
-conda install -c bioconda f5c slow5tools
+pip install nanoCEM==0.0.1.8
+```
+
+Other tools if you needed
+```sh
+pip install ont-fast5-api pod
+conda install -c bioconda f5c slow5tools minimap2 
 ```
 ## Options
 ### read_tombo_resquiggle
@@ -61,6 +82,7 @@ optional arguments:
   --overplot-number OVERPLOT_NUMBER (default:500)
                         Number of read will be used to plot
   --rna                 Turn on the RNA mode 
+  --norm                Turn on the normalization
 ```
 ### read_f5c_resquiggle
 ```sh
@@ -84,7 +106,7 @@ optional arguments:
                         Turn on the RNA mode
   --base_shift BASE_SHIFT
                         base shift if required (default:0)
-
+  --norm                Turn on the normalization
 ```
 ## Quick start
 ### 1. Run Basecaller and alignment on your ONT data

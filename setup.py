@@ -5,14 +5,14 @@ with open("README.md", "r") as fh:
 
 setup(
     name="nanoCEM",
-    version="0.0.1.7",
+    version="0.0.1.8",
     author="GUO Zhihao",
     author_email="qhuozhihao@icloud.com",
-    description='A sample tool designed to visualize the features that distinguish between two groups of ONT data at the site level.\
-                It supports two re-squiggle pipeline(Tombo and f5c).',
+    description='A simple tool designed to visualize the features that distinguish between two groups of ONT data at the site level.\
+                It supports two re-squiggle program(tombo and f5c).',
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/lrslab/current_events_magnifier",
+    url="https://github.com/lrslab/nanoCEM",
     packages=find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
