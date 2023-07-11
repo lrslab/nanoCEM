@@ -105,7 +105,7 @@ def signal_plot(df, results_path, pos, base_list, title, plot_type,filter=False)
         for item in item_list:
             # collect data
             temp = df[[item, 'position', 'type']].copy()
-            temp.columns = ['value', 'position', 'type']
+            temp.columns = ['value', 'position', 'Group']
             temp.loc[:, 'stats'] = item
             if filter and item!='Dwell time':
                 sig_min, sig_max = np.percentile(temp['value'], SIG_PCTL_RANGE)
@@ -117,7 +117,7 @@ def signal_plot(df, results_path, pos, base_list, title, plot_type,filter=False)
             else:
                 new_df = pd.concat([new_df, temp], axis=0)
 
-        plot = p9.ggplot(new_df, p9.aes(x='position', y="value", fill='type')) \
+        plot = p9.ggplot(new_df, p9.aes(x='position', y="value", fill='Group')) \
                + p9.theme_bw() \
                + p9.scale_fill_manual(values={"Sample": "#ff6f91", "Control": "#7389af", "Single": "#a3abbd"}) \
                + p9.scale_x_discrete(labels=list(base_list)) \
@@ -127,14 +127,16 @@ def signal_plot(df, results_path, pos, base_list, title, plot_type,filter=False)
             axis_text=p9.element_text(size=13),
             axis_title=p9.element_text(size=13),
             title=p9.element_text(size=13),
+            legend_position='bottom',
+            legend_title=p9.element_blank(),
             strip_text=p9.element_text(size=13),
-            legend_position='none',
-            strip_background=p9.element_rect(alpha=0)
+            strip_background=p9.element_rect(alpha=0),
+
         ) \
                + p9.facet_grid('stats ~', scales='free_y')
         plot = plot + p9.labs(title=title, x=str(pos + 1), y='')
 
-        if new_df['type'].drop_duplicates().shape[0] == 1:
+        if new_df['Group'].drop_duplicates().shape[0] == 1:
             plot2 = plot + p9.geom_violin(color='none', position=p9.position_dodge(0.9), width=1)
             plot2 = plot2 + p9.geom_boxplot(outlier_shape='', position=p9.position_dodge(0.9), size=0.2, width=0.1)
             plot2.save(filename=results_path + "/Merged_single.pdf", dpi=300)
@@ -170,4 +172,4 @@ def draw_signal(df, start, base,start_index,end_index):
     print(plot)
     # plot.save(filename="/home/zhguo/Dropbox/@labfiles/projects/GUO/ONT_showcase_tool/plot/norm_signal_aligned.pdf", dpi=300)
 
-    print(1)
+    # print(1)

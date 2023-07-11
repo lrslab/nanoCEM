@@ -156,6 +156,6 @@ if __name__ == '__main__':
         percentile_filter=True
 
     signal_plot(df, results_path, args.pos, base_list, title, 'merged',percentile_filter)
-    signal_plot(df, results_path, args.pos, base_list, title, 'boxplot')
-    signal_plot(df, results_path, args.pos, base_list, title, 'violin_plot')
+    # signal_plot(df, results_path, args.pos, base_list, title, 'boxplot')
+    # signal_plot(df, results_path, args.pos, base_list, title, 'violin_plot')
     print('finished')
