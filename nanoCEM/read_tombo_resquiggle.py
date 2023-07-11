@@ -215,7 +215,7 @@ def extract_group(args, total_fl,subsapmle_num=500):
     df['position'] = df['position'].astype(int).astype(str)
 
     if num_aligned > 50:
-        dwell_filter_pctls = (2.5, 97.5)
+        dwell_filter_pctls = (0.5, 99.5)
         dwell_min, dwell_max = np.percentile(df['Dwell time'].values, dwell_filter_pctls)
         df = df[(df['Dwell time'] > dwell_min) & (df['Dwell time'] < dwell_max)]
         df.reset_index(inplace=True,drop=True)

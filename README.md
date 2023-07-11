@@ -153,9 +153,12 @@ tombo resquiggle single/ reference.fasta --processes 16 --num-most-common-errors
 ```
 3. Run current_events_magnifier to plot
 ```sh
-nanoCEM.py tombo -i sample1/single -c sample2/single -o tombo_result\
- --chrom NR_103073.1 --strand + --pos 2030 \
- --len 5 --cpu 4 --ref reference.fasta --rna
+# tackle tombo result
+current_events_magnifier.py tombo -i data/wt/single -c data/ivt/single -o tombo_result \
+--chrom NR_103073.1 --strand + \
+--pos 2030 \
+--ref data/23S_rRNA.fasta \
+--rna --cpu 4 --norm
 ```
 #### 4.2 F5c resquiggle (v1.2) (support R10)
 Step 1 and 2 should run on your two sample respectively, before the step 3.
@@ -175,10 +178,11 @@ f5c resquiggle -c all.fastq file.blow5 -o file.paf --rna --pore r9
 3. Run nanoCEM to plot
 ```sh
 # run the pipeline below for your two sample respective and keep the suffix of bam/paf/blow5 is the same
-current_events_magnifier.py f5c -i sample1/file -c sample2/file -o f5c_result \
+current_events_magnifier.py f5c -i data/wt/file -c data/ivt/file -o f5c_result \
 --chrom NR_103073.1 --strand + \
---pos 3929 --len 10 \
---ref reference.fasta --base_shift 2 --rna
+--pos 2030 \
+--ref data/23S_rRNA.fasta \
+--base_shift 2 --rna --norm
 ```
 
 

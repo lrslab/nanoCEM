@@ -105,7 +105,7 @@ def signal_plot(df, results_path, pos, base_list, title, plot_type,filter=False)
             temp = df[[item, 'position', 'type']].copy()
             temp.columns = ['value', 'position', 'Group']
             temp.loc[:, 'stats'] = item
-            if filter and item != 'Dwell time':
+            if filter:
                 sig_min, sig_max = np.percentile(temp['value'], SIG_PCTL_RANGE)
                 sig_diff = sig_max - sig_min
                 ylim_tuple = [sig_min - sig_diff * 0.1, sig_max + sig_diff * 0.1]
