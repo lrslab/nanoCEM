@@ -171,11 +171,11 @@ def read_blow5(path,position,length,chromo,strand,subsapmle_num=500,base_shift=2
     global info_dict,s5,pbar
     bam_file = path+".bam"
     if not os.path.exists(path+'.bam'):
-        raise RuntimeError(path+'.bam' +"is not exist in your path!")
+        raise RuntimeError(path+'.bam ' +"is not exist in your path!")
     if not os.path.exists(path+'.paf'):
-        raise RuntimeError(path+'.paf' +"is not exist in your path!")
+        raise RuntimeError(path+'.paf ' +"is not exist in your path!")
     if not os.path.exists(path+'.blow5'):
-        raise RuntimeError(path+'.blow5' +"is not exist in your path!")
+        raise RuntimeError(path+'.blow5 ' +"is not exist in your path!")
     bam_file=pysam.AlignmentFile(bam_file,'rb')
     # if rna_mode:
     #     if strand =='+':

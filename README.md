@@ -185,8 +185,8 @@ current_events_magnifier.py f5c -i data/wt/file -c data/ivt/file -o f5c_result \
 --ref data/23S_rRNA.fasta \
 --base_shift 2 --rna --norm
 ```
-
-
+## Data release and commands
+For the data we used and related commands, please view our [wiki](https://github.com/lrslab/nanoCEM/wiki/Data-release-and-commands)
 
 
 
