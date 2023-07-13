@@ -34,6 +34,7 @@ def init_parser():
                         help="input_fast5_file")
     parser_tombo.add_argument('-c', "--control_fast5",
                         help="control_fast5_file")
+    # parser_tombo.add_argument('-b', "--bam", help="bam file to help index to speed up")
     parser_tombo.add_argument('-o', "--output", default="tombo_result", help="output_file")
     parser_tombo.add_argument('-t', "--cpu", default=4, type=int, help="num of process")
     add_public_argument(parser_tombo)
@@ -46,7 +47,7 @@ def init_parser():
                         help="control_blow5_path")
     parser_f5c.add_argument('-o', "--output", default="f5c_result", help="output_file")
 
-    parser_f5c.add_argument('--base_shift',type=int, default=0, help="output_file")
+    parser_f5c.add_argument('--base_shift',type=int, default=2, help="output_file")
     add_public_argument(parser_f5c)
     return parser
 

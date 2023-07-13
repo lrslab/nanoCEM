@@ -47,7 +47,7 @@ This is because RNA undergoes splicing and other phenomena after transcription, 
 ### Base shift (only available for f5c)
 The mechanism of tombo and f5c is different, f5c applied a k-mer model, which means base should satisfy at least 4 bases before it.
 For example, in CTAT**G**, f5c will only return the last **G**'s current event.So, compared to tombo, there is always an offset in the results of f5c. 
-In order to make the results of the two methods comparable and draw similar conclusions, we recommend using an offset of **2** maintained a distance no greater than **1** base compared with Tombo. However, if you trust the original input, you can set the offset to **0**.
+In order to make the results of the two methods comparable and draw similar conclusions, we recommend using an offset of **2** maintained a distance no greater than **1** base compared with Tombo (default : **2**). However, if you trust the original input, you can set the offset to **0**.
 ## Installation
 Requirement : Python >=3.7, <3.10
 ```sh
@@ -107,7 +107,7 @@ optional arguments:
   --rna                 
                         Turn on the RNA mode
   --base_shift BASE_SHIFT
-                        base shift if required (default:0)
+                        base shift if required (default:2)
   --norm                Turn on the normalization
 ```
 ## Quick start
