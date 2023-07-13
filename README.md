@@ -28,6 +28,8 @@ Then you can generate the following pdf files.
 ![alt text](example/boxplot.png)
 ![alt text](example/violin.png)
 
+## Data release and commands
+For the data we used and related commands in our paper, please view our [wiki](https://github.com/lrslab/nanoCEM/wiki/Data-release-and-commands)
 ## Before start, you should know
 ### Re-squiggle
 In ONT technology, "resquiggle" refers to the process of converting the raw electrical signals from the sequencer into corresponding DNA/RNA sequence information, which is then corrected and realigned. 
@@ -185,8 +187,7 @@ current_events_magnifier.py f5c -i data/wt/file -c data/ivt/file -o f5c_result \
 --ref data/23S_rRNA.fasta \
 --base_shift 2 --rna --norm
 ```
-## Data release and commands
-For the data we used and related commands, please view our [wiki](https://github.com/lrslab/nanoCEM/wiki/Data-release-and-commands)
+
 
 
 
