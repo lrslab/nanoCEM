@@ -28,7 +28,7 @@ Then you can generate the following pdf files.
 ![alt text](example/boxplot.png)
 ![alt text](example/violin.png)
 
-## Data release and commands
+## Data release
 For the data we used and related commands in our paper, please view our [wiki](https://github.com/lrslab/nanoCEM/wiki/Data-release-and-commands)
 ## Before start, you should know
 ### Re-squiggle
