@@ -37,9 +37,9 @@ def save_fasta_dict(fasta_dict,path):
     f=open(path,'w+')
     for key,value in fasta_dict.items():
         f.write('>'+key+'\n')
-        line = len(value) //70 + 1
+        line = len(value) //80 + 1
         for i in range(0, line):
-            f.write(value[i*70:(i+1)*70]+'\n')
+            f.write(value[i*80:(i+1)*80]+'\n')
         f.close()
 # fasta=read_fasta_to_dic("/data/Ecoli_23s/23S_rRNA.fasta")
 # for key,value in fasta.items():

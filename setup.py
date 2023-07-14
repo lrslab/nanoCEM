@@ -28,7 +28,8 @@ setup(
         'tqdm>=4.62.0',
         "pysam>=0.21.0",
         "pyslow5>=1.0.0",
-        "vbz_h5py_plugin>=1.0.1"
+        "vbz_h5py_plugin>=1.0.1",
+        "biopython>=1.80"
     ],
     scripts=['nanoCEM/current_events_magnifier.py','nanoCEM/extract_sub_fast5_from_bam.py']
 )
