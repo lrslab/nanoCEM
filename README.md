@@ -131,6 +131,8 @@ And the new reads will be copied to ```subsample_single/```
 ```sh
 multi_to_single_fast5 -i fast5/ -s single/ --recursive -t 16
 extract_sub_fast5_from_bam.py -i single/ -o subsample_single/ -b file.bam --chrom NR_103073.1 --pos 2030 
+# Remember to sample fastq if you sampled your fast5
+extract_sub_fastq_from_bam.py -i all.fastq -o final.fastq -b file.bam --chrom NR_103073.1 --pos 2030 
 ```
 ### 4 Re-squiggle
 #### 4.1 Tombo resquiggle (v1.5.0)
@@ -176,6 +178,7 @@ slow5tools index file.blow5
 
 Use ```--rna``` to turn to the rna mode and ```--pore r10``` to re-squiggle reads from R10
 ```sh
+
 f5c resquiggle -c all.fastq file.blow5 -o file.paf --rna --pore r9
 ```
 3. Run nanoCEM to plot
