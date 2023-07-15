@@ -23,7 +23,7 @@ setup(
     install_requires=[
         'h5py==3.8.0',
         'numpy>=1.23.0',
-        'pandas>=1.1.5',
+        'pandas>=1.2.0',
         'plotnine>=0.8.0',
         'tqdm>=4.62.0',
         "pysam>=0.21.0",

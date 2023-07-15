@@ -156,7 +156,8 @@ def extract_pairs_pos(bam_file,position,length,chromosome,strand):
         aligned_pair = pd.DataFrame(aligned_pair)
         if strand == '-':
             aligned_pair[0] = aligned_pair[0].iloc[::-1]
-        aligned_pair.dropna(inplace=True,ignore_index=True)
+        aligned_pair = aligned_pair.dropna()
+        aligned_pair.reset_index(drop=True, inplace=True)
         aligned_pair = aligned_pair[(aligned_pair[1] >= position - length) & (aligned_pair[1] <= position + length)]
 
         temp={}

@@ -150,7 +150,8 @@ if __name__ == '__main__':
     # draw_volin(df,results_path,args.pos,base_list,title)
     # draw_boxplot(df,results_path,args.pos,base_list,title)
     print("Start to generate plots and save  in "+ results_path)
-    # if args.function == 'f5c':
+    df.to_csv(results_path+'/feature.csv',index=None)
+   # if args.function == 'f5c':
     #     if (args.rna and args.strand == '+') or (not args.rna and args.strand == '-'):
     #         args.pos = args.pos - args.base_shift
     #     else:
