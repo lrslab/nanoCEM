@@ -32,9 +32,10 @@ Then you can generate the following pdf files.
 For the data we used and related commands in our paper, please view our [wiki](https://github.com/lrslab/nanoCEM/wiki/Data-release-and-commands)
 ## Before start, you should know
 ### Re-squiggle
-In ONT technology, "resquiggle" refers to the process of converting the raw electrical signals from the sequencer into corresponding DNA/RNA sequence information, which is then corrected and realigned. 
-This process utilizes the signal features of ONT sequencing, such as changes in electrical resistance and noisy signals, to capture information from the DNA/RNA sequence and analyze and interpret it. 
-Although new basecaller program (Guppy/Boinito/Dorado) generated the bam file with move table to record the event index,but  resquiggle is a more fine alignment than the move table in most cases.
+The electric current signal level data produced from a nanopore read is referred to as a **squiggle**.
+Base calling this squiggle information generally contains some errors compared to a reference sequence. 
+The re-squiggle algorithm defines a new assignment from squiggle to reference sequence, hence a **re-squiggle**.
+Although new basecaller program (Guppy/Boinito/Dorado) generated the bam file with move table to record the event index,but resquiggle is a more fine alignment than the move table in most cases.
 ### Data format
 Since the release of the R10, ONT's data formats have become more diverse, including the initial fast5 format, the new pod5 format, and community-provided slow5/blow5 formats. The relationship between them and conversion tools are shown in the following figure.
 
@@ -115,6 +116,7 @@ optional arguments:
 ```sh
 # assumed your fast5 file folder name is fast5/ and reference is reference.fasta
 # q 30 is recommended but you can try other filter in your data
+# guppy is just an example, and other basecalling software such as Bonito and Dorado can also be used.
 guppy_basecaller -i fast5/ -s ./guppy_out --recursive --device auto -c rna_r9.4.1_70bps_hac.cfg  &
 cat guppy_out/*/*.fastq > all.fastq
 minimap2 -ax map-ont -t 16 --MD reference.fasta all.fastq | samtools view -hbS -F 260 -q 30 - | samtools sort -@ 16 -o file.bam
