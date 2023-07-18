@@ -37,7 +37,12 @@ Base calling this squiggle information generally contains some errors compared t
 The re-squiggle algorithm defines a new assignment from squiggle to reference sequence, hence a **re-squiggle**.
 Although new basecaller program (Guppy/Boinito/Dorado) generated the bam file with move table to record the event index,but resquiggle is a more fine alignment than the move table in most cases.
 
+<center>
+
 ![alt text](example/resquiggle.png)
+
+</center>
+
 ### Data format
 Since the release of the R10, ONT's data formats have become more diverse, including the initial fast5 format, the new pod5 format, and community-provided slow5/blow5 formats. The relationship between them and conversion tools are shown in the following figure.
 
