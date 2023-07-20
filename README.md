@@ -145,7 +145,7 @@ extract_sub_fastq_from_bam -i all.fastq -o final.fastq -b file.bam --chrom NR_10
 ```
 ### 4 Re-squiggle
 #### 4.1 Tombo resquiggle (v1.5.0)
-Step 1 and 2 should run on your two sample respectively, before the step 5.
+Step 1 and 2 should run on your two sample respectively, before the step 3.
 1. Data format conversion
 
 If you did the subsample,skip this step and used ```subsample_single``` as the following input rather than ```single/```
