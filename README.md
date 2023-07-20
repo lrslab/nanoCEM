@@ -12,13 +12,13 @@ pip install nanoCEM
 git clone https://github.com/lrslab/nanoCEM
 cd nanoCEM/example
 # tackle f5c result
-current_events_magnifier.py f5c -i data/wt/file -c data/ivt/file -o f5c_result \
+current_events_magnifier f5c -i data/wt/file -c data/ivt/file -o f5c_result \
 --chrom NR_103073.1 --strand + \
 --pos 2030 \
 --ref data/23S_rRNA.fasta \
 --base_shift 2 --rna --norm
 # tackle tombo result
-current_events_magnifier.py tombo -i data/wt/single -c data/ivt/single -o tombo_result \
+current_events_magnifier tombo -i data/wt/single -c data/ivt/single -o tombo_result \
 --chrom NR_103073.1 --strand + \
 --pos 2030 \
 --ref data/23S_rRNA.fasta \
@@ -70,7 +70,7 @@ conda install -c bioconda f5c slow5tools minimap2 samtools
 ## Options
 ### read_tombo_resquiggle
 ```sh
-current_events_magnifier.py tombo -h
+current_events_magnifier tombo -h
 optional arguments:
   -h, --help            show this help message and exit
   --basecall_group BASECALL_GROUP
@@ -96,7 +96,7 @@ optional arguments:
 ```
 ### read_f5c_resquiggle
 ```sh
-current_events_magnifier.py f5c -h
+current_events_magnifier f5c -h
 optional arguments:
   -h, --help            show this help message and exit
   -i INPUT, --input INPUT
@@ -168,7 +168,7 @@ tombo resquiggle single/ reference.fasta --processes 16 --num-most-common-errors
 3. Run current_events_magnifier to plot
 ```sh
 # tackle tombo result
-current_events_magnifier.py tombo -i data/wt/single -c data/ivt/single -o tombo_result \
+current_events_magnifier tombo -i data/wt/single -c data/ivt/single -o tombo_result \
 --chrom NR_103073.1 --strand + \
 --pos 2030 \
 --ref data/23S_rRNA.fasta \
@@ -193,7 +193,7 @@ f5c resquiggle -c all.fastq file.blow5 -o file.paf --rna --pore r9
 3. Run nanoCEM to plot
 ```sh
 # run the pipeline below for your two sample respective and keep the suffix of bam/paf/blow5 is the same
-current_events_magnifier.py f5c -i data/wt/file -c data/ivt/file -o f5c_result \
+current_events_magnifier f5c -i data/wt/file -c data/ivt/file -o f5c_result \
 --chrom NR_103073.1 --strand + \
 --pos 2030 \
 --ref data/23S_rRNA.fasta \
