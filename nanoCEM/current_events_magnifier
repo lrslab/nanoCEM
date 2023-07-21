@@ -3,7 +3,7 @@ import argparse
 import os
 import time
 import warnings
-
+import copy
 import pandas as pd
 from plotnine.exceptions import PlotnineWarning
 
@@ -81,7 +81,7 @@ if __name__ == '__main__':
         base_list = "".join(list(reversed(base_list)))
         base_list = reverse_fasta(base_list)
 
-    title = args.chrom + ':' + str(args.pos - args.len + 1) + '-' + str(args.pos + args.len + 2) + ':' + args.strand
+    title = args.chrom + ':' + str(args.pos - args.len + 1) + '-' + str(args.pos + args.len + 1) + ':' + args.strand
     if args.rna:
         base_list = base_list.replace("T", "U")
         print("Running RNA mode ...")
@@ -150,14 +150,18 @@ if __name__ == '__main__':
             df_wt['type'] = 'Single'
             title = title + '   Sample:' + str(aligned_num_wt)
 
-    category_data = [str(args.pos + x) for x in range(-args.len, args.len + 1)]
-    category = pd.api.types.CategoricalDtype(categories=category_data, ordered=True)
-    df['position'] = df['position'].astype(category)
+
 
     # draw_volin(df,results_path,args.pos,base_list,title)
     # draw_boxplot(df,results_path,args.pos,base_list,title)
     print("Start to generate plots and save  in " + results_path)
-    df.to_csv(results_path + '/feature.csv', index=None)
+    df_copy=copy.deepcopy(df)
+    df_copy['position'] = df_copy['position'].astype(int) + 1
+    df_copy.to_csv(results_path + '/feature.csv', index=None)
+
+    category_data = [str(args.pos + x) for x in range(-args.len, args.len + 1)]
+    category = pd.api.types.CategoricalDtype(categories=category_data, ordered=True)
+    df['position'] = df['position'].astype(category)
     # if args.function == 'f5c':
     #     if (args.rna and args.strand == '+') or (not args.rna and args.strand == '-'):
     #         args.pos = args.pos - args.base_shift
