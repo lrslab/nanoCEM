@@ -35,7 +35,7 @@ For the data we used and related commands in our paper, please view our [wiki](h
 The electric current signal level data produced from a nanopore read is referred to as a **squiggle**.
 Base calling this squiggle information generally contains some errors compared to a reference sequence. 
 The re-squiggle algorithm defines a new assignment from squiggle to reference sequence, hence a **re-squiggle**.
-Although new basecaller program (Guppy/Boinito/Dorado) generated the bam file with move table to record the event index,but resquiggle is a more fine alignment than the move table in most cases.
+Although new basecall program (Guppy/Boinito/Dorado) generated the bam file with move table to record the event index,but re-squiggle is a more fine alignment than the move table in most cases.
 
 <center>
 
@@ -59,7 +59,7 @@ In order to make the results of the two methods comparable and draw similar conc
 ## Installation
 Requirement : Python >=3.7, <3.10
 ```sh
-pip install nanoCEM==0.0.2.0
+pip install nanoCEM==0.0.2.4
 ```
 
 Other tools if you needed
@@ -122,16 +122,16 @@ optional arguments:
 ### 1. Run Basecaller and alignment on your ONT data
 ```sh
 # assumed your fast5 file folder name is fast5/ and reference is reference.fasta
-# q 30 is recommended but you can try other filter in your data
+# q 30 is recommended for DNA and q 5 for RNA ,but you can try other filter in your data
 # guppy is just an example, and other basecalling software such as Bonito and Dorado can also be used.
 guppy_basecaller -i fast5/ -s ./guppy_out --recursive --device auto -c rna_r9.4.1_70bps_hac.cfg  &
 cat guppy_out/*/*.fastq > all.fastq
-minimap2 -ax map-ont -t 16 --MD reference.fasta all.fastq | samtools view -hbS -F 260 -q 30 - | samtools sort -@ 16 -o file.bam
+minimap2 -ax map-ont -t 16 --MD reference.fasta all.fastq | samtools view -hbS -F 260 -q 5 - | samtools sort -@ 16 -o file.bam
 samtools index file.bam
 ```
 Option ```-c``` means config file ,which will depend on your data
 ### 2. Decide the chrom or transcript name and region of your interest
-In this sample, I plot the 23s rRNA whose header in fasta file is NR_103073.1 and I am intereted in A2030 on the plus strand.
+In this sample, I plot the 23s rRNA whose header in fasta file is NR_103073.1, and I am interested in A2030 on the plus strand.
 So for the following command , I used ```--chrom NR_103073.1  --pos 2030 --strand +```.
 ### 3. Subsample (Optional)
 Re-squiggle is a really time-consuming program, it will be applied on all reads not only the reads around interest region.
