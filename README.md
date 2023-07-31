@@ -59,7 +59,7 @@ In order to make the results of the two methods comparable and draw similar conc
 ## Installation
 Requirement : Python >=3.7, <3.10
 ```sh
-pip install nanoCEM==0.0.2.4
+pip install nanoCEM==0.0.2.6
 ```
 
 Other tools if you needed
@@ -199,6 +199,10 @@ current_events_magnifier f5c -i data/wt/file -c data/ivt/file -o f5c_result \
 --ref data/23S_rRNA.fasta \
 --base_shift 2 --rna --norm
 ```
+### 4 Result files
+
+Merged_violin.pdf and Merged_boxplot.pdf will be generated in the output folder if compared two groups, while will obtain Merged_single.pdf if applied single mode 
+And result table included all statistical feature called feature.csv will be added to the output file
 
 
 
