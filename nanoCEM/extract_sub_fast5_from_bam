@@ -7,7 +7,7 @@ import pysam
 import argparse
 import shutil
 import time
-
+from multiprocessing import Pool
 def create_result_folder(output_path):
     print("Try to build generate the result path: "+output_path)
     if os.path.exists(output_path):
@@ -30,13 +30,19 @@ def select_sub_reads(line):
 def copy2new_path(line,results_path):
     global pbar
     fold_name = line[0].split('/')[-2]
-    if not os.path.exists(results_path+'/single/'+fold_name):
-        os.mkdir(results_path+'/single/'+fold_name)
+    try:
+       if not os.path.exists(results_path+'/single/'+fold_name):
+           os.mkdir(results_path+'/single/'+fold_name)
+    except Exception:
+        print("mkdir failed")
     os.system('cp ' + line[0] + ' ' + results_path+'/single/'+fold_name)
-    pbar.update(1)
 
+def process_line(line,results_path):
+    copy2new_path(line, results_path)
+    return 1
 def transfer_fast5(total_fl, df,results_path):
     global pbar
+    results_list=[]
     total_fl.columns=[0,'readname']
     df = df[['readname']]
     df[2] = '.'
@@ -50,7 +56,17 @@ def transfer_fast5(total_fl, df,results_path):
 
 
     os.mkdir(results_path+'/single/')
-    temp.apply(copy2new_path,results_path=results_path, axis=1)
+    # 使用多进程处理
+    pool = Pool(processes=args.cpu)  # 根据需要设置进程数
+
+    for line in temp.iterrows():
+        result_per_process = pool.apply_async(process_line, args=(line[1],results_path,))
+        results_list.append(result_per_process)
+    pool.close()
+    for result_per_read in results_list:
+        temp = result_per_read.get()
+        pbar.update(1)
+    pool.join()
     pbar.close()
 
 def main(args):
@@ -95,14 +111,8 @@ if __name__ == '__main__':
     parser.add_argument('-b',"--bam", required=True,
                         help="bam_path")
     parser.add_argument('-o',"--output", default='subsample_single', help="output_file")
-    parser.add_argument("--chrom",help="Gene or chromosome name(head of your fasta file)")
-    parser.add_argument("--pos", type=int, help="site of your interest")
-    # parser.add_argument("-f","--fast5", default='/data/Ecoli_23s/data/L_rep2/single/',
-    #                     help="fast5_path")
-    # parser.add_argument('-b',"--bam", default="/data/Ecoli_23s/data/L_rep2/file.bam",
-    #                     help="bam_path")
-    # parser.add_argument('-o',"--output", default='/data/Ecoli_23s/data/L_rep2/subsample2', help="output_file")
-    # parser.add_argument("--chrom", default='NR_103073.1',help="Gene or chromosome name(head of your fasta file)")
-    # parser.add_argument("--pos", default=2029, type=int, help="site of your interest")
+    parser.add_argument('-t', "--cpu", default=4, help="Process numbers")
+    parser.add_argument("--chrom",help="Gene or chromosome name(head of your fasta file) if required")
+    parser.add_argument("--pos", type=int, help="site of your interest if required")
     args = parser.parse_args()
     main(args)
