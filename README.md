@@ -138,8 +138,8 @@ Re-squiggle is a really time-consuming program, it will be applied on all reads 
 So I provide a simple py file to help extract the reads you want to visualize.
 And the new reads will be copied to ```subsample_single/```
 ```sh
-multi_to_single_fast5 -i fast5/ -s single/ --recursive -t 16
-extract_sub_fast5_from_bam -i single/ -o subsample_single/ -b file.bam --chrom NR_103073.1 --pos 2030 
+multi_to_single_fast5 -i fast5/ -s single/ --recursive
+extract_sub_fast5_from_bam -i single/ -o subsample_single/ -b file.bam --chrom NR_103073.1 --pos 2030 -t 16
 # Remember to sample fastq if you sampled your fast5
 extract_sub_fastq_from_bam -i all.fastq -o final.fastq -b file.bam --chrom NR_103073.1 --pos 2030 
 ```
@@ -151,7 +151,7 @@ Step 1 and 2 should run on your two sample respectively, before the step 3.
 If you did the subsample,skip this step and used ```subsample_single``` as the following input rather than ```single/```
 ```sh
 # assumed your fast5 file folder name is fast5/
-multi_to_single_fast5 -i fast5/ -s single/ --recursive -t 16
+multi_to_single_fast5 -i fast5/ -s single/ --recursive 
 ```
 2. Run tombo resquiggle
 ```sh
