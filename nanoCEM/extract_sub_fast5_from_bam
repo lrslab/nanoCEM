@@ -57,7 +57,7 @@ def transfer_fast5(total_fl, df,results_path):
 
     os.mkdir(results_path+'/single/')
     # 使用多进程处理
-    pool = Pool(processes=args.cpu)  # 根据需要设置进程数
+    pool = Pool(processes=int(args.cpu))  # 根据需要设置进程数
 
     for line in temp.iterrows():
         result_per_process = pool.apply_async(process_line, args=(line[1],results_path,))
