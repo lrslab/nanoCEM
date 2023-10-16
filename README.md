@@ -59,7 +59,7 @@ In order to make the results of the two methods comparable and draw similar conc
 ## Installation
 Requirement : Python >=3.7, <3.10
 ```sh
-pip install nanoCEM==0.0.2.6
+pip install nanoCEM==0.0.2.8
 ```
 
 Other tools if you needed
