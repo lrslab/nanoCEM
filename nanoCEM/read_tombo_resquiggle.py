@@ -1,8 +1,7 @@
 import numpy as np
 import h5py
 import pandas as pd
-import plotnine as p9
-import argparse
+
 import os
 import multiprocessing
 from tqdm import tqdm
@@ -17,7 +16,7 @@ def matrix_append(total_matrix,new_matrix,index):
         return total_matrix
     len_new_matrix=new_matrix.shape[0]
     if index+len_new_matrix>total_matrix.shape[0]:
-        temp_matrix=np.zeros((500000,5),dtype=float)
+        temp_matrix=np.zeros((500000,6),dtype='O')
         total_matrix=np.vstack((total_matrix,temp_matrix))
     total_matrix[index:index+len_new_matrix]=new_matrix
     return total_matrix
@@ -46,11 +45,12 @@ def get_label_raw(fast5_fn, basecall_group, basecall_subgroup ,chromosome, posit
         corr_data = fast5_data['/Analyses/' + basecall_group + '/' + basecall_subgroup + '/Events']
         align_data = fast5_data['/Analyses/' + basecall_group + '/' + basecall_subgroup + '/Alignment']
         corr_attrs = dict(list(corr_data.attrs.items()))
-        align_attrs=dict(list(align_data.attrs.items()))
+        align_attrs = dict(list(align_data.attrs.items()))
         corr_data = corr_data[()]
     # ~ .value
-    except:
-        raise RuntimeError(('Corrected data not found.'))
+    except Exception as e:
+        return None
+        # raise RuntimeError(('Corrected data not found.'))
 
     # fast5_info = fast5_data['UniqueGlobalKey/channel_id'].attrs
     # sampling_rate = fast5_info['sampling_rate'].astype('int_')
@@ -79,106 +79,79 @@ def get_label_raw(fast5_fn, basecall_group, basecall_subgroup ,chromosome, posit
     return (raw_dat, event_bases, event_starts, event_lengths,start_position,strand,chrome)
 
 
-def extract_feature(signal, event_start, event_length, base,start_position,end_position,strand,norm=True):
-    global BASE_LIST
-    position=FLAG.pos
-    if strand == '+':
-        current_index = position-start_position
-    else:
-        current_index = end_position - position - 1
-    if current_index-FLAG.len < 0:
-        start = 0
-    else:
-        start = current_index-FLAG.len
-    if current_index + FLAG.len >= (end_position - start_position):
-        end=len(event_start)
-    else:
-        end=current_index + FLAG.len + 1
+def extract_feature(signal, event_start, event_length, base, start_position,end_position,plot_pos,plot_len,strand,norm=True):
+    # calculate relative index on reads of reference position
+    current_index = plot_pos - start_position
+    if strand =='-':
+        current_index = end_position - plot_pos -1
+    start = current_index - plot_len if current_index > plot_len else 0
+    end = current_index + plot_len + 1 if current_index + plot_len < (end_position - start_position) else end_position - start_position
 
-    seq_array = np.array(list(base))
-    assert seq_array.shape == event_length.shape
     # uniq_arr = np.unique(signal)
     # signal = (signal - np.median(uniq_arr)) / float(robust.mad(uniq_arr))
+
     # normalization
-
     signal = signal[event_start[0]:event_start[-1] + event_length[-1]]
-
     event_start = event_start-event_start[0]
     if norm:
         signal = normalize_signal_with_lim(signal)
 
-    # filter too short or long dwell time
-    # dwell_filter_pctls = (5, 95)
-    # dwell_min, dwell_max = np.percentile(event_length, dwell_filter_pctls)
-    # valid_bases = np.logical_and.reduce(
-    #     (
-    #         event_length > dwell_min,
-    #         event_length < dwell_max,
-    #         np.logical_not(np.isnan(event_length)),
-    #     )
-    # )
-    # event_length[~valid_bases]=0
-
-
-    total_feature_per_reads = []
+    total_feature_per_read = []
     # if end >=event_start.shape[0]:
     #     #print(1)
     # draw_signal(norm_signal[event_start[start]:event_start[end]], event_start[start:end] - event_start[start],
     #             base[start:end])
-    raw_signal_every = [signal[event_start[start + x]:event_start[start + x] + event_length[start + x]] for x in range(end-start)]
+    raw_signal_every = [signal[event_start[start + x]:event_start[start + x] + event_length[start + x]] for x in range(end - start)]
 
     for i, element in enumerate(raw_signal_every):
         if event_length[start + i] == 0:
             continue
         if strand == '+':
-            final_position = position - FLAG.len + i
+            final_position = plot_pos - plot_len + i
         else:
-            final_position = position + FLAG.len - i
+            final_position = plot_pos + plot_len - i
         temp = [np.mean(element), np.std(element), np.median(element), event_length[start + i], final_position]
-        total_feature_per_reads.append(temp)
-    total_feature_per_reads=np.array(total_feature_per_reads)
-    return total_feature_per_reads
+        total_feature_per_read.append(temp)
+    return total_feature_per_read
 
-def extract_file(input_file,mode):
+def extract_file(input_file,FLAG):
     basecall_group = FLAG.basecall_group
     basecall_subgroup = FLAG.basecall_subgroup
 
     chromosome = FLAG.chrom
     position = FLAG.pos
     strand = FLAG.strand
-    try:
-        temp_result = get_label_raw(input_file, basecall_group, basecall_subgroup,chromosome, position,strand)
-        if temp_result is None:
-            return None
-        (raw_data, raw_label, raw_start, raw_length, start_position, strand,chrome) = temp_result
-    except Exception as e:
-        # print(str(e))
+    temp_result = get_label_raw(input_file, basecall_group, basecall_subgroup,chromosome, position,strand)
+    if temp_result is None:
         return None
+    (raw_data, raw_label, raw_start, raw_length, start_position, strand,chrome) = temp_result
+
 
     # ~ print(input_file,raw_start,raw_length,raw_label)
     total_seq = "".join([x.decode() for x in raw_label])
     base_len=raw_label.shape[0]
     end_position = start_position+base_len
-    if mode:
+    if FLAG.rna:
         raw_data = np.flip(raw_data)
-    matrix_feature = extract_feature(raw_data, raw_start, raw_length, total_seq,start_position,end_position,strand,FLAG.norm)
-    if matrix_feature is None:
-        return None
+    matrix_feature = extract_feature(raw_data, raw_start, raw_length, total_seq,start_position,end_position,position,FLAG.len,FLAG.strand,FLAG.norm)
     del raw_data
-
+    if matrix_feature is not None:
+        read_name = input_file.split('/')[-1].split('.')[-2]
+        df = pd.DataFrame(matrix_feature)
+        df.insert(0, 'read', read_name)
+        matrix_feature = df.values
     return matrix_feature
 
-def extract_group(args, total_fl,subsapmle_num=500):
-    global FLAG,BASE_LIST
-    BASE_LIST=None
-    FLAG=args
-    # feature_matrix = np.zeros((1000000,40))
+def extract_group(args, total_fl,subsample_num=1):
+
     results_list = []
+    if subsample_num<1:
+        total_fl = random.sample(total_fl, int(len(total_fl)*subsample_num))
     ##########
     pool = multiprocessing.Pool(processes=int(args.cpu))
     ##########
     for fl in total_fl:
-        result_per_read = pool.apply_async(extract_file, (fl,args.rna))
+        result_per_read = pool.apply_async(extract_file, (fl,args))
         results_list.append(result_per_read)
     pool.close()
     ############################
@@ -191,15 +164,13 @@ def extract_group(args, total_fl,subsapmle_num=500):
             feature_per_read = temp
             result_list.append(feature_per_read)
 
-            del  feature_per_read
+            del feature_per_read
         pbar.update(1)
     #############################
     pool.join()
     pbar.close()
 
     num_aligned = len(result_list)
-    if subsapmle_num < num_aligned:
-        result_list=random.sample(result_list,subsapmle_num)
     final_feature=[]
     for item in result_list:
         final_feature.extend(item)
@@ -209,16 +180,16 @@ def extract_group(args, total_fl,subsapmle_num=500):
     if df.shape[0] == 0:
         raise Exception("can not find basecall_group or basecall_subgroup in fast5 files or there is no read aligned on the position")
     print('\nextracted ',num_aligned,' aligned reads from fast5 files')
-    df.columns = ['Mean', 'STD', 'Median', 'Dwell time', 'position']
+    df.columns = ['Read_ID','Mean', 'STD', 'Median', 'Dwell time', 'position']
 
     # 转化为数值
-    df['position'] = df['position'].astype(int).astype(str)
+    df['position'] = df['position'].astype(int)
 
-    if num_aligned > 50:
-        dwell_filter_pctls = (0.5, 99.5)
-        dwell_min, dwell_max = np.percentile(df['Dwell time'].values, dwell_filter_pctls)
-        df = df[(df['Dwell time'] > dwell_min) & (df['Dwell time'] < dwell_max)]
-        df.reset_index(inplace=True,drop=True)
+    # if num_aligned > 50:
+    #     dwell_filter_pctls = (0.5, 99.5)
+    #     dwell_min, dwell_max = np.percentile(df['Dwell time'].values, dwell_filter_pctls)
+    #     df = df[(df['Dwell time'] > dwell_min) & (df['Dwell time'] < dwell_max)]
+    #     df.reset_index(inplace=True,drop=True)
     #     item_list = ['Mean', 'STD']
     #     for item in item_list:
     #         # collect data

@@ -19,9 +19,9 @@ def init_parser():
         parser_input.add_argument("--pos", required=True, type=int, help="site of your interest")
         parser_input.add_argument("--len", default=10, type=int, help="region around the position")
         parser_input.add_argument("--strand", default="+", help="Strand of your interest")
-        parser_input.add_argument("--ref", required=True, help="fasta file")
+        parser_input.add_argument('-r',"--ref", required=True, help="fasta file")
         parser_input.add_argument('--norm', action='store_true', help='Turn on the normalization mode')
-        parser_input.add_argument("--overplot-number", default=500, type=int,
+        parser_input.add_argument('-s',"--subsample_ratio", default=1.0, type=float,
                                   help="Number of read will be used to plot")
         parser_input.add_argument('--rna', action='store_true', help='Turn on the RNA mode')
 
@@ -40,8 +40,7 @@ def init_parser():
                               help="input_fast5_file")
     parser_tombo.add_argument('-c', "--control_fast5",
                               help="control_fast5_file")
-    # parser_tombo.add_argument('-b', "--bam", help="bam file to help index to speed up")
-    parser_tombo.add_argument('-o', "--output", default="tombo_result", help="output_file")
+    parser_tombo.add_argument('-o', "--output", default="nanoCEM_result", help="output_file")
     parser_tombo.add_argument('-t', "--cpu", default=4, type=int, help="num of process")
     add_public_argument(parser_tombo)
 
@@ -51,7 +50,7 @@ def init_parser():
                             help="blow5_path")
     parser_f5c.add_argument('-c', "--control",
                             help="control_blow5_path")
-    parser_f5c.add_argument('-o', "--output", default="f5c_result", help="output_file")
+    parser_f5c.add_argument('-o', "--output", default="nanoCEM_result", help="output_file")
 
     parser_f5c.add_argument('--base_shift', type=int, default=2, help="output_file")
     add_public_argument(parser_f5c)
@@ -67,14 +66,14 @@ if __name__ == '__main__':
     # read reference
     # print(args)
     if args.function is None:
-        raise RuntimeError("Please choose function from f5c or tombo, or use -h to view the help document")
+        raise RuntimeError("Invalid function selection. Please choose a function from f5c or tombo, or use the -h flag to view the help documentation.")
     subsample_num = args.overplot_number
     fasta = read_fasta_to_dic(args.ref)
     # length filter
     args.pos = args.pos - 1
     length_gene = len(fasta[args.chrom])
     if args.pos + args.len + 1 >= length_gene or args.pos - args.len <= 0:
-        raise RuntimeError("The position requested is too close to the border (pos-len>0 and pos+len<length of fasta)")
+        raise RuntimeError("Invalid position selection: exceeds reference length or contains positions with no coverage.")
     base_list = fasta[args.chrom][args.pos - args.len:args.pos + args.len + 1].upper()
 
     if args.strand == '-':
@@ -123,7 +122,7 @@ if __name__ == '__main__':
         from nanoCEM.read_f5c_resquiggle import read_blow5
 
         if args.base_shift < 0:
-            raise RuntimeError("base_shift should not less than 0")
+            raise Exception("base_shift should not less than 0")
         # if (args.rna and args.strand=='+') or (not args.rna and args.strand=='-'):
         #     args.pos = args.pos + args.base_shift
         # else:
@@ -132,7 +131,7 @@ if __name__ == '__main__':
                                                             subsample_num, args.base_shift, args.norm)
         df_wt['type'] = 'Sample'
         if nucleotide_type == 'RNA' and not args.rna:
-            raise RuntimeError("You need to add --rna to turn on the rna mode")
+            raise Exception("You need to add --rna to turn on the rna mode")
         try:
             df_ivt, aligned_num_ivt, _ = read_blow5(args.control, args.pos, args.len, args.chrom, args.strand,
                                                     subsample_num, args.base_shift, args.norm)

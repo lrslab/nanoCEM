@@ -133,7 +133,7 @@ def extract_feature(line,strand,base_shift=2,norm=True):
     for i, element in enumerate(raw_signal_every):
         if event_length[read_pos[i]] == 0:
             continue
-        temp = [np.mean(element), np.std(element), np.median(element), event_length[read_pos[i]],ref_pos[i]]
+        temp = [read_id,np.mean(element), np.std(element), np.median(element), event_length[read_pos[i]],ref_pos[i]]
         total_feature_per_reads.append(temp)
     return total_feature_per_reads
 
@@ -168,7 +168,7 @@ def extract_pairs_pos(bam_file,position,length,chromosome,strand):
 
 
 
-def read_blow5(path,position,length,chromo,strand,subsapmle_num=500,base_shift=2,norm=True):
+def read_blow5(path,position,length,chrom,strand,subsample_ratio=1,base_shift=2,norm=True):
     global info_dict,s5,pbar
     bam_file = path+".bam"
     if not os.path.exists(path+'.bam'):
@@ -183,7 +183,7 @@ def read_blow5(path,position,length,chromo,strand,subsapmle_num=500,base_shift=2
     #         position=position+ (kmer_model-1)
     #     else:
     #         position=position- (kmer_model-1)
-    info_dict=extract_pairs_pos(bam_file,position,length,chromo,strand)
+    info_dict=extract_pairs_pos(bam_file,position,length,chrom,strand)
     if info_dict == {}:
         raise RuntimeError("There is no read aligned on this position")
     info_df = pd.DataFrame(list(info_dict.keys()))
@@ -201,13 +201,13 @@ def read_blow5(path,position,length,chromo,strand,subsapmle_num=500,base_shift=2
     pbar.close()
     df.dropna(inplace=True)
     num_aligned = df.shape[0]
-    if subsapmle_num < df.shape[0]:
-        df=df.sample(n=subsapmle_num)
+    if subsample_ratio<1:
+        df=df.sample(frac=subsample_ratio)
     final_feature=[]
     for item in df["feature"]:
         final_feature.extend(item)
     final_feature=pd.DataFrame(final_feature)
-    final_feature.columns=['Mean','STD','Median','Dwell time','position']
+    final_feature.columns=['Read_ID','Mean','STD','Median','Dwell time','position']
     # if rna_mode:
     #     if strand == '+':
     #         final_feature['position']=final_feature['position'] - (kmer_model-1)
