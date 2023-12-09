@@ -10,7 +10,7 @@ A Python command-line tool designed to  visualize and analyse multiple statistic
 
 ## Installation
 
-Before your installation, make sure you had installed the following packages,
+Before pip installation, make sure you had installed the `samtools`(>=1.16),
 
     conda install -c bioconda samtools 
 
@@ -25,10 +25,7 @@ To check the version of nanoCEM, run:
     pip list | grep nanoCEM
 
 
-> **Notes：** 
-
-Additionally, we do not rely on any re-squiggle or 
-eventalign packages. We only need their index files for the sequencing data.
+ **Notes:** Additionally, we do not rely on any re-squiggle or eventalign packages. We only need their index files for the sequencing data.
 
 
 
@@ -93,7 +90,7 @@ Then nanoCEM will output the current feature of your interest region as below,
 
 Meanwhile, to visually display the differences in current features 
 of selected data points between two groups, 
-the selected points within each group can be subjected to Principal Component Analysis (PCA).
+the selected points(A2030) within each group can be subjected to Principal Component Analysis (PCA).
 
 <center>![f5c_pca](zscore_density_f5c.png "f5c_pca") </center>
 
