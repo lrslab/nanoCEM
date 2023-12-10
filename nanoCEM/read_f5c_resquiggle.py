@@ -5,6 +5,7 @@ import pyslow5
 import pysam
 from tqdm import tqdm
 from nanoCEM.normalization import normalize_signal,normalize_signal_with_lim
+from nanoCEM.cem_utils import generate_bam_file,identify_file_path
 # from nanoCEM.plot import draw_signal
 import os
 import argparse
@@ -168,16 +169,14 @@ def extract_pairs_pos(bam_file,position,length,chromosome,strand):
 
 
 
-def read_blow5(path,position,length,chrom,strand,subsample_ratio=1,base_shift=2,norm=True):
-    global info_dict,s5,pbar
-    bam_file = path+".bam"
-    if not os.path.exists(path+'.bam'):
-        raise RuntimeError(path+'.bam ' +"is not exist in your path!")
-    if not os.path.exists(path+'.paf'):
-        raise RuntimeError(path+'.paf ' +"is not exist in your path!")
-    if not os.path.exists(path+'.blow5'):
-        raise RuntimeError(path+'.blow5 ' +"is not exist in your path!")
-    bam_file=pysam.AlignmentFile(bam_file,'rb')
+def read_blow5(path,position,reference,length,chrom,strand,subsample_ratio=1,base_shift=2,norm=True,cpu=4):
+    global info_dict, s5,pbar
+
+    identify_file_path(path+'.paf')
+    identify_file_path(path+'.blow5')
+    fastq_file = path + ".fastq"
+    bam_file = generate_bam_file(fastq_file,reference,cpu)
+    bam_file = pysam.AlignmentFile(bam_file,'rb')
     # if rna_mode:
     #     if strand =='+':
     #         position=position+ (kmer_model-1)

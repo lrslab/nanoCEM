@@ -1,6 +1,6 @@
 # ![logo](logo_tiny.png "nanoCEM")Output files format
 
-## Results file from alignment_magnifier
+## Result file from alignment_magnifier
 
 The `alignment_feature.csv` file will be output and mismatch information will be recorded.
 
@@ -19,7 +19,7 @@ The `alignment_feature.csv` file will be output and mismatch information will be
 | G          |the number of `G` aligned to this position
 | Match      |the number of bases aligned to this position that match the reference base
 
-## Results file from current_event_magnifier
+## Result file from current_event_magnifier
 
 The `current_feature.csv` file will be output and mismatch information will be recorded.
 

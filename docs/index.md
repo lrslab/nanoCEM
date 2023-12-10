@@ -50,6 +50,7 @@ The path to the downloaded data is as follows:
             file.blow5  # blow5 file for f5c re-squiggle
             file.blow5.idx  # index file of blow5 file
             file.paf    # result file from f5c
+            file.fastq # basecall result file
             single/ # single-format fast5 files for tombo re-squiggle
         ivt/
             file.bam    # alignment file
@@ -57,6 +58,7 @@ The path to the downloaded data is as follows:
             file.blow5  # blow5 file for f5c re-squiggle
             file.blow5.idx  # index file of blow5 file
             file.paf    # result file from f5c
+            file.fastq # basecall result file
             single/ # fast5 files for tombo re-squiggle
         23S_rRNA.fasta  # reference fasta file
         23S_rRNA.fasta.fai  # index file of fasta file
@@ -65,7 +67,7 @@ The path to the downloaded data is as follows:
 To visualize the alignment feature, 
 
     # get alignment visualization 
-    alignemnt_magnifier -i data/wt/file.bam  -c data/ivt/file.bam  --output nanoCEM_result \
+    alignemnt_magnifier -i data/wt/file.fastq  -c data/ivt/file.fastq  --output nanoCEM_result \
     --chrom NR_103073.1 --pos 2030 --len 10 --strand + \
     --rna --ref data/23S_rRNA.fasta 
 
@@ -108,6 +110,6 @@ and you can achieve the same functionality using the following commands
 * [Tutorials](tutorials.md)
 * [Output files description](output_format.md)
 * [Data preparation from raw reads](preparation.md)
-* [Command line arguments]
+* [Command line arguments](argument.md)
 * [An example for application]
 * [Contacts](contact.md)

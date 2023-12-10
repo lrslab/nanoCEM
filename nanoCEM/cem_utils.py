@@ -36,13 +36,23 @@ def identify_file_path(file_path):
         raise FileNotFoundError("File do not exist! Please check your path : " + file_path)
 
 
+def generate_bam_file(fastq_file, reference, cpu):
+    bam_file = os.path.dirname(fastq_file) + '/' + os.path.basename(fastq_file).split('.')[0] + '.bam'
+    if not os.path.exists(bam_file):
+        cmds = 'minimap2 -ax map-ont -t ' + cpu + ' --MD ' + reference + ' ' + fastq_file + ' | samtools view -hbS -F ' + str(
+            260) + '  - | samtools sort -@ ' + cpu + ' -o ' + bam_file
+        print('Start to alignment ...')
+        os.system(cmds)
+        print('bam file is saved in ' + bam_file)
+    else:
+        print(bam_file + ' existed! Will skip the minimap2 ... ')
+    cmds = 'samtools index ' + bam_file
+    os.system(cmds)
+    return bam_file
+
+
 def run_samtools(fastq_file, location, reference, result_path, group, cpu):
-    bam_file = os.path.dirname(fastq_file) + '/file.bam'
-    cmds = 'minimap2 -ax map-ont -t '+cpu+' --MD '+reference +' '+fastq_file+' | samtools view -hbS -F '+str(260)+'  - | samtools sort -@ '+cpu+' -o '+bam_file
-    print('Start to alignment ...')
-    os.system(cmds)
-    cmds = 'samtools index '+bam_file
-    os.system(cmds)
+    bam_file = generate_bam_file(fastq_file, reference, cpu)
     cmds = 'samtools mpileup ' + bam_file + ' -r ' + location + ' --no-output-ins --no-output-del -B -Q 0 -f ' + reference + ' -o ' + result_path + 'temp.txt'
     os.system(cmds)
     temp_file = pd.read_csv(result_path + 'temp.txt', sep='\t', header=None)

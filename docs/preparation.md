@@ -26,10 +26,10 @@ Here is an example script to run Guppy and Dorado basecaller. You can find more 
 
     # Guppy basecaller
     guppy_basecaller -i <path/to/fastt> -s <path/to/fastq> --config <config file> --device auto -r
-    cat <path/to/fastq> > final.fastq
+    cat <path/to/fastq> > file.fastq
     # Dorado basecaller (support fast5 & pod5)
     dorado basecaller <model> </path/to/reads> > dorado.bam
-    samtools bam2fq dorado.bam > final.fastq
+    samtools bam2fq dorado.bam > file.fastq
 
 ## Choose your reference
 The alignment of DNA is relatively simple, but for RNA, it becomes more complex due to the presence of 
@@ -45,13 +45,22 @@ f5c is a software that supports eventalign and also supports the new R10 data.
 We recommend using version 1.2 or above. Here are the sample commands for dna/rna from different flowcell.
 
     # for rna data from r9 flowcell
-    f5c resquiggle -c final.fastq file.blow5 -o file.paf --rna --pore r9
+    f5c resquiggle -c file.fastq file.blow5 -o file.paf --rna --pore r9
     # for dna data from r10 flowcell
-    f5c resquiggle -c final.fastq file.blow5 -o file.paf  --pore r10
+    f5c resquiggle -c file.fastq file.blow5 -o file.paf --pore r10
 
 ### tombo
+
+**Optional:**
+We provide a python script `extract_sub_fast5_from_bam` to assist in sampling reads aligned to your region of interest to reduce re-squiggle time.
+
+    extract_sub_fast5_from_bam -i </path/to/single_reads> -o </path/to/results> -b file.bam --chrom NR_103073.1 --pos 2030 --cpu 32
+
 Tombo is a suite of tools primarily for the identification of modified nucleotides from nanopore sequencing data, and firstly proposed
 the generation of re-squiggle.
 
-    tombo preprocess annotate_raw_with_fastqs --fast5-basedir  </path/to/single_reads> --fastq-filenames final.fastq --processes 16 
+    tombo preprocess annotate_raw_with_fastqs --fast5-basedir  </path/to/single_reads> --fastq-filenames file.fastq --processes 16 
     tombo resquiggle </path/to/single_reads> reference.fasta --processes 16 --num-most-common-errors 5
+
+**Notes:**  Since the re-squiggle process in tombo can be time-consuming, we recommend using an SSD (Solid State Drive) 
+to reduce processing time. 

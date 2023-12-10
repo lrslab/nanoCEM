@@ -141,7 +141,7 @@ And the new reads will be copied to ```subsample_single/```
 multi_to_single_fast5 -i fast5/ -s single/ --recursive -t 16
 extract_sub_fast5_from_bam -i single/ -o subsample_single/ -b file.bam --chrom NR_103073.1 --pos 2030 -t 32
 # Remember to sample fastq if you sampled your fast5
-extract_sub_fastq_from_bam -i all.fastq -o final.fastq -b file.bam --chrom NR_103073.1 --pos 2030 
+extract_sub_fastq_from_bam -i all.fastq -o file.fastq -b file.bam --chrom NR_103073.1 --pos 2030 
 ```
 ### 4 Re-squiggle
 #### 4.1 Tombo resquiggle (v1.5.0)

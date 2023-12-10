@@ -14,7 +14,7 @@ from nanoCEM.cem_utils import read_fasta_to_dic,identify_file_path,build_out_pat
 from nanoCEM.plot import current_plot
 
 warnings.filterwarnings("ignore", category=PlotnineWarning)
-
+from nanoCEM.cem_utils import generate_bam_file
 
 def init_parser():
     def add_public_argument(parser_input):
@@ -23,10 +23,12 @@ def init_parser():
         parser_input.add_argument("--len", default=10, type=int, help="region around the position")
         parser_input.add_argument("--strand", default="+", help="Strand of your interest")
         parser_input.add_argument('-r', "--ref", required=True, help="fasta file")
+        parser_input.add_argument('-t', "--cpu", default=4, type=int, help="num of process")
         parser_input.add_argument('--norm', action='store_true', help='Turn on the normalization mode')
         parser_input.add_argument('-s', "--subsample_ratio", default=1, type=float,
                                   help="Subsample ratio to select reads")
         parser_input.add_argument('--rna', action='store_true', help='Turn on the RNA mode')
+        parser_input.add_argument('-o', "--output", default="nanoCEM_result", help="output_file")
 
     # Define the argument parser
     parser = argparse.ArgumentParser(
@@ -44,8 +46,8 @@ def init_parser():
     parser_tombo.add_argument('-c', "--control_fast5",
                               help="control_fast5_file")
     # parser_tombo.add_argument('-b', "--bam", help="bam file to help index to speed up")
-    parser_tombo.add_argument('-o', "--output", default="nanoCEM_result", help="output_file")
-    parser_tombo.add_argument('-t', "--cpu", default=4, type=int, help="num of process")
+
+
     add_public_argument(parser_tombo)
 
     # f5c subparser
@@ -54,9 +56,7 @@ def init_parser():
                             help="blow5_path")
     parser_f5c.add_argument('-c', "--control",
                             help="control_blow5_path")
-    parser_f5c.add_argument('-o', "--output", default="nanoCEM_result", help="output_file")
-
-    parser_f5c.add_argument('--base_shift', type=int, default=2, help="output_file")
+    parser_f5c.add_argument('--base_shift', type=int, default=2, help="used for result shifting in f5c")
     add_public_argument(parser_f5c)
     # parser.set_defaults(function='tombo', chrom="NR_103073.1", pos=2030, len=10, strand='+', cpu=8,norm=True,
     #                     input_fast5='../example/data/wt/single/', \
@@ -140,14 +140,15 @@ if __name__ == '__main__':
         #     args.pos = args.pos + args.base_shift
         # else:
         #     args.pos = args.pos - args.base_shift
-        df_wt, aligned_num_wt, nucleotide_type = read_blow5(args.input, args.pos, args.len, args.chrom, args.strand,
-                                                            subsample_ratio, args.base_shift, args.norm)
+
+        df_wt, aligned_num_wt, nucleotide_type = read_blow5(args.input, args.pos,args.ref, args.len, args.chrom, args.strand,
+                                                            subsample_ratio, args.base_shift, args.norm, args.cpu)
         df_wt['Group'] = 'Sample'
         if nucleotide_type == 'RNA' and not args.rna:
             raise RuntimeError("You need to add --rna to turn on the rna mode")
         try:
-            df_ivt, aligned_num_ivt, _ = read_blow5(args.control, args.pos, args.len, args.chrom, args.strand,
-                                                    subsample_ratio, args.base_shift, args.norm)
+            df_ivt, aligned_num_ivt, _ = read_blow5(args.control, args.pos,args.ref, args.len, args.chrom, args.strand,
+                                                    subsample_ratio, args.base_shift, args.norm, args.cpu)
             df_ivt['Group'] = 'Control'
 
             df = pd.concat([df_wt, df_ivt])
