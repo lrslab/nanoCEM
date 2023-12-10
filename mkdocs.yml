@@ -1,7 +1,7 @@
 site_name: nanoCEM
 nav:
   - Home: index.md
-  - Tutorials: tutorials.md
+  - Quick start: tutorials.md
   - Output files description: output_format.md
   - Data preparation from raw reads : preparation.md
   - Command line arguments : argument.md

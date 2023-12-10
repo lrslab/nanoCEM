@@ -56,7 +56,7 @@ def run_samtools(fastq_file, location, reference, result_path, group, cpu):
     cmds = 'samtools mpileup ' + bam_file + ' -r ' + location + ' --no-output-ins --no-output-del -B -Q 0 -f ' + reference + ' -o ' + result_path + 'temp.txt'
     os.system(cmds)
     temp_file = pd.read_csv(result_path + 'temp.txt', sep='\t', header=None)
-    temp_file['group'] = group
+    temp_file['Group'] = group
     os.system('rm ' + result_path + 'temp.txt')
     return temp_file
 

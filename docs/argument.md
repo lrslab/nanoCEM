@@ -8,7 +8,7 @@ alignment_magnifier
 | Argument name                       | Required | Description                                     |
 |---------------------------------|----------|-------------------------------------------------|
 | -i, --input_fastq               | Yes       | input FASTQ file                                |
-| -c, --control_fastq             | Yes       | control FASTQ file                              |
+| -c, --control_fastq             | No       | control FASTQ file, will run as single-mode if missing            |
 | -o, --output                    | No       | output folder's name (Default:nanoCEM_result)    |
 | --chrom                         | Yes       | gene/transcript or chromosome name (header of your reference file)|
 | --pos                           | Yes       | Site of your interest (**1-based**)         |
@@ -29,7 +29,7 @@ For tombo, you can view it for
 |  Argument  name            | Required | Description                                                     |
 |---------------------------------|----------|-----------------------------------------------------------------|
 | -i , --fast5          | Yes       | the input single-format fast5's folder                            |
-| -c , --control_fast5 | Yes       | the control single-format fast5's folder                                          |
+| -c , --control_fast5 | No       | the control single-format fast5's folder, will run as single-mode if missing              |
 | -o , --output       | No       | output_file (Default:nanoCEM_result)                                                     |
 | --ref                        | Yes       |reference file (fasta/fna/fa)          |
 | --chrom                    | Yes       | gene/transcript or chromosome name (headdf of your fasta file)               |
@@ -50,7 +50,7 @@ And f5c
 |  Argument name            | Required | Description                                                     |
 |---------------------------------|----------|-----------------------------------------------------------------|
 | -i , --input          | Yes       | the input files' prefix                            |
-| -c , --control | Yes       | the control files' prefix                                         |
+| -c , --control | No       | the control files' prefix, will run as single-mode if missing           |
 | -o , --output       | No       | output_file (Default:nanoCEM_result)               |
 | --ref                        | Yes       |reference file (fasta/fna/fa)          |
 | --chrom                    | Yes       | gene/transcript or chromosome name (header of your reference file)               |

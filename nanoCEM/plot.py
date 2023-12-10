@@ -101,6 +101,7 @@ def current_plot(df, results_path, pos, base_list, title):
     plot = plot + p9.labs(title=title, x=str(pos + 1), y='')
 
     if new_df['Group'].drop_duplicates().shape[0] == 1:
+        print("control files do not exist, will turn to the single mode")
         plot2 = plot + p9.geom_violin(color='none', position=p9.position_dodge(0.9), width=1)
         plot2 = plot2 + p9.geom_boxplot(outlier_shape='', position=p9.position_dodge(0.9), size=0.2, width=0.1)
         plot2.save(filename=results_path + "/current_single.pdf", dpi=300)
@@ -142,7 +143,7 @@ def alignment_plot(final_feature,pos_list,base_list,title,pos,results_path):
     category = pd.api.types.CategoricalDtype(categories=order_list, ordered=True)
     final_feature['variable'] = final_feature['variable'].astype(category)
 
-    order_list = ['Sample', 'Control']
+    order_list = ['Sample', 'Control','Single']
     category = pd.api.types.CategoricalDtype(categories=order_list, ordered=True)
     final_feature['Group'] = final_feature['Group'].astype(category)
 
