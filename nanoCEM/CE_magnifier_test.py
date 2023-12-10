@@ -11,7 +11,7 @@ import pandas as pd
 from plotnine.exceptions import PlotnineWarning
 
 from nanoCEM.cem_utils import read_fasta_to_dic,identify_file_path,build_out_path
-from nanoCEM.plot import current_plot
+from nanoCEM.plot import current_plot,plot_PCA
 
 warnings.filterwarnings("ignore", category=PlotnineWarning)
 from nanoCEM.cem_utils import generate_bam_file
@@ -179,3 +179,6 @@ if __name__ == '__main__':
     # signal_plot(df, results_path, args.pos, base_list, title, 'boxplot')
     # signal_plot(df, results_path, args.pos, base_list, title, 'violin_plot')
     print('Finished')
+
+    df = df_copy[df_copy['Position'] == args.pos + 1]
+    plot_PCA(df, results_path)

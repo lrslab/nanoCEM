@@ -44,7 +44,7 @@ To compare two samples' alignment feature, provide their `fastq` file , referenc
 script using our test data to visualize the alignment feature,
 
     # get alignment visualization 
-    alignemnt_magnifier -i data/wt/file.fastq  -c data/ivt/file.fastq  --output nanoCEM_result \
+    alignment_magnifier -i data/wt/file.fastq  -c data/ivt/file.fastq  --output nanoCEM_result \
     --chrom NR_103073.1 --pos 2030 --len 10 --strand + \
     --rna --ref data/23S_rRNA.fasta 
 

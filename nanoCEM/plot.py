@@ -172,3 +172,36 @@ def alignment_plot(final_feature,pos_list,base_list,title,pos,results_path):
     plot = plot + p9.labs(title=title, x=str(pos), y='Coverage')
     plot.save(filename=results_path + "/alignment.pdf", dpi=300)
     print('Figures are saved in ' + results_path)
+
+def plot_PCA(df,results_path):
+    print("Start to do PCA analysis ...")
+    from scipy.stats import zscore
+    df.loc[:, 'Mean'] = zscore(df['Mean'])
+    df.loc[:, 'Median'] = zscore(df['Median'])
+    df.loc[:, 'STD'] = zscore(df['STD'])
+    df.loc[:, 'Dwell time'] = zscore(np.log10(df['Dwell time']))
+
+    from sklearn.decomposition import PCA
+    pca = PCA(n_components=2)
+    new_df = pd.DataFrame(pca.fit_transform(df[['Mean', 'Median', 'STD', 'Dwell time']]))
+    new_df.columns = ['PC1', 'PC2']
+    new_df = pd.concat([new_df, df['Group'].reset_index()], axis=1)
+    plot = p9.ggplot(new_df, p9.aes(x='PC1', y='PC2', color='Group')) \
+           + p9.theme_bw() \
+           + p9.ylim(-4, 4) \
+           + p9.xlim(-4, 4) \
+           + p9.stat_density_2d() \
+           + p9.scale_color_manual(values={"Sample": "#F57070", "Control": "#9F9F9F", "Single": "#a3abbd"}) \
+           + p9.geom_point() \
+           + p9.theme(
+        figure_size=(5, 5),
+        panel_grid_minor=p9.element_blank(),
+        axis_text=p9.element_text(size=13),
+        axis_title=p9.element_text(size=13),
+        title=p9.element_text(size=13),
+        legend_position='bottom',
+        legend_title=p9.element_blank(),
+        strip_text=p9.element_text(size=13),
+        strip_background=p9.element_rect(alpha=0),
+    )
+    plot.save(filename=results_path + "/zscore_density.pdf", dpi=300)
