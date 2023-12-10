@@ -22,12 +22,13 @@ def init_parser():
     parser.add_argument("--chrom", help="Gene or chromosome name(head of your fasta file)")
     parser.add_argument("--pos", type=int, help="site of your interest")
     parser.add_argument("--len", default=10, type=int, help="region around the position")
+    parser.add_argument('-t',"--cpu", default=4, type=int, help="region around the position")
     parser.add_argument("--strand", default="+", help="Strand of your interest")
     parser.add_argument('--rna', action='store_true', help='Turn on the RNA mode')
     parser.add_argument('-r', "--ref", help="fasta file")
-    parser.add_argument('-i', "--input_bam",
+    parser.add_argument('-i', "--input_fastq",
                         help="input_bam_file")
-    parser.add_argument('-c', "--control_bam",
+    parser.add_argument('-c', "--control_fastq",
                         help="control_bam_file")
     # parser_tombo.add_argument('-b', "--bam", help="bam file to help index to speed up")
     parser.add_argument('-o', "--output", default="nanoCEM_result", help="output_file")
@@ -39,13 +40,13 @@ if __name__ == '__main__':
     # Parse the arguments
     parser = init_parser()
     args = parser.parse_args()
-    input_bam = args.input_bam
-    control_bam = args.control_bam
+    input_fastq = args.input_fastq
+    control_fastq = args.control_fastq
     ref = args.ref
-
+    cpu = str(args.cpu)
     # check input file
-    identify_file_path(input_bam)
-    identify_file_path(control_bam)
+    identify_file_path(input_fastq)
+
     # prepare title
     location = args.chrom + ':' + str(args.pos - args.len) + '-' + str(args.pos + args.len)
     title = location + ':' + args.strand
@@ -54,13 +55,19 @@ if __name__ == '__main__':
     build_out_path(results_path)
 
     print("Running samtools ...")
-    sample_feature = run_samtools(input_bam, location, ref, results_path, 'Sample')
+    sample_feature = run_samtools(input_fastq, location, ref, results_path, 'Sample',cpu)
     if sample_feature.shape[0]<args.len*2+1:
         raise Exception('Invalid position selection: exceeds reference length or contains positions with no coverage.')
     pos_list = list(sample_feature[1].values)
     base_list = list(sample_feature[2].values)
-    control_feature = run_samtools(control_bam, location, ref, results_path, 'Control')
-    final_feature = pd.concat([sample_feature, control_feature], axis=0)
+    try:
+        identify_file_path(control_fastq)
+        control_feature = run_samtools(control_fastq, location, ref, results_path, 'Control',cpu)
+        final_feature = pd.concat([sample_feature, control_feature], axis=0)
+    except Exception:
+        print("control files do not exist, will turn to the single mode")
+        final_feature = sample_feature
+        final_feature['Group'] = 'Single'
 
     if args.rna:
         base_list = (''.join(base_list)).replace("T", "U")
@@ -76,15 +83,16 @@ if __name__ == '__main__':
     else:
         feature_matrix = [",", 'a', 't', 'c', 'g']
 
+
     final_feature = final_feature.apply(lambda x: count_mis(x, feature_matrix), axis=1)
     final_feature['Match'] = final_feature[feature_matrix[0]]
     final_feature.drop(feature_matrix[0], inplace=True, axis=1)
-    final_feature.columns = ['chrom', 'position', 'base', 'coverage', 'align_string', 'Q_string', 'Group', 'A', 'T',
+    final_feature.columns = ['Chrom', 'Position', 'Base', 'Coverage', 'Align string', 'Q string', 'Group', 'A', 'T',
                              'C', 'G', 'Match']
     final_feature.to_csv(results_path + '/alignment_feature.csv', index=None)
     print("Alignment feature file saved as "+results_path + '/alignment_feature.csv')
 
-    final_feature = pd.melt(final_feature, id_vars=['position', 'Group'], value_vars=['A', 'T', 'C', 'G', 'Match'])
+    final_feature = pd.melt(final_feature, id_vars=['Position', 'Group'], value_vars=['A', 'T', 'C', 'G', 'Match'])
 
     print("Start to plot ...")
     alignment_plot(final_feature, pos_list, base_list, title, args.pos, results_path)
