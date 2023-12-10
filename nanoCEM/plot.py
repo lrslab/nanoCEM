@@ -64,6 +64,7 @@ SIG_PCTL_RANGE = (1, 99)
 # print(plot)
 
 def current_plot(df, results_path, pos, base_list, title):
+    print("Start to plot ...")
     item_list = ['Mean', 'STD', 'Median', 'Dwell time']
     len_plot = (len(base_list)-1)//2
     pos_list = list(range(-len_plot+pos,len_plot+1+pos))
@@ -71,16 +72,16 @@ def current_plot(df, results_path, pos, base_list, title):
     new_df = pd.DataFrame()
     for item in item_list:
         # collect data
-        temp = df[[item, 'position', 'type']].copy()
-        temp.columns = ['value', 'position', 'Group']
+        temp = df[[item, 'Position', 'Group']].copy()
+        temp.columns = ['value', 'Position', 'Group']
         temp.loc[:, 'stats'] = item
         if filter:
             sig_min, sig_max = np.percentile(temp['value'], SIG_PCTL_RANGE)
             ylim_tuple = [sig_min , sig_max]
             temp = temp[(temp['value'] >= ylim_tuple[0]) & (temp['value'] <= ylim_tuple[1])]
         new_df = pd.concat([new_df, temp], axis=0)
-    new_df['position']=new_df['position'].astype(str)
-    plot = p9.ggplot(new_df, p9.aes(x='position', y="value", fill='Group')) \
+    new_df['Position']=new_df['Position'].astype(str)
+    plot = p9.ggplot(new_df, p9.aes(x='Position', y="value", fill='Group')) \
            + p9.theme_bw() \
            + p9.scale_fill_manual(values={"Sample": "#F57070", "Control": "#9F9F9F", "Single": "#a3abbd"}) \
            + p9.scale_x_discrete(breaks=pos_list, labels=base_list) \
@@ -102,12 +103,13 @@ def current_plot(df, results_path, pos, base_list, title):
     if new_df['Group'].drop_duplicates().shape[0] == 1:
         plot2 = plot + p9.geom_violin(color='none', position=p9.position_dodge(0.9), width=1)
         plot2 = plot2 + p9.geom_boxplot(outlier_shape='', position=p9.position_dodge(0.9), size=0.2, width=0.1)
-        plot2.save(filename=results_path + "/Current_single.pdf", dpi=300)
+        plot2.save(filename=results_path + "/current_single.pdf", dpi=300)
     else:
         plot1 = plot + p9.geom_boxplot(outlier_shape='', position=p9.position_dodge(0.9), size=0.2, width=0.75,alpha = 0.8)
         plot1.save(filename=results_path + "/Current_boxplot.pdf", dpi=300)
         plot2 = plot + p9.geom_violin(style='left-right', position=p9.position_dodge(0), color='none', width=1.5,alpha = 0.8)
-        plot2.save(filename=results_path + "/Current_violin.pdf", dpi=300)
+        plot2.save(filename=results_path + "/current_violin.pdf", dpi=300)
+    print('Figures are saved in '+results_path)
 
 
 def draw_signal(df, start, base,start_index,end_index):
@@ -144,7 +146,7 @@ def alignment_plot(final_feature,pos_list,base_list,title,pos,results_path):
     category = pd.api.types.CategoricalDtype(categories=order_list, ordered=True)
     final_feature['Group'] = final_feature['Group'].astype(category)
 
-    plot = p9.ggplot(final_feature, p9.aes(x='position', y="value", fill='variable')) \
+    plot = p9.ggplot(final_feature, p9.aes(x='Position', y="value", fill='variable')) \
            + p9.theme_bw() \
            + p9.geom_bar(stat='identity') \
            + p9.scale_x_continuous(breaks=pos_list, labels=base_list) \
@@ -167,4 +169,5 @@ def alignment_plot(final_feature,pos_list,base_list,title,pos,results_path):
     ) \
            + p9.facet_grid('Group ~', scales='free_y')
     plot = plot + p9.labs(title=title, x=str(pos), y='Coverage')
-    plot.save(filename=results_path + "/Alignment.pdf", dpi=300)
+    plot.save(filename=results_path + "/alignment.pdf", dpi=300)
+    print('Figures are saved in ' + results_path)

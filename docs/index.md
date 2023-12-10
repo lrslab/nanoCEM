@@ -69,7 +69,7 @@ To visualize the alignment feature,
     --chrom NR_103073.1 --pos 2030 --len 10 --strand + \
     --rna --ref data/23S_rRNA.fasta 
 
-Then nanoCEM will output the alignment feature of your interest region as below,
+Then nanoCEM will output the alignment feature table called [`alignment_feature.csv`](output_format.md) and figure in your interest region as below,
 
 <center>![alignment](Alignment.png "Alignment visualization") </center>
 
@@ -105,8 +105,9 @@ and you can achieve the same functionality using the following commands
     --rna --cpu 4 --norm
 ## Content
 
-* Re-squiggle programs
-* nanoCEM tutorials
-* Output files description
-* An example for application
-* Contacts
+* [Tutorials](tutorials.md)
+* [Output files description](output_format.md)
+* [Data preparation from raw reads](preparation.md)
+* [Command line arguments]
+* [An example for application]
+* [Contacts](contact.md)

@@ -207,14 +207,14 @@ def read_blow5(path,position,length,chrom,strand,subsample_ratio=1,base_shift=2,
     for item in df["feature"]:
         final_feature.extend(item)
     final_feature=pd.DataFrame(final_feature)
-    final_feature.columns=['Read_ID','Mean','STD','Median','Dwell time','position']
+    final_feature.columns=['Read ID','Mean','STD','Median','Dwell time','Position']
     # if rna_mode:
     #     if strand == '+':
     #         final_feature['position']=final_feature['position'] - (kmer_model-1)
     #     else:
     #         final_feature['position']=final_feature['position'] + (kmer_model-1)
 
-    final_feature['position'] = final_feature['position'].astype(int).astype(str)
+    final_feature['Position'] = final_feature['Position'].astype(int).astype(str)
     print('Extracted ', num_aligned, ' aligned reads from blow5 files')
 
     if num_aligned>50:

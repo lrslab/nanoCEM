@@ -2,7 +2,7 @@ site_name: nanoCEM
 nav:
   - Home: index.md
   - Tutorials: tutorials.md
-  - Output files description: oturpur_format.md
+  - Output files description: output_format.md
   - Data preparation from raw reads : preparation.md
   - Command line arguments : argument.md
   - An example for application: application.md

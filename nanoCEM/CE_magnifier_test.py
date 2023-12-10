@@ -82,7 +82,6 @@ def init_parser():
                         ref="../example/data/reverse/23S_rRNA_re.fasta", rna=True)
     return parser
 
-
 if __name__ == '__main__':
     # Parse the arguments
     parser = init_parser()
@@ -117,20 +116,20 @@ if __name__ == '__main__':
 
         wt_file = create_read_list_file(args.input_fast5, results_path)
         df_wt, aligned_num_wt = extract_group(args, wt_file, subsample_ratio)
-        df_wt['type'] = 'Sample'
+        df_wt['Group'] = 'Sample'
         try:
             ivt_file = create_read_list_file(args.control_fast5, results_path)
             df_ivt, aligned_num_ivt = extract_group(args, ivt_file, subsample_ratio)
-            df_ivt['type'] = 'Control'
+            df_ivt['Group'] = 'Control'
             df = pd.concat([df_wt, df_ivt])
             title = title + '   Sample:' + str(aligned_num_wt) + '  Control:' + str(aligned_num_ivt)
             category = pd.api.types.CategoricalDtype(categories=['Sample', "Control"], ordered=True)
-            df['type'] = df['type'].astype(category)
+            df['Group'] = df['Group'].astype(category)
         except:
             args.control_fast5 = None
         if args.control_fast5 is None:
             df = df_wt
-            df_wt['type'] = 'Single'
+            df_wt['Group'] = 'Single'
             title = title + '   Sample:' + str(aligned_num_wt)
     elif args.function == 'f5c':
         from nanoCEM.read_f5c_resquiggle import read_blow5
@@ -143,33 +142,33 @@ if __name__ == '__main__':
         #     args.pos = args.pos - args.base_shift
         df_wt, aligned_num_wt, nucleotide_type = read_blow5(args.input, args.pos, args.len, args.chrom, args.strand,
                                                             subsample_ratio, args.base_shift, args.norm)
-        df_wt['type'] = 'Sample'
+        df_wt['Group'] = 'Sample'
         if nucleotide_type == 'RNA' and not args.rna:
             raise RuntimeError("You need to add --rna to turn on the rna mode")
         try:
             df_ivt, aligned_num_ivt, _ = read_blow5(args.control, args.pos, args.len, args.chrom, args.strand,
                                                     subsample_ratio, args.base_shift, args.norm)
-            df_ivt['type'] = 'Control'
+            df_ivt['Group'] = 'Control'
 
             df = pd.concat([df_wt, df_ivt])
             category = pd.api.types.CategoricalDtype(categories=['Sample', "Control"], ordered=True)
-            df['type'] = df['type'].astype(category)
+            df['Group'] = df['Group'].astype(category)
 
             title = title + '   Sample:' + str(aligned_num_wt) + '  Control:' + str(aligned_num_ivt)
         except:
             args.control = None
         if args.control is None:
             df = df_wt
-            df_wt['type'] = 'Single'
+            df_wt['Group'] = 'Single'
             title = title + '   Sample:' + str(aligned_num_wt)
 
     # draw_volin(df,results_path,args.pos,base_list,title)
     # draw_boxplot(df,results_path,args.pos,base_list,title)
 
     df_copy = copy.deepcopy(df)
-    df_copy['position'] = df_copy['position'].astype(int) + 1
-    df_copy.to_csv(results_path + '/Current_feature.csv', index=None)
-    print("Feature file saved  in " + results_path + '/Current_feature.csv')
+    df_copy['Position'] = df_copy['Position'].astype(int) + 1
+    df_copy.to_csv(results_path + '/current_feature.csv', index=None)
+    print("Feature file saved  in " + results_path + '/current_feature.csv')
 
     # percentile_filter = False
     # if aligned_num_wt > 50 and aligned_num_ivt > 50:
