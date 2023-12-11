@@ -45,7 +45,7 @@ def generate_bam_file(fastq_file, reference, cpu):
         os.system(cmds)
         print('bam file is saved in ' + bam_file)
     else:
-        print(bam_file + ' existed! Will skip the minimap2 ... ')
+        print(bam_file + ' existed. Will skip the minimap2 ... ')
     cmds = 'samtools index ' + bam_file
     os.system(cmds)
     return bam_file
