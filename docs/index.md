@@ -36,5 +36,5 @@ To check the version of nanoCEM, run:
 * [Output files description](output_format.md)
 * [Data preparation from raw reads](preparation.md)
 * [Command line arguments](argument.md)
-* [An example for application]
+* [An example for application](example.md)
 * [Contacts](contact.md)
