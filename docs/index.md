@@ -6,11 +6,11 @@
 
 <center><span style="color:#0084A9;">nanoCEM (nanopore Current Events Magnifier) </span></center>
 
-A Python command-line tool designed to  visualize and analyse multiple statistical features of current events from nanopore sequence data.
+A Python command-line tool designed to  visualize and analyse multiple statistical features of current events from nanopore sequencing data.
 
 ## Installation
 
-Before pip installation, make sure you had installed the `samtools`(>=1.16) and `minimap2`(>=2.17),
+Before pip installation, make sure you have installed the `samtools`(>=1.16) and `minimap2`(>=2.17),
 
     conda install -c bioconda samtools minimap2
 
@@ -32,7 +32,7 @@ To check the version of nanoCEM, run:
 
 ## Content
 
-* [Tutorials](tutorials.md)
+* [Quick start](tutorials.md)
 * [Output files description](output_format.md)
 * [Data preparation from raw reads](preparation.md)
 * [Command line arguments](argument.md)

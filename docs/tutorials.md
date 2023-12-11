@@ -1,14 +1,14 @@
 # ![logo](logo_tiny.png "nanoCEM")Quick start
 
 This quick start guide outlines the steps to use the nanoCEM command line for analyzing our example data, which consists
-of the E. coli 23S rRNA around a known m6A site(A2030). nanoCEM will calculate alignment features and current event
+of the E. coli 23S rRNA around a known m6A site (A2030). nanoCEM will calculate alignment features and current event
 features within this specified region.
 
-If you want to deal DNA data, remember to delete all `--rna` in the following commands
+If you want to deal with DNA data, remember to delete all `--rna` in the following commands.
 
 ## Dataprep
 
-Before utilizing NanoCEM, it is required to convert the raw data format to the appropriate format(single-format `fast5`
+Before utilizing NanoCEM, it is required to convert the raw data format to the appropriate format (single-format `fast5`
 or `blow5`) and perform basecalling to obtain a `fastq` file. Subsequently, select a suitable reference `fasta` file
 based on research requirements and proceed with the re-squiggle process using either `tombo` or `f5c`.
 
@@ -40,7 +40,7 @@ The path to the downloaded data is as follows:
 
 ## Alignment feature visualization
 
-To compare two samples' alignment feature, provide their `fastq` file , reference file and specific position , here is a
+To compare two samples' alignment feature,  their `fastq` files , reference file and the specific position are required. Here is a
 script using our test data to visualize the alignment feature,
 
     # get alignment visualization 
@@ -59,8 +59,8 @@ For the current event feature, we provide  `current_events_magnifier` script. Yo
 from `f5c` and `tombo`. They are different in several aspects, including the re-squiggle algorithm
 (which may introduce one base bias) and the supported data types (fast5/blow5). 
 
-If you choose `f5c`, make sure that the prefix of `fastq`, `blow5`,`paf` should be same
-for each group like below,
+If you choose `f5c`, make sure that the prefix of `fastq`, `blow5`,`paf` should be the same
+for each group as below,
 
     test/
         file.blow5  
@@ -83,11 +83,11 @@ and plot it as below,
 <center>![f5c_feature](Current_boxplot_f5c.png "f5c_feature") </center>
 
 Meanwhile, to visually display the differences in current features of selected data points between two groups, the
-selected points(A2030) within each group can be subjected to Principal Component Analysis (PCA).
+selected points (A2030) within each group can be subjected to Principal Component Analysis (PCA).
 
 <center>![f5c_pca](zscore_density_f5c.png "f5c_pca") </center>
 
-In addition to `f5c`, nanoCEM also supports `tombo`, and achieve the same functionality by providing the fast5 folder
+In addition to `f5c`, nanoCEM also supports `tombo`, and achieves the same functionality by providing the fast5 folder
 like the following commands,
 
     # tackle tombo result

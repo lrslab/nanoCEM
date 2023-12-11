@@ -2,17 +2,17 @@
 
 ## Raw data from Oxford Nanopore Technologies sequencing
 
-With the introduction of R10.4.1 flowcell, the diversity of ONT data formats has increased. 
+With the introduction of R10.4.1 flow cell, the diversity of ONT data formats has increased. 
 These now include the original single and multiple fast5 format, the newer pod5 format,
-and the community-driven slow5/blow5 formats. The relationship between and conversion tools 
-between these different data formats is as below
+and the community-driven slow5/blow5 formats. The relationship between conversion tools 
+and these different data formats is as below.
 
  <center>![data format](data_format.png "data_format") </center>
 
-nanoCEM only support single-format `fast5` and `blow5`, please transfer the data format before usage.
+nanoCEM only supports single-format `fast5` and `blow5`; please transfer the data format before usage.
 Since we support `tombo` and `f5c`, where `tombo` only supports single format `fast5` and `f5c` supports `blow5`,
 you only need to choose one from them.
-Here are some advices commands if your original data is multi-format fast5
+Here are some advice commands if your original data is multi-format fast5.
 
     # ont-fast5-api
     multi_to_single_fast5 --input_path </path/to/multi_reads> --save_path </path/to/single_reads> --recursive
@@ -22,7 +22,7 @@ Here are some advices commands if your original data is multi-format fast5
 
 ## Basecall your raw reads
 After obtaining raw reads files, the first step is to basecall them.
-Here is an example script to run Guppy and Dorado basecaller. You can find more detail about basecalling at ONT:
+Here is an example script to run Guppy and Dorado basecaller. You can find more details about basecalling at ONT:
 
     # Guppy basecaller
     guppy_basecaller -i <path/to/fastt> -s <path/to/fastq> --config <config file> --device auto -r
@@ -42,7 +42,7 @@ it is advisable to use `transcript` as the reference, while for DNA, the referen
 nanoCEM supports the re-squiggle results of both `tombo` and `f5c`.
 ### f5c
 f5c is a software that supports eventalign and also supports the new R10 data. 
-We recommend using version 1.2 or above. Here are the sample commands for dna/rna from different flowcell.
+We recommend using version 1.2 or above. Here are the sample commands for dna/rna from different flow cell.
 
     # for rna data from r9 flowcell
     f5c resquiggle -c file.fastq file.blow5 -o file.paf --rna --pore r9

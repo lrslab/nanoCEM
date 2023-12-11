@@ -12,7 +12,7 @@ The following code is used to organize the 5-mer data and perform z-score normal
     import numpy as np
     import pandas as pd
     df = pd.read_csv('current_feature.csv')
-    k_mer = 3
+    k_mer = 5
     kmer_size= int((k_mer-1)/2)
     df = df[(df['position']>=2030-kmer_size)&(df['position']<=2030+kmer_size)]
     grouped_df = df.groupby('Read_ID')

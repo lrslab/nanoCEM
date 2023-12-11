@@ -5,14 +5,14 @@ with open("README.md", "r") as fh:
 
 setup(
     name="nanoCEM",
-    version="0.0.3.0",
+    version="0.0.3.1",
     author="GUO Zhihao",
     author_email="qhuozhihao@icloud.com",
     description='A simple tool designed to visualize the features that distinguish between two groups of ONT data at the site level.\
                 It supports two re-squiggle program(tombo and f5c).',
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://nanocem.readthedocs.io/",
+    url="https://github.com/lrslab/nanoCEM",
     packages=find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
@@ -29,7 +29,8 @@ setup(
         "pysam>=0.21.0",
         "pyslow5>=1.0.0",
         "vbz_h5py_plugin>=1.0.1",
-        "biopython>=1.80"
+        "biopython>=1.80",
+        "scikit-learn>=1.2.2"
     ],
     scripts=['nanoCEM/current_events_magnifier','nanoCEM/extract_sub_fast5_from_bam','nanoCEM/alignment_magnifier']
 )
