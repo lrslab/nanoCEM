@@ -5,7 +5,7 @@ import pyslow5
 import pysam
 from tqdm import tqdm
 from nanoCEM.normalization import normalize_signal,normalize_signal_with_lim
-from nanoCEM.cem_utils import generate_bam_file,identify_file_path
+from nanoCEM.cem_utils import generate_bam_file,identify_file_path,generate_paf_file
 # from nanoCEM.plot import draw_signal
 import os
 import argparse
@@ -169,27 +169,24 @@ def extract_pairs_pos(bam_file,position,length,chromosome,strand):
 
 
 
-def read_blow5(path,position,reference,length,chrom,strand,subsample_ratio=1,base_shift=2,norm=True,cpu=4):
+def read_blow5(path,position,reference,length,chrom,strand,pore,subsample_ratio=1,base_shift=2,norm=True,cpu=4,rna=True):
     global info_dict, s5,pbar
-
-    identify_file_path(path+'.paf')
-    identify_file_path(path+'.blow5')
+    slow5_file = path + ".blow5"
     fastq_file = path + ".fastq"
+    identify_file_path(fastq_file)
+    identify_file_path(slow5_file)
+    paf_file = generate_paf_file(fastq_file,slow5_file,pore,rna)
     bam_file = generate_bam_file(fastq_file,reference,cpu)
     bam_file = pysam.AlignmentFile(bam_file,'rb')
-    # if rna_mode:
-    #     if strand =='+':
-    #         position=position+ (kmer_model-1)
-    #     else:
-    #         position=position- (kmer_model-1)
+
     info_dict=extract_pairs_pos(bam_file,position,length,chrom,strand)
     if info_dict == {}:
         raise RuntimeError("There is no read aligned on this position")
     info_df = pd.DataFrame(list(info_dict.keys()))
-    slow5 = path+".blow5"
-    s5 = pyslow5.Open(slow5, 'r')
 
-    df=pd.read_csv(path+".paf",sep='\t',header=None)
+    s5 = pyslow5.Open(slow5_file, 'r')
+
+    df=pd.read_csv(paf_file,sep='\t',header=None)
     df=pd.merge(df,info_df,how='inner',on=0)
     if df.shape[0] == 0:
         raise RuntimeError("cannot found the record from bam in your paf file. Please check your f5c command ... ")
@@ -198,6 +195,7 @@ def read_blow5(path,position,reference,length,chrom,strand,subsample_ratio=1,bas
     pbar = tqdm(total=df.shape[0], position=0, leave=True)
     df["feature"] = df.apply(extract_feature,strand=strand,base_shift=base_shift,norm=norm,axis=1)
     pbar.close()
+
     df.dropna(inplace=True)
     num_aligned = df.shape[0]
     if subsample_ratio<1:
@@ -216,10 +214,10 @@ def read_blow5(path,position,reference,length,chrom,strand,subsample_ratio=1,bas
     final_feature['Position'] = final_feature['Position'].astype(int).astype(str)
     print('Extracted ', num_aligned, ' aligned reads from blow5 files')
 
-    if num_aligned>50:
-        dwell_filter_pctls = (0.5, 99.5)
-        dwell_min, dwell_max = np.percentile(final_feature['Dwell time'].values, dwell_filter_pctls)
-        final_feature = final_feature[(final_feature['Dwell time'] > dwell_min) & (final_feature['Dwell time'] < dwell_max)]
+    # if num_aligned>50:
+    #     dwell_filter_pctls = (0.5, 99.5)
+    #     dwell_min, dwell_max = np.percentile(final_feature['Dwell time'].values, dwell_filter_pctls)
+    #     final_feature = final_feature[(final_feature['Dwell time'] > dwell_min) & (final_feature['Dwell time'] < dwell_max)]
 
     return final_feature,num_aligned,nucleotide_type
 

@@ -1,10 +1,6 @@
 #!/usr/bin/env python
-
-# !/usr/bin/env python
 import argparse
 import copy
-import os
-import time
 import warnings
 
 import pandas as pd
@@ -57,6 +53,7 @@ def init_parser():
     parser_f5c.add_argument('-c', "--control",
                             help="control_blow5_path")
     parser_f5c.add_argument('--base_shift', type=int, default=2, help="used for result shifting in f5c")
+    parser_f5c.add_argument('--pore', choices=['r9', 'r10'], help='Select pore type', default='r9')
     add_public_argument(parser_f5c)
     return parser
 
@@ -119,14 +116,14 @@ if __name__ == '__main__':
         # else:
         #     args.pos = args.pos - args.base_shift
 
-        df_wt, aligned_num_wt, nucleotide_type = read_blow5(args.input, args.pos,args.ref, args.len, args.chrom, args.strand,
-                                                            subsample_ratio, args.base_shift, args.norm, args.cpu)
+        df_wt, aligned_num_wt, nucleotide_type = read_blow5(args.input, args.pos,args.ref, args.len, args.chrom, args.strand, args.pore,
+                                                            subsample_ratio, args.base_shift, args.norm, str(args.cpu),args.rna)
         df_wt['Group'] = 'Sample'
         if nucleotide_type == 'RNA' and not args.rna:
             raise RuntimeError("You need to add --rna to turn on the rna mode")
         try:
-            df_ivt, aligned_num_ivt, _ = read_blow5(args.control, args.pos,args.ref, args.len, args.chrom, args.strand,
-                                                    subsample_ratio, args.base_shift, args.norm, args.cpu)
+            df_ivt, aligned_num_ivt, _ = read_blow5(args.control, args.pos,args.ref, args.len, args.chrom, args.strand, args.pore,
+                                                            subsample_ratio, args.base_shift, args.norm, str(args.cpu),args.rna)
             df_ivt['Group'] = 'Control'
 
             df = pd.concat([df_wt, df_ivt])
@@ -149,15 +146,7 @@ if __name__ == '__main__':
     df_copy.to_csv(results_path + '/current_feature.csv', index=None)
     print("Feature file saved  in " + results_path + '/current_feature.csv')
 
-    # percentile_filter = False
-    # if aligned_num_wt > 50 and aligned_num_ivt > 50:
-    #     percentile_filter = True
-
     current_plot(df, results_path, args.pos, base_list, title)
-    # signal_plot(df, results_path, args.pos, base_list, title, 'boxplot')
-    # signal_plot(df, results_path, args.pos, base_list, title, 'violin_plot')
-
-    df = df_copy[df_copy['Position'] == args.pos+1]
-    plot_PCA(df,results_path)
+    df = df_copy[df_copy['Position'] == args.pos + 1]
+    plot_PCA(df, results_path)
     print('Finished')
-

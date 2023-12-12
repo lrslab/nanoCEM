@@ -14,11 +14,13 @@ Since we support `tombo` and `f5c`, where `tombo` only supports single format `f
 you only need to choose one from them.
 Here are some advice commands if your original data is multi-format fast5.
 
-    # ont-fast5-api
-    multi_to_single_fast5 --input_path </path/to/multi_reads> --save_path </path/to/single_reads> --recursive
-    # slow5tools
+    # pod5 to blow5
+    blue-crab p2s file.pod5 -o file.blow5
+    # fasts to blow5
     slow5tools f2s </path/to/multi_reads> -d </path/to/blow5_dir>
     slow5tools cat </path/to/blow5_dir> -o file.blow5
+    # multi-format fast5 to single-format fast5
+    multi_to_single_fast5 --input_path </path/to/multi_reads> --save_path </path/to/single_reads> --recursive
 
 ## Basecall your raw reads
 After obtaining raw reads files, the first step is to basecall them.

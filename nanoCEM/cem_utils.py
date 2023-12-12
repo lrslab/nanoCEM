@@ -38,7 +38,7 @@ def identify_file_path(file_path):
 
 def generate_bam_file(fastq_file, reference, cpu):
     bam_file = os.path.dirname(fastq_file) + '/' + os.path.basename(fastq_file).split('.')[0] + '.bam'
-    if not os.path.exists(bam_file):
+    if  not os.path.exists(bam_file):
         cmds = 'minimap2 -ax map-ont -t ' + cpu + ' --MD ' + reference + ' ' + fastq_file + ' | samtools view -hbS -F ' + str(
             260) + '  - | samtools sort -@ ' + cpu + ' -o ' + bam_file
         print('Start to alignment ...')
@@ -49,6 +49,22 @@ def generate_bam_file(fastq_file, reference, cpu):
     cmds = 'samtools index ' + bam_file
     os.system(cmds)
     return bam_file
+
+def generate_paf_file(fastq_file, blow5_file,pore,rna):
+    paf_file = os.path.dirname(fastq_file) + '/' + os.path.basename(fastq_file).split('.')[0] + '.paf'
+    if not os.path.exists(paf_file):
+        cmds = 'slow5tools index ' + blow5_file
+        os.system(cmds)
+
+        cmds = 'f5c resquiggle -c '+ fastq_file + ' ' + blow5_file + ' --pore '+ pore+' -o ' + paf_file
+        if rna:
+            cmds =cmds +' --rna'
+        print('Start to resquiggle ...')
+        os.system(cmds)
+        print('Generated paf file : ' + paf_file)
+    else:
+        print(paf_file + ' existed. Will skip the f5c resquiggle ... ')
+    return paf_file
 
 
 def run_samtools(fastq_file, location, reference, result_path, group, cpu):

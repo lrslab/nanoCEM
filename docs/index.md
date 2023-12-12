@@ -10,9 +10,9 @@ A Python command-line tool designed to  visualize and analyse multiple statistic
 
 ## Installation
 
-Before pip installation, make sure you have installed the `samtools`(>=1.16) and `minimap2`(>=2.17),
+Before pip install, make sure you have installed the `samtools`(>=1.16) , `f5c`(>=1.2), `slow5tools`(>=1.1.0) and `minimap2`(>=2.17),
 
-    conda install -c bioconda samtools minimap2
+    conda install samtools=1.16 minimap2 f5c=1.3 slow5tools -c conda-forge -c bioconda 
 
 To install the latest nanoCEM
 
@@ -23,9 +23,6 @@ See our Installation page for details.
 To check the version of nanoCEM, run:
 
     pip list | grep nanoCEM
-
-
- **Notes:** Additionally, we do not rely on any re-squiggle or eventalign packages. We only need their index files for the sequencing data.
 
 
 
