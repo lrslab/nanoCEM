@@ -7,7 +7,7 @@ These now include the original single and multiple fast5 format, the newer pod5 
 and the community-driven slow5/blow5 formats. The relationship between conversion tools 
 and these different data formats is as below.
 
- <center>![data format](data_format.png "data_format") </center>
+ <center>![data format](data_format.jpg "data_format") </center>
 
 nanoCEM only supports single-format `fast5` and `blow5`; please transfer the data format before usage.
 Since we support `tombo` and `f5c`, where `tombo` only supports single format `fast5` and `f5c` supports `blow5`,
@@ -16,11 +16,12 @@ Here are some advice commands if your original data is multi-format fast5.
 
     # pod5 to blow5
     blue-crab p2s file.pod5 -o file.blow5
+
     # fasts to blow5
     slow5tools f2s </path/to/multi_reads> -d </path/to/blow5_dir>
     slow5tools cat </path/to/blow5_dir> -o file.blow5
-    # multi-format fast5 to single-format fast5
-    multi_to_single_fast5 --input_path </path/to/multi_reads> --save_path </path/to/single_reads> --recursive
+
+
 
 ## Basecall your raw reads
 After obtaining raw reads files, the first step is to basecall them.
@@ -43,13 +44,8 @@ it is advisable to use `transcript` as the reference, while for DNA, the referen
 ## Re-squiggle process
 nanoCEM supports the re-squiggle results of both `tombo` and `f5c`.
 ### f5c
-f5c is a software that supports eventalign and also supports the new R10 data. 
-We recommend using version 1.2 or above. Here are the sample commands for dna/rna from different flow cell.
-
-    # for rna data from r9 flowcell
-    f5c resquiggle -c file.fastq file.blow5 -o file.paf --rna --pore r9
-    # for dna data from r10 flowcell
-    f5c resquiggle -c file.fastq file.blow5 -o file.paf --pore r10
+f5c is a software that supports re-squiggle and also supports the new R10 data. 
+Since f5c has already been integrated into our script, `tombo` users will need to install the required environment on their own.
 
 ### tombo
 

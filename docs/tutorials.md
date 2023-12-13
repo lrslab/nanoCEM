@@ -4,6 +4,10 @@ This quick start guide outlines the steps to use the nanoCEM command line for an
 of the E. coli 23S rRNA around a known m6A site (A2030). nanoCEM will calculate alignment features and current event
 features within this specified region.
 
+ **Notes:** Our default mode is `f5c`, so our framework internally executes the `f5c` commands. 
+ However, for `tombo`, although we have added support for it, you will need to set up the `tombo` environment 
+ separately to run the resquiggle command.
+
 If you want to deal with DNA data, remember to delete all `--rna` in the following commands.
 
 ## Dataprep
@@ -60,16 +64,13 @@ your interest region as below,
 
 ## Current event feature visualization
 
- **Notes:** Our default mode is `f5c`, so our framework internally executes the `f5c` commands. 
- However, for `tombo`, although we have added support for it, you will need to set up the `tombo` environment 
- separately to run the resquiggle command.
 
-### f5c (Default mode)
+
 For the current event feature, we provide  `current_events_magnifier` script. You can choose the re-squiggle program
 from `f5c` and `tombo`. They are different in several aspects, including the re-squiggle algorithm
 (which may introduce one base bias) and the supported data types (fast5/blow5). 
 
-If you choose `f5c`, make sure that the prefix of `fastq`, `blow5`,`paf` should be the same
+If you choose `f5c`, make sure that the prefix of `fastq`, `blow5` should be the same
 for each group as below,
 
     test/
@@ -84,7 +85,7 @@ Then you can use `current_events_magnifier` as below,
     --ref data/23S_rRNA.fasta -o nanoCEM_result \
     --base_shift 2 --rna --norm
 
-Then nanoCEM will output the current feature called [`current_feature.csv`](output_format.md) of your interest region
+Then nanoCEM will output the current feature called [`current_feature.csv`](output_format.md) of your target region
 and plot it as below,
 
 <center>![f5c_feature](Current_boxplot_f5c.png "f5c_feature") </center>
@@ -94,13 +95,38 @@ selected points (A2030) within each group can be subjected to Principal Componen
 
 <center>![f5c_pca](zscore_density_f5c.png "f5c_pca") </center>
 
-### tombo support
+## tombo support
 
 In addition to `f5c`, nanoCEM also supports `tombo`, and achieves the same functionality by providing the fast5 folder
-like the following commands,
+like the following workflow,
+
+### Dataprep
+
+Tombo is a suite of tools primarily for the identification of modified nucleotides from nanopore sequencing data, and only support single-format fast5.
+
+    # pod5 to single-format fast5
+    pod5 convert to_fast5 file.pod5 --output </path/to/multi_reads>
+    multi_to_single_fast5 --input_path </path/to/multi_reads> --save_path </path/to/single_reads> --recursive
+
+For Sample and Control group,  files should be as below,
+
+    test/
+        single/
+        file.fastq
+
+###  tombo resquiggle
+For Sample and Control group, run the commands below respectively,
+ 
+    tombo preprocess annotate_raw_with_fastqs --fast5-basedir single/ --fastq-filenames file.fastq --processes 16 
+    tombo resquiggle single/ ../23S_rRNA.fasta --processes 16 --num-most-common-errors 5
+    
+### current_events_magnifier
+Afterwards, you can run the `current_event_magnifier` function in the `tombo` mode to achieve the same functionality.
 
     # run tombo mode
     current_events_magnifier tombo -i data/wt/single -c data/ivt/single \
     --chrom NR_103073.1 --strand + --pos 2030 \
     --ref data/23S_rRNA.fasta -o nanoCEM_result \
     --rna --cpu 4 --norm
+
+Then nanoCEM will output the current feature called [`current_feature.csv`](output_format.md) of your target region
