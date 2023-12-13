@@ -21,7 +21,7 @@ The `alignment_feature.csv` file will be output and mismatch information will be
 
 ## Result file from current_event_magnifier
 
-The `current_feature.csv` file will be output and mismatch information will be recorded.
+The `current_feature.csv` file will be output and current feature information will be recorded.
 
 | Column name       |Description|
 |------------|------------|
