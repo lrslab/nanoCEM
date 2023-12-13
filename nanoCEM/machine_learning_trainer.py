@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 import pandas as pd
 import xgboost
 import shap
-from  nanoCEM.cem_utils import  extract_kmer_feature
+from nanoCEM.cem_utils import  extract_kmer_feature
 plt.rcParams['pdf.fonttype'] = 42
 results_path='f5c_result_rna'
 df = pd.read_csv(results_path+'/current_feature.csv')
