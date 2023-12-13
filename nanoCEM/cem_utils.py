@@ -94,6 +94,33 @@ def reverse_fasta(ref):
     reverse_fasta = list(reversed(''.join(ref)))
     return ''.join(reverse_fasta)
 
+def extract_kmer_feature(df, kmer, position):
+
+    def is_odd(number):
+        if number % 2 == 1:
+            return True
+        else:
+            return False
+    if not is_odd(kmer) or kmer < 0:
+        raise Exception("The kmer should be an odd number and greater than zero.")
+
+    kmer_size = (kmer-1)//2
+    df = df[(df['Position'] >= position-kmer_size) & (df['Position'] <= position+kmer_size)]
+    grouped_df = df.groupby('Read ID')
+    df.loc[:,'Dwell time'] = np.log10(df['Dwell time'])
+    result_list=[]
+    label_list=[]
+    for key,temp in grouped_df:
+        item = temp[['Mean','STD','Median','Dwell time']].values
+        item = item.reshape(-1,).tolist()
+        if len(item) < kmer * 4:
+            continue
+
+        result_list.append(item)
+        label_list.append([temp['Group'].values[0]])
+    feature_matrix = pd.DataFrame(result_list)
+    label = pd.DataFrame(label_list)
+    return feature_matrix, label
 
 def save_fasta_dict(fasta_dict, path):
     f = open(path, 'w+')

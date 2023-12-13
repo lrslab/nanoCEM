@@ -173,23 +173,25 @@ def alignment_plot(final_feature,pos_list,base_list,title,pos,results_path):
     plot.save(filename=results_path + "/alignment.pdf", dpi=300)
     print('Figures are saved in ' + results_path)
 
-def plot_PCA(df,results_path):
+def plot_PCA(feature_matrix,label,results_path):
     print("Start to do PCA analysis ...")
-    from scipy.stats import zscore
-    df.loc[:, 'Mean'] = zscore(df['Mean'])
-    df.loc[:, 'Median'] = zscore(df['Median'])
-    df.loc[:, 'STD'] = zscore(df['STD'])
-    df.loc[:, 'Dwell time'] = zscore(np.log10(df['Dwell time']))
 
-    from sklearn.decomposition import PCA
-    pca = PCA(n_components=2)
-    new_df = pd.DataFrame(pca.fit_transform(df[['Mean', 'Median', 'STD', 'Dwell time']]))
-    new_df.columns = ['PC1', 'PC2']
-    new_df = pd.concat([new_df, df['Group'].reset_index()], axis=1)
+    # from sklearn.decomposition import PCA
+    # pca = PCA(n_components=2)
+    # new_df = pd.DataFrame(pca.fit_transform(feature_matrix))
+
+    # new_df.columns = ['PC1', 'PC2','Group']
+    # explained_variance_ratio = pca.explained_variance_ratio_
+    # for i, ratio in enumerate(explained_variance_ratio):
+    #     print(f"Principal Component {i + 1}: {ratio:.2f}")
+
+    import umap
+    reducer = umap.UMAP(n_components=2)  # 指定降维后的维度为2
+    new_df = reducer.fit_transform(feature_matrix)
+    new_df = pd.concat([pd.DataFrame(new_df), label], axis=1)
+    new_df.columns = ['PC1', 'PC2', 'Group']
     plot = p9.ggplot(new_df, p9.aes(x='PC1', y='PC2', color='Group')) \
            + p9.theme_bw() \
-           + p9.ylim(-4, 4) \
-           + p9.xlim(-4, 4) \
            + p9.stat_density_2d() \
            + p9.scale_color_manual(values={"Sample": "#F57070", "Control": "#9F9F9F", "Single": "#a3abbd"}) \
            + p9.geom_point() \
@@ -204,4 +206,5 @@ def plot_PCA(df,results_path):
         strip_text=p9.element_text(size=13),
         strip_background=p9.element_rect(alpha=0),
     )
-    plot.save(filename=results_path + "/zscore_density.pdf", dpi=300)
+    print(plot)
+    plot.save(filename=results_path + "/PCA.pdf", dpi=300)

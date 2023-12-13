@@ -6,7 +6,7 @@ import warnings
 import pandas as pd
 from plotnine.exceptions import PlotnineWarning
 
-from nanoCEM.cem_utils import read_fasta_to_dic,identify_file_path,build_out_path
+from nanoCEM.cem_utils import read_fasta_to_dic,identify_file_path,build_out_path,extract_kmer_feature
 from nanoCEM.plot import current_plot,plot_PCA
 
 warnings.filterwarnings("ignore", category=PlotnineWarning)
@@ -147,6 +147,6 @@ if __name__ == '__main__':
     print("Feature file saved  in " + results_path + '/current_feature.csv')
 
     current_plot(df, results_path, args.pos, base_list, title)
-    df = df_copy[df_copy['Position'] == args.pos + 1]
-    plot_PCA(df, results_path)
+    feature_matrix,label = extract_kmer_feature(df_copy, 5,  args.pos + 1)
+    plot_PCA(feature_matrix,label, results_path)
     print('Finished')

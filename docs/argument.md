@@ -62,6 +62,7 @@ And f5c
 | --rna                           | No       | turn on the RNA mode       (Default:False)                                      |
 | --norm                          | No       | turn on the normalization      (Default:False)                  |
 | --base_shift                          | No       |  for shifting the result from f5c      (Default:2)                  |
+| --pore | No       |  type of pore choose from `r9` and `r10` (Default: `r9`)                 |
 | -h, --help                      | No       | Show this help message and exit                                  |
 
 extract_sub_fast5_from_bam

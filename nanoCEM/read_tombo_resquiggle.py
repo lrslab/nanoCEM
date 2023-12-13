@@ -180,7 +180,7 @@ def extract_group(args, total_fl,subsample_num=1):
     if df.shape[0] == 0:
         raise Exception("can not find basecall_group or basecall_subgroup in fast5 files or there is no read aligned on the position")
     print('\nextracted ',num_aligned,' aligned reads from fast5 files')
-    df.columns = ['Read_ID','Mean', 'STD', 'Median', 'Dwell time', 'Position']
+    df.columns = ['Read ID','Mean', 'STD', 'Median', 'Dwell time', 'Position']
 
     # 转化为数值
     df['Position'] = df['Position'].astype(int)
