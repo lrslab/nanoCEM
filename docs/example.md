@@ -7,45 +7,33 @@ an example of training a model using **XGBoost** for the `current_feature.csv` f
 ## Prepare the data feature
 
 In the current k-mer based RNA modification detection algorithms (such as nanom6A, xPore ...), most of them utilize 5-mer algorithms. 
-The following code is used to organize the 5-mer data and perform z-score normalization.
+We provide the function `extract_kmer_feature(result_df, kmer_number,target_position)` to extract kmer feature from our output file and the example is as below
 
     import numpy as np
     import pandas as pd
+    from  nanoCEM.cem_utils import  extract_kmer_feature
     df = pd.read_csv('current_feature.csv')
-    k_mer = 5
-    kmer_size= int((k_mer-1)/2)
-    df = df[(df['position']>=2030-kmer_size)&(df['position']<=2030+kmer_size)]
-    grouped_df = df.groupby('Read_ID')
-    
-    result_list=[]
-    for key,temp in grouped_df:
-        item = temp[['Mean','STD','Median','Dwell time']].values
-        item = item.reshape(-1,).tolist()
-        item.append(temp['type'].values[0])
-        if len(item)<k_mer*4:
-            continue
-        result_list.append(item)
-    df = pd.DataFrame(result_list)
-    result_col = (kmer_size*2+1)*4
-    df[result_col+1] = df[result_col].apply(lambda x: 1 if x=='Sample' else 0)
-    
-    pos_list = [str(num) for num in list(range(0,result_col+2))]
-    df.columns=pos_list
-    X = df[[str(num) for num in list(range(0,result_col))]]
-    y = df[str(result_col+1)]
+    # extract_kmer_feature(result_df, kmer_number,target_position)
+    feature_matrix, label = extract_kmer_feature( df, 5, 2030)
+    label[0] = label[0].apply(lambda x: 1 if x == 'Sample' else 0)
 
 ## Train and test
 Perform k-fold cross-validation using XGBoost and calculate the average accuracy.
 
+
     from sklearn.metrics import accuracy_score
     from sklearn.model_selection import KFold
+
+    X = feature_matrix.values
+    y = label.values
     kfold = KFold(n_splits=5)
     # Perform k-fold cross-validation
     accuracy_scores=[]
+
     for train_index, test_index in kfold.split(X):
         # Split the data into training and testing sets for each fold
-        X_train, X_test = X.iloc[train_index], X.iloc[test_index]
-        y_train, y_test = y.iloc[train_index], y.iloc[test_index]
+        X_train, X_test = X[train_index], X[test_index]
+        y_train, y_test = y[train_index], y[test_index]
     
         # Create an XGBoost classifier
         model = xgboost.XGBClassifier()
