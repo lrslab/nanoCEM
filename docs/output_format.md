@@ -32,3 +32,12 @@ The `current_feature.csv` file will be output and current feature information wi
 | Dwell time |the length of the current event of this position in this read
 | Position |position in transcript/chrome or gene id (**1-based**)
 | Group |represent the group from `Sample` or `Control`. The `Sample` is the input in argument, and `Control` belongs to the control group.
+
+
+The `MANOVA_result.csv` file records the significant level indicating the difference between two groups
+
+| Column name       |Description|
+|------------|------------|
+| Position | position in transcript/chrome or gene id (**1-based**)
+| P value(-log10) | P value from MANOVA applying on the PCA result. (Recommend cutoff : `2` for f5c)
+| Result  | whether it is significant after dividing according to the recommended cutoff.

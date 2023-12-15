@@ -106,6 +106,8 @@ def extract_kmer_feature(df, kmer, position):
 
     kmer_size = (kmer-1)//2
     df = df[(df['Position'] >= position-kmer_size) & (df['Position'] <= position+kmer_size)]
+    df = df.sort_values(['Read ID', 'Position'], ascending=True)
+    df =df.reset_index(drop=True)
     grouped_df = df.groupby('Read ID')
     df.loc[:,'Dwell time'] = np.log10(df['Dwell time'])
     result_list=[]
@@ -130,6 +132,42 @@ def save_fasta_dict(fasta_dict, path):
         for i in range(0, line):
             f.write(value[i * 80:(i + 1) * 80] + '\n')
         f.close()
+
+def calculate_MANOVA_result(position,df,subsample_num=500,windows_len=10):
+    print("Start to run the MANOVA analysis on target region ...")
+    from statsmodels.multivariate.manova import MANOVA
+    from sklearn.decomposition import PCA
+
+    methylation_list=list(range( position- 9 ,position + 10))
+    result_list=[]
+    for item in methylation_list:
+        # subsample the reads
+        control = df[df['Group']=='Control']
+        if control.shape[0] > subsample_num*(2*windows_len+1):
+            control=control.iloc[0:subsample_num*(2*windows_len+1), :]
+        sample = df[df['Group'] == 'Sample']
+        if sample.shape[0] > control.shape[0] * 2:
+            sample = sample.iloc[0:control.shape[0],:]
+        df = pd.concat([control,sample],axis=0).reset_index(drop=True)
+        feature,label = extract_kmer_feature(df,3,item)
+        pca = PCA(n_components=2,whiten=True)
+        new_df = pd.DataFrame(pca.fit_transform(feature))
+
+        new_df = pd.concat([pd.DataFrame(new_df),label], axis =1)
+        new_df.columns=['PC1','PC2','Group']
+        if np.sum(new_df['Group']=='Sample') > 10 and np.sum(new_df['Group']=='Control') > 10:
+            manova = MANOVA.from_formula('PC1 + PC2 ~ Group', data=new_df)
+            # 执行多元方差分析
+            results = manova.mv_test()
+            pvalue = results.summary().tables[3].iloc[0,5]
+            result_list.append([item,pvalue])
+        else:
+            result_list.append([item, None])
+    new_df = pd.DataFrame(result_list)
+    new_df[1] = np.log10(new_df[1]) * (-1)
+    new_df.columns = ['Position', 'P value(-log10)']
+    return new_df
+
 # fasta=read_fasta_to_dic("../example/data/23S_rRNA.fasta")
 # for key,value in fasta.items():
 #     fasta[key]=reverse_fasta(value)

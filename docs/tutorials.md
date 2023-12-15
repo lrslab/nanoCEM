@@ -84,10 +84,16 @@ and plot it as below,
 
 <center>![f5c_feature](Current_boxplot_f5c.png "f5c_feature") </center>
 
-Meanwhile, to visually display the differences in current features of selected data points between two groups, the
-selected points (A2030) within each group can be subjected to Principal Component Analysis (PCA).
+Meanwhile, to visually display the differences in current features of target position (A2030) between two groups, the
+3-mer's feature will be collected within each group can be subjected to Principal Component Analysis (PCA).
 
-<center>![f5c_pca](zscore_density_f5c.png "f5c_pca") </center>
+<center>![f5c_pca](PCA_target_position.png "f5c_pca") </center>
+
+Finally, in order to demonstrate the difference in current between each point in the target region, we utilized MANOVA to analyze 
+the results of PCA and determine the presence of statistically significant differences. `MANOVA_result.csv` and the figure below will be saved in the 
+output path.
+
+<center>![manova](RNA_pval.png "manova") </center>
 
 ## tombo support
 

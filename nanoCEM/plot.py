@@ -2,6 +2,7 @@ import pandas as pd
 import plotnine as p9
 import numpy as np
 from matplotlib import pyplot as plt
+import umap
 
 plt.rcParams['pdf.fonttype'] = 42
 # plt.rcParams['font.sans-serif'] = ['Arial']
@@ -64,7 +65,7 @@ SIG_PCTL_RANGE = (1, 99)
 # print(plot)
 
 def current_plot(df, results_path, pos, base_list, title):
-    print("Start to plot ...")
+    print("Start to plot current feature ...")
     item_list = ['Mean', 'STD', 'Median', 'Dwell time']
     len_plot = (len(base_list)-1)//2
     pos_list = list(range(-len_plot+pos,len_plot+1+pos))
@@ -107,7 +108,7 @@ def current_plot(df, results_path, pos, base_list, title):
         plot2.save(filename=results_path + "/current_single.pdf", dpi=300)
     else:
         plot1 = plot + p9.geom_boxplot(outlier_shape='', position=p9.position_dodge(0.9), size=0.2, width=0.75,alpha = 0.8)
-        plot1.save(filename=results_path + "/Current_boxplot.pdf", dpi=300)
+        plot1.save(filename=results_path + "/current_boxplot.pdf", dpi=300)
         plot2 = plot + p9.geom_violin(style='left-right', position=p9.position_dodge(0), color='none', width=1.5,alpha = 0.8)
         plot2.save(filename=results_path + "/current_violin.pdf", dpi=300)
     print('Figures are saved in '+results_path)
@@ -174,27 +175,41 @@ def alignment_plot(final_feature,pos_list,base_list,title,pos,results_path):
     print('Figures are saved in ' + results_path)
 
 def plot_PCA(feature_matrix,label,results_path):
-    print("Start to do PCA analysis ...")
+    print("Start to plot the PCA distribution on target position ...")
 
-    # from sklearn.decomposition import PCA
-    # pca = PCA(n_components=2)
-    # new_df = pd.DataFrame(pca.fit_transform(feature_matrix))
+    from sklearn.decomposition import PCA
+    pca = PCA(n_components=2)
+    new_df = pd.DataFrame(pca.fit_transform(feature_matrix))
+    weights = pca.explained_variance_ratio_
 
-    # new_df.columns = ['PC1', 'PC2','Group']
-    # explained_variance_ratio = pca.explained_variance_ratio_
-    # for i, ratio in enumerate(explained_variance_ratio):
-    #     print(f"Principal Component {i + 1}: {ratio:.2f}")
+    # 打印权重
+    print("Weights:", weights)
 
-    import umap
-    reducer = umap.UMAP(n_components=2)  # 指定降维后的维度为2
-    new_df = reducer.fit_transform(feature_matrix)
+    x_axis = 'PC1 : ' + str(round(weights[0],2))
+    y_axis = 'PC2 : ' + str(round(weights[1],2))
+#     y_test = label[0].apply(lambda x: 1 if x == 'Sample' else 0)
+#     # new_df.columns = ['PC1', 'PC2','Group']
+#     # explained_variance_ratio = pca.explained_variance_ratio_
+#     # for i, ratio in enumerate(explained_variance_ratio):
+#     #     print(f"Principal Component {i + 1}: {ratio:.2f}")
+#     new_df =  umap.UMAP(
+#     n_neighbors=15,
+#     min_dist=0.0,
+#     n_components=2,
+#     random_state=42,
+# ).fit_transform(feature_matrix)
+    # plt.scatter(new_df[:, 0], new_df[:, 1], c=y_test, s=0.1, cmap='Spectral');
+
+    # reducer = umap.UMAP(n_components=2)  # 指定降维后的维度为2
+    # new_df = reducer.fit_transform(feature_matrix)
     new_df = pd.concat([pd.DataFrame(new_df), label], axis=1)
     new_df.columns = ['PC1', 'PC2', 'Group']
     plot = p9.ggplot(new_df, p9.aes(x='PC1', y='PC2', color='Group')) \
            + p9.theme_bw() \
-           + p9.stat_density_2d() \
+            +p9.labs(x=x_axis,y=y_axis)\
            + p9.scale_color_manual(values={"Sample": "#F57070", "Control": "#9F9F9F", "Single": "#a3abbd"}) \
            + p9.geom_point() \
+           + p9.geom_density_2d() \
            + p9.theme(
         figure_size=(5, 5),
         panel_grid_minor=p9.element_blank(),
@@ -206,5 +221,29 @@ def plot_PCA(feature_matrix,label,results_path):
         strip_text=p9.element_text(size=13),
         strip_background=p9.element_rect(alpha=0),
     )
-    print(plot)
-    plot.save(filename=results_path + "/PCA.pdf", dpi=300)
+    # print(plot)
+    plot.save(filename=results_path + "/PCA_target_position.pdf", dpi=300)
+
+def MANOVA_plot(df, results_path):
+
+    df['Result'] = df['P value(-log10)'].apply(lambda x: 'Significant' if x >= 2 else 'Not significant')
+    df.to_csv(results_path + '/MANOVA_result.csv', index=None)
+    print("Feature file saved  in " + results_path + '/MANOVA_result.csv')
+    plot = p9.ggplot(df, p9.aes(x='Position', y='P value(-log10)', fill='Result')) \
+           + p9.theme_bw() \
+           + p9.geom_col() \
+           + p9.scale_fill_manual(values={'Significant': "#BB9A8B", 'Not significant': "#D7D7DD"}) \
+           + p9.geom_hline(yintercept=2, linetype='dashed') \
+           + p9.theme(
+        figure_size=(8, 3),
+        panel_grid_minor=p9.element_blank(),
+        axis_text=p9.element_text(size=13),
+        axis_title=p9.element_text(size=13),
+        title=p9.element_text(size=13),
+        legend_position='bottom',
+        legend_title=p9.element_blank(),
+        strip_text=p9.element_text(size=13),
+        strip_background=p9.element_rect(alpha=0),
+    )
+    # plot.save(filename=results_path + "/zscore_density.pdf", dpi=300)
+    plot.save(filename=results_path + "/MANOVA_distribution.pdf", dpi=300)
