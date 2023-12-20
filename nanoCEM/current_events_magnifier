@@ -6,8 +6,8 @@ import warnings
 import pandas as pd
 from plotnine.exceptions import PlotnineWarning
 
-from nanoCEM.cem_utils import read_fasta_to_dic,identify_file_path,build_out_path,extract_kmer_feature
-from nanoCEM.plot import current_plot,plot_PCA
+from nanoCEM.cem_utils import read_fasta_to_dic,identify_file_path,build_out_path,extract_kmer_feature,calculate_MANOVA_result
+from nanoCEM.plot import current_plot,plot_PCA,MANOVA_plot
 
 warnings.filterwarnings("ignore", category=PlotnineWarning)
 from nanoCEM.cem_utils import generate_bam_file
@@ -138,15 +138,20 @@ if __name__ == '__main__':
             df_wt['Group'] = 'Single'
             title = title + '   Sample:' + str(aligned_num_wt)
 
-    # draw_volin(df,results_path,args.pos,base_list,title)
-    # draw_boxplot(df,results_path,args.pos,base_list,title)
-
+    # save result table
     df_copy = copy.deepcopy(df)
     df_copy['Position'] = df_copy['Position'].astype(int) + 1
     df_copy.to_csv(results_path + '/current_feature.csv', index=None)
     print("Feature file saved  in " + results_path + '/current_feature.csv')
 
+    # draw current feature
     current_plot(df, results_path, args.pos, base_list, title)
-    feature_matrix,label = extract_kmer_feature(df_copy, 5,  args.pos + 1)
-    plot_PCA(feature_matrix,label, results_path)
+
+    # draw PCA
+    feature_matrix, label = extract_kmer_feature(df_copy, 3, args.pos + 1)
+    plot_PCA(feature_matrix, label, results_path)
+
+    # draw p_value
+    new_df = calculate_MANOVA_result( args.pos+1,df_copy,500,args.len)
+    MANOVA_plot(new_df, results_path)
     print('Finished')
