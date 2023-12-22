@@ -57,7 +57,6 @@ Perform k-fold cross-validation using XGBoost and calculate the average accuracy
 ## Density plot
 After obtaining the trained model, it is possible to visualize the distribution of the test data using tools like plotnine as below.
 
-    import plotnine as p9
     prediction_df = pd.DataFrame({'y_test': y_test.reshape(-1,), 'y_pred': y_pred})
     prediction_df['y_test'] = prediction_df['y_test'].apply(lambda x: 'Sample' if x==1 else 'Control')
     import plotnine as p9
