@@ -32,3 +32,6 @@ For the data we used and related commands in our paper, please view our [wiki](h
 
 ## Documents
 Full documentation is available at https://nanocem.readthedocs.io/
+
+## Workflow
+![workflow](docs/Workflow.png)
