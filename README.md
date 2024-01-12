@@ -1,5 +1,6 @@
 # nanoCEM ![logo](docs/logo_tiny.png "nanoCEM")
-
+<a href="https://pypi.python.org/pypi/nanoCEM" rel="pypi">![PyPI](https://img.shields.io/pypi/v/nanoCEM?color=green) </a>
+<a href="https://opensource.org/license/mit/" rel="license">![License](https://img.shields.io/pypi/l/nanoCEM?color=orange)</a>
 
 The nanopore current events magnifier (`nanoCEM`) is a python command line to facilitate the analysis of DNA/RNA modification sites by visualizing statistical features of current events. 
 NanoCEM can be used to showcase high confidence sites and observe the difference based on the modification sample and the low or no modification sample.
