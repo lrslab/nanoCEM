@@ -37,7 +37,8 @@ def identify_file_path(file_path):
 
 
 def generate_bam_file(fastq_file, reference, cpu):
-    bam_file = os.path.dirname(fastq_file) + '/' + os.path.basename(fastq_file).split('.')[0] + '.bam'
+
+    bam_file = '.'.join(fastq_file.split('.')[:-1]) + '.bam'
     if  not os.path.exists(bam_file):
         cmds = 'minimap2 -ax map-ont -t ' + cpu + ' --MD ' + reference + ' ' + fastq_file + ' | samtools view -hbS -F ' + str(
             260) + '  - | samtools sort -@ ' + cpu + ' -o ' + bam_file
@@ -51,7 +52,7 @@ def generate_bam_file(fastq_file, reference, cpu):
     return bam_file
 
 def generate_paf_file(fastq_file, blow5_file,pore,rna):
-    paf_file = os.path.dirname(fastq_file) + '/' + os.path.basename(fastq_file).split('.')[0] + '.paf'
+    paf_file =  '.'.join(fastq_file.split('.')[:-1]) + '.paf'
     if not os.path.exists(paf_file):
         cmds = 'slow5tools index ' + blow5_file
         os.system(cmds)
