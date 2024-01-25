@@ -7,7 +7,7 @@ features within this target region.
  **Notes:** Our default mode is `f5c`, so our framework integrated the `f5c` commands. 
  However, for `tombo`, although we have added support for it, you will need to set up the additional `tombo` environment 
  and run tombo resquiggle command . If you want to deal with DNA data, remember to delete all `--rna` in the following commands. 
- For script `current_event_magnifier`, to use the `r10` mode instead of the default `r9` mode, you can use the command `--pore r10`
+ For script `current_event_magnifier`, to use the `r10` mode instead of the default `r9` mode, you can use the command `--pore r10` and set `--base_shift 4`.
 ## Dataprep
 
 [comment]: <> (Before utilizing NanoCEM, it is required to convert the raw data format to the appropriate format &#40;single-format `fast5`)
