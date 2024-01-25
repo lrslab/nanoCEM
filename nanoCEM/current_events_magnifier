@@ -10,6 +10,7 @@ from nanoCEM.cem_utils import read_fasta_to_dic,identify_file_path,build_out_pat
 from nanoCEM.plot import current_plot,plot_PCA,MANOVA_plot
 
 warnings.filterwarnings("ignore", category=PlotnineWarning)
+warnings.filterwarnings("ignore", category=FutureWarning)
 from nanoCEM.cem_utils import generate_bam_file
 
 def init_parser():

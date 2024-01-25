@@ -2,7 +2,6 @@ import pandas as pd
 import plotnine as p9
 import numpy as np
 from matplotlib import pyplot as plt
-import umap
 
 plt.rcParams['pdf.fonttype'] = 42
 # plt.rcParams['font.sans-serif'] = ['Arial']
