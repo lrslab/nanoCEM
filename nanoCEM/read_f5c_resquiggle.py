@@ -11,12 +11,13 @@ import os
 import argparse
 score_dict={}
 nucleotide_type=None
-def extract_feature(line,strand,base_shift=2,norm=True):
+
+def extract_feature(line,strand,position,windows_length,base_shift=2,norm=True):
     global nucleotide_type
     pbar.update(1)
     read_id = line[0]
-    # if read_id !='562eeb47-2b86-4fc7-abfc-5dce62f511ed':
-    #     return None
+    if read_id == '0a017d09-5c09-456d-8875-635f4c2c1380':
+        print(1)
     if read_id not in info_dict:
         return None
     # tackle moves tag
@@ -40,8 +41,6 @@ def extract_feature(line,strand,base_shift=2,norm=True):
                 continue
             else:
                 return None
-        elif '=' in item:
-            return None
         else:
             event_length.append(int(item))
     # build event_length from move table
@@ -52,89 +51,59 @@ def extract_feature(line,strand,base_shift=2,norm=True):
 
     # identify RNA or DNA
     if nucleotide_type is None:
-        if line[7]>line[8]:
-            nucleotide_type='RNA'
+        if line[7] > line[8]:
+            nucleotide_type = 'RNA'
         else:
-            nucleotide_type='DNA'
+            nucleotide_type = 'DNA'
     #  assert len_raw_signal in paf and blow5
     try:
         assert end_index-start_index == np.sum(event_length)
+        assert np.abs(line[8] - line[7]) == len(event_length)
         assert read['len_raw_signal'] == line[1]
     except Exception:
         print("Warning: 1 read's length of signal is not equal between blow5 and paf")
         return None
 
     signal = read['signal']
-
-    # create event start and flip all table
     signal = signal[start_index:end_index]
-    if nucleotide_type=='RNA':
-        signal = np.flip(signal)
-        event_length = np.flip(event_length)
 
     event_starts = event_length.cumsum()
     event_starts = np.insert(event_starts, 0, 0)[:-1]
     if norm:
         signal = normalize_signal_with_lim(signal)
 
-    # filter too short or long dwell time
-    # dwell_filter_pctls = (0.5, 99.5)
-    # dwell_min, dwell_max = np.percentile(event_length, dwell_filter_pctls)
-    # valid_bases = np.logical_and.reduce(
-    #     (
-    #         event_length > dwell_min,
-    #         event_length < dwell_max,
-    #         np.logical_not(np.isnan(event_length)),
-    #     )
-    # )
-    # event_length[~valid_bases] = 0
-
-    # normalized signal
-    # draw_signal(signal, event_starts,None, 8850,8855)
-
-
-    # index query and reference
-    aligned_pair=info_dict[read_id]['pairs']
-    qlen = info_dict[read_id]['query_length']
-    # correct index about DNA and RNA
-    if nucleotide_type == 'RNA':
-        if strand == '+':
-            gap = qlen - event_length.shape[0]
-            aligned_pair[0] = aligned_pair[0] - gap
-            aligned_pair = aligned_pair[aligned_pair[0] >= 0]
-        elif strand == '-':
-            aligned_pair[0] = event_length.shape[0]-aligned_pair[0]-1
+    # index query and reference map index
+    if nucleotide_type == 'RNA' :
+        # signal = np.flip(signal)
+        # event_length = np.flip(event_length)
+        ref_start = line[8]
+        start_position = np.max([line[8], position - windows_length]) - ref_start
+        end_position = np.min([line[7], position + windows_length]) - ref_start
     else:
-        if strand == '-':
-            aligned_pair[0] = qlen - aligned_pair[0] - 1
-        aligned_pair=aligned_pair[aligned_pair[0] < event_length.shape[0]]
+        ref_start = line[7]
+        start_position = np.max([line[7], position - windows_length]) - ref_start
+        end_position = np.min([line[8], position + windows_length]) - ref_start
+
     # base shift
-    if nucleotide_type == 'RNA':
-        aligned_pair[0]=aligned_pair[0].values + base_shift
-        aligned_pair = aligned_pair[aligned_pair[0] < event_length.shape[0]]
+    if (nucleotide_type == 'RNA' and strand == '+') or (nucleotide_type == 'DNA' and strand == '-'):
+        end_pos = line[10] - start_position + base_shift - 1
+        start_pos = line[10] - end_position + base_shift - 1
     else:
-        aligned_pair[0] = aligned_pair[0].values - base_shift
-        aligned_pair = aligned_pair[aligned_pair[0] >= 0]
-
-    if aligned_pair.shape[0]==0:
-        return None
-    read_pos = aligned_pair[0].values
-    ref_pos = aligned_pair[1].values
-
+        end_pos = end_position - base_shift
+        start_pos = start_position - base_shift
+    end_pos = np.min([end_pos, line[10] - 1])
     # extract raw signal by event length and event start
     total_feature_per_reads = []
-    try:
-        raw_signal_every = [signal[event_starts[x]:event_starts[x] + event_length[x]] for x in
-                            read_pos]
-        # if aligned_pair.shape[0] < 11:
-        #     draw_signal(signal[event_starts[read_pos[0]]:event_starts[read_pos[-1]+1]], event_starts[read_pos[0]:read_pos[-1]+1]-event_starts[read_pos[0]], base_list)
-    except Exception:
-        print(1)
+
+    raw_signal_every = [signal[event_starts[x]:event_starts[x] + event_length[x]] for x in
+                        range(start_pos,end_pos+1)]
+    if (nucleotide_type == 'RNA' and strand == '+') or (nucleotide_type == 'DNA' and strand == '-'):
+        raw_signal_every.reverse()
     # calculate mean median and dwell time
     for i, element in enumerate(raw_signal_every):
-        if event_length[read_pos[i]] == 0:
+        if len(element)==0:
             continue
-        temp = [read_id,np.mean(element), np.std(element), np.median(element), event_length[read_pos[i]],ref_pos[i]]
+        temp = [read_id,np.mean(element), np.std(element), np.median(element), len(element),str(start_position+ref_start+i)]
         total_feature_per_reads.append(temp)
     return total_feature_per_reads
 
@@ -142,42 +111,46 @@ def extract_pairs_pos(bam_file,position,length,chromosome,strand):
 
     result_dict={}
     for read in bam_file.fetch(chromosome,position-length, position+length+1):
+        if read.is_supplementary or read.is_secondary:
+            continue
         if strand == '+' and read.is_reverse:
             continue
         if strand == '-' and not read.is_reverse:
             continue
-        # if read.qname == '7dcec2bc-65f3-41fe-8981-dd3af9fa6e67':
-        #     print(1)
+        if read.qname == 'db71b047-e073-42cf-833b-a3ccdd9459b3':
+            print(1)
         start_position=read.reference_start
         end_position=read.reference_end
         if position < start_position or position > end_position:
             continue
         # unit
-        aligned_pair = np.array(read.aligned_pairs)
-        aligned_pair = pd.DataFrame(aligned_pair)
-        aligned_pair = aligned_pair.dropna()
-        aligned_pair.reset_index(drop=True, inplace=True)
-        aligned_pair = aligned_pair[(aligned_pair[1] >= position - length) & (aligned_pair[1] <= position + length)]
-
         temp={}
-        temp['pairs']=aligned_pair
-        temp['query_length'] = read.query_length
+        temp['ref_length'] = read.reference_length
         result_dict[read.qname] = temp
     return result_dict
 
 
 
-def read_blow5(path,position,reference,length,chrom,strand,pore,subsample_ratio=1,base_shift=2,norm=True,cpu=4,rna=True):
+def read_blow5(path,position,reference,length,chrom,strand,pore,subsample_ratio=1,base_shift=True,norm=True,cpu=4,rna=True):
     global info_dict, s5,pbar
     slow5_file = path + ".blow5"
     fastq_file = path + ".fastq"
     identify_file_path(fastq_file)
     identify_file_path(slow5_file)
-    paf_file = generate_paf_file(fastq_file,slow5_file,pore,rna)
-    bam_file = generate_bam_file(fastq_file,reference,cpu)
+
+    if base_shift:
+        if rna or (pore == 'r9' and not rna):
+            base_shift = 2
+        else:
+            base_shift = 4
+    else:
+        base_shift = 0
+    fastq_file, bam_file = generate_bam_file(fastq_file, reference, cpu, subsample_ratio)
+    paf_file = generate_paf_file(fastq_file,slow5_file,bam_file,reference,pore,rna)
+
     bam_file = pysam.AlignmentFile(bam_file,'rb')
 
-    info_dict=extract_pairs_pos(bam_file,position,length,chrom,strand)
+    info_dict = extract_pairs_pos(bam_file,position,length,chrom,strand)
     if info_dict == {}:
         raise RuntimeError("There is no read aligned on this position")
     info_df = pd.DataFrame(list(info_dict.keys()))
@@ -191,7 +164,7 @@ def read_blow5(path,position,reference,length,chrom,strand,pore,subsample_ratio=
     if df.shape[0] / info_df.shape[0] < 0.8:
         print('There are '+str(info_df.shape[0]-df.shape[0])+" reads not found in your paf file ...")
     pbar = tqdm(total=df.shape[0], position=0, leave=True)
-    df["feature"] = df.apply(extract_feature,strand=strand,base_shift=base_shift,norm=norm,axis=1)
+    df["feature"] = df.apply(extract_feature,base_shift=base_shift,strand=strand,position=position,windows_length=length,norm=norm,axis=1)
     pbar.close()
 
     df.dropna(inplace=True)

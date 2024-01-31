@@ -4,7 +4,10 @@ from collections import OrderedDict
 
 import numpy as np
 import pandas as pd
-
+from tqdm import tqdm
+import multiprocessing
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
 
 def read_fasta_to_dic(filename):
     """
@@ -36,35 +39,54 @@ def identify_file_path(file_path):
         raise FileNotFoundError("File do not exist! Please check your path : " + file_path)
 
 
-def generate_bam_file(fastq_file, reference, cpu):
-
+def generate_bam_file(fastq_file, reference, cpu,subsample_ratio):
     bam_file = '.'.join(fastq_file.split('.')[:-1]) + '.bam'
-    if  not os.path.exists(bam_file):
+    if not os.path.exists(bam_file):
         cmds = 'minimap2 -ax map-ont -t ' + cpu + ' --MD ' + reference + ' ' + fastq_file + ' | samtools view -hbS -F ' + str(
-            260) + '  - | samtools sort -@ ' + cpu + ' -o ' + bam_file
+            3328) + '  - | samtools sort -@ ' + cpu + ' -o ' + bam_file
         print('Start to alignment ...')
         os.system(cmds)
         print('bam file is saved in ' + bam_file)
     else:
         print(bam_file + ' existed. Will skip the minimap2 ... ')
+
+    if subsample_ratio < 1:
+        new_bam = '.'.join(fastq_file.split('.')[:-1]) + '_sub.bam'
+        cmds = "samtools view -hbS -s " +str(subsample_ratio) +' ' + bam_file +' > ' + new_bam
+        print(cmds)
+        os.system(cmds)
+        bam_file = new_bam
+
+    # if not os.path.exists(bam_file+'.bai'):
     cmds = 'samtools index ' + bam_file
     os.system(cmds)
-    return bam_file
 
-def generate_paf_file(fastq_file, blow5_file,pore,rna):
+    new_fastq_file = '.'.join(bam_file.split('.')[:-1]) + '_aligned.fastq'
+    if not os.path.exists(new_fastq_file):
+        cmds = 'samtools bam2fq ' + bam_file + ' > '+ new_fastq_file
+        os.system(cmds)
+    return new_fastq_file,bam_file
+
+def generate_paf_file(fastq_file, blow5_file,bam_file,fasta_file,pore,rna):
     paf_file =  '.'.join(fastq_file.split('.')[:-1]) + '.paf'
     if not os.path.exists(paf_file):
         cmds = 'slow5tools index ' + blow5_file
         os.system(cmds)
 
-        cmds = 'f5c resquiggle -c '+ fastq_file + ' ' + blow5_file + ' --pore '+ pore+' -o ' + paf_file
+        cmds = 'f5c index --slow5 ' +blow5_file+' '+ fastq_file
+        os.system(cmds)
+
+        cmds = 'f5c eventalign -r '+ fastq_file +" -g "+fasta_file+ ' --slow5 ' + blow5_file + ' --pore '+ pore+' -b ' + bam_file +' -c --min-mapq 0'
+        print()
         if rna:
             cmds =cmds +' --rna'
-        print('Start to resquiggle ...')
+        cmds =cmds +' > '+ paf_file
+        print(cmds)
+        print('Start to eventalign ...')
         os.system(cmds)
         print('Generated paf file : ' + paf_file)
     else:
-        print(paf_file + ' existed. Will skip the f5c resquiggle ... ')
+        print(paf_file + ' existed. Will skip the f5c eventalign ... ')
     return paf_file
 
 
@@ -85,7 +107,6 @@ def build_out_path(results_path):
         print("Output file existed! It will be overwrite or add content after 5 secs ...")
         time.sleep(5)
         print("Continue ...")
-
 
 def reverse_fasta(ref):
     base_dict = {'A': 'T', "T": "A", "C": "G", "G": "C"}
@@ -118,12 +139,121 @@ def extract_kmer_feature(df, kmer, position):
         item = item.reshape(-1,).tolist()
         if len(item) < kmer * 4:
             continue
-
+        if len(item) > kmer * 4:
+            print(1)
         result_list.append(item)
         label_list.append([temp['Group'].values[0]])
     feature_matrix = pd.DataFrame(result_list)
     label = pd.DataFrame(label_list)
     return feature_matrix, label
+
+
+def process_group(read_df,shift_size):
+    # fill nan row
+    read_df.reset_index(drop=True, inplace=True)
+    positions = read_df['Position'].astype(int)
+    missing_positions = read_df[positions.diff() > 1].index
+
+    # 构建空行 DataFrame
+    empty_df = pd.DataFrame(index=missing_positions, columns=read_df.columns)
+
+    # 合并空行和原始数据
+    merged_df = pd.concat([read_df, empty_df]).sort_index()
+
+    data_df = merged_df[['Mean', 'STD', 'Median', 'Dwell time']]
+    previous_row = data_df.shift(shift_size)
+    next_row = data_df.shift(-shift_size)
+
+    # 将当前行、前一行和后一行的数据合并成新的一行
+    merged_data = pd.concat([previous_row, data_df, next_row], axis=1)
+    merged_data.columns = range(merged_data.shape[1])
+    merged_data['Position'] = read_df['Chrom'] + ":" + read_df['Position'].astype(str) + ':' + read_df['Strand']
+    # 删除空的列并重塑成新的一行
+    merged_data = merged_data.dropna(axis=0).reset_index(drop=True)
+    return merged_data.values.tolist()
+
+def extract_feature_parallel(df, kmer_size, label, cpu):
+    def is_odd(number):
+        if number % 2 == 1:
+            return True
+        else:
+            return False
+
+    if not is_odd(kmer_size) or kmer_size < 0:
+        raise Exception("The kmer should be an odd number and greater than zero.")
+
+    window_size = (kmer_size - 1) // 2
+    df_group = df.groupby('Read ID')
+
+    results_list=[]
+    pool = multiprocessing.Pool(processes=cpu)
+    pbar = tqdm(total=df_group.ngroups, position=0, leave=True,unit='reads')
+
+    for key, read_df in df_group:
+        result_per_read = pool.apply_async(process_group, args=(read_df,window_size,))
+        results_list.append(result_per_read)
+    pool.close()
+    pool.join()
+
+    final_df = []
+    for item in results_list:
+        item = item.get()
+        if item is not None:
+            final_df.extend(item)
+        pbar.update(1)
+
+    pbar.close()
+    print("Merging the result table ...")
+    final_df = pd.DataFrame(final_df)
+    columns = list(range(final_df.shape[1]-1))
+    columns.append('Position')
+    final_df.columns = columns
+    final_df['Label'] = label
+    return final_df
+
+def extract_feature(df, kmer_size, label):
+    def is_odd(number):
+        if number % 2 == 1:
+            return True
+        else:
+            return False
+
+    if not is_odd(kmer_size) or kmer_size < 0:
+        raise Exception("The kmer should be an odd number and greater than zero.")
+
+    shift_size = (kmer_size - 1) // 2
+    df_group = df.groupby('Read ID')
+
+    pbar = tqdm(total= df_group.ngroups, position=0, leave=True)
+
+    final_df = pd.DataFrame()
+    for key, read_df in df_group:
+        # fill nan row
+        read_df.reset_index(drop=True, inplace=True)
+        positions = read_df['Position'].astype(int)
+        missing_positions = read_df[positions.diff() > 1].index
+
+        # 构建空行 DataFrame
+        empty_df = pd.DataFrame(index=missing_positions, columns=read_df.columns)
+
+        # 合并空行和原始数据
+        merged_df = pd.concat([read_df, empty_df]).sort_index()
+
+        data_df = merged_df[['Mean', 'STD', 'Median', 'Dwell time']]
+        previous_row = data_df.shift(shift_size)
+        next_row = data_df.shift(-shift_size)
+
+        # 将当前行、前一行和后一行的数据合并成新的一行
+        merged_data = pd.concat([previous_row, data_df, next_row], axis=1)
+        merged_data.columns = range(merged_data.shape[1])
+        merged_data['Position'] = read_df['Chrom'] + ":" + read_df['Position'] + ':' + read_df['Strand']
+        # 删除空的列并重塑成新的一行
+        merged_data = merged_data.dropna(axis=0).reset_index(drop=True)
+        final_df = pd.concat([final_df, merged_data], axis=0)
+        pbar.update(1)
+    pbar.close()
+    final_df['Label'] = label
+    return final_df
 
 def save_fasta_dict(fasta_dict, path):
     f = open(path, 'w+')
@@ -134,12 +264,12 @@ def save_fasta_dict(fasta_dict, path):
             f.write(value[i * 80:(i + 1) * 80] + '\n')
         f.close()
 
-def calculate_MANOVA_result(position,df,subsample_num=500,windows_len=10):
+def calculate_MANOVA_result(position,df,subsample_num=500,windows_len=10,kmer=3):
     print("Start to run the MANOVA analysis on target region ...")
     from statsmodels.multivariate.manova import MANOVA
     from sklearn.decomposition import PCA
-
-    methylation_list=list(range( position- 9 ,position + 10))
+    kmer_size =(kmer-1)//2
+    methylation_list=list(range( position- 10 + kmer_size ,position + 11-kmer_size))
     result_list=[]
     for item in methylation_list:
         # subsample the reads
@@ -150,7 +280,7 @@ def calculate_MANOVA_result(position,df,subsample_num=500,windows_len=10):
         if sample.shape[0] > control.shape[0] * 2:
             sample = sample.iloc[0:control.shape[0],:]
         df = pd.concat([control,sample],axis=0).reset_index(drop=True)
-        feature,label = extract_kmer_feature(df,3,item)
+        feature,label = extract_kmer_feature(df,kmer,item)
         pca = PCA(n_components=2,whiten=True)
         new_df = pd.DataFrame(pca.fit_transform(feature))
 

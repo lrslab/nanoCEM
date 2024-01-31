@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 
 plt.rcParams['pdf.fonttype'] = 42
 # plt.rcParams['font.sans-serif'] = ['Arial']
-SIG_PCTL_RANGE = (1, 99)
+SIG_PCTL_RANGE = [0.01,0.99]
 
 
 # def draw_boxplot(df,results_path,pos,base_list,title):
@@ -76,7 +76,8 @@ def current_plot(df, results_path, pos, base_list, title):
         temp.columns = ['value', 'Position', 'Group']
         temp.loc[:, 'stats'] = item
         if filter:
-            sig_min, sig_max = np.percentile(temp['value'], SIG_PCTL_RANGE)
+            sig_min = temp['value'].quantile(SIG_PCTL_RANGE[0])
+            sig_max = temp['value'].quantile(SIG_PCTL_RANGE[1])
             ylim_tuple = [sig_min , sig_max]
             temp = temp[(temp['value'] >= ylim_tuple[0]) & (temp['value'] <= ylim_tuple[1])]
         new_df = pd.concat([new_df, temp], axis=0)
@@ -223,16 +224,16 @@ def plot_PCA(feature_matrix,label,results_path):
     # print(plot)
     plot.save(filename=results_path + "/PCA_target_position.pdf", dpi=300)
 
-def MANOVA_plot(df, results_path):
+def MANOVA_plot(df, results_path,cutoff):
 
-    df['Result'] = df['P value(-log10)'].apply(lambda x: 'Significant' if x >= 2 else 'Not significant')
+    df['Result'] = df['P value(-log10)'].apply(lambda x: 'Significant' if x >= cutoff else 'Not significant')
     df.to_csv(results_path + '/MANOVA_result.csv', index=None)
     print("Feature file saved  in " + results_path + '/MANOVA_result.csv')
     plot = p9.ggplot(df, p9.aes(x='Position', y='P value(-log10)', fill='Result')) \
            + p9.theme_bw() \
            + p9.geom_col() \
            + p9.scale_fill_manual(values={'Significant': "#BB9A8B", 'Not significant': "#D7D7DD"}) \
-           + p9.geom_hline(yintercept=2, linetype='dashed') \
+           + p9.geom_hline(yintercept=cutoff, linetype='dashed') \
            + p9.theme(
         figure_size=(8, 3),
         panel_grid_minor=p9.element_blank(),
