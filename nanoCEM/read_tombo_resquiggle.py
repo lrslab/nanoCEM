@@ -94,7 +94,7 @@ def extract_feature(signal, event_start, event_length, base, start_position,end_
     signal = signal[event_start[0]:event_start[-1] + event_length[-1]]
     event_start = event_start-event_start[0]
     if norm:
-        signal = normalize_signal_with_lim(signal)
+        signal,_,_ = normalize_signal_with_lim(signal)
 
     total_feature_per_read = []
     # if end >=event_start.shape[0]:

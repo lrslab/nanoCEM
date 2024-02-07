@@ -54,13 +54,21 @@ def init_parser():
     parser_f5c.add_argument('--base_shift', action='store_true', help='Turn on the base shift')
     parser_f5c.add_argument('--pore', choices=['r9', 'r10'], help='Select pore type', default='r9')
     add_public_argument(parser_f5c)
+
+    parser_f5c = subparsers.add_parser('move_table', help='tackle move_table from basecaller')
+    parser_f5c.add_argument("-i", "--input", required=True,
+                            help="blow5_path")
+    parser_f5c.add_argument('-c', "--control",
+                            help="control_blow5_path")
+    parser_f5c.add_argument('-m','--sig_move_offset', type=int, help='sig_move_offset for squigualiser reform')
+    parser_f5c.add_argument('-k','--kmer_length', type=int, help='kmer_length for squigualiser reform')
+    add_public_argument(parser_f5c)
     return parser
 
 if __name__ == '__main__':
     # Parse the arguments
     parser = init_parser()
     args = parser.parse_args()
-
     # args check
     if args.function is None:
         raise Exception("Please choose function from f5c or tombo, or use -h to view the help document")
@@ -101,15 +109,15 @@ if __name__ == '__main__':
             category = pd.api.types.CategoricalDtype(categories=['Sample', "Control"], ordered=True)
             df['Group'] = df['Group'].astype(category)
         except:
-            args.control_fast5 = None
+            single_mode = True
         if args.control_fast5 is None:
             single_mode = True
 
     elif args.function == 'f5c':
         from nanoCEM.read_f5c_resquiggle import read_blow5
 
-        if args.base_shift < 0:
-            raise RuntimeError("base_shift should not less than 0")
+        # if args.base_shift < 0:
+        #     raise RuntimeError("base_shift should not less than 0")
         # if (args.rna and args.strand=='+') or (not args.rna and args.strand=='-'):
         #     args.pos = args.pos + args.base_shift
         # else:
@@ -131,10 +139,37 @@ if __name__ == '__main__':
 
             title = title + '   Sample:' + str(aligned_num_wt) + '  Control:' + str(aligned_num_ivt)
         except:
-            args.control = None
-            args.control_fast5 = None
+            single_mode =True
         if args.control is None:
             single_mode =True
+    elif args.function == 'move_table':
+        from nanoCEM.read_move_table import read_basecall_bam
+
+        # if (args.rna and args.strand=='+') or (not args.rna and args.strand=='-'):
+        #     args.pos = args.pos + args.base_shift
+        # else:
+        #     args.pos = args.pos - args.base_shift
+
+        df_wt, aligned_num_wt = read_basecall_bam(args.input, args.pos, args.ref, args.len, args.chrom,
+                                                            args.strand, args.sig_move_offset, args.kmer_length,
+                                                            subsample_ratio, args.norm, str(args.cpu),
+                                                            args.rna)
+        df_wt['Group'] = 'Sample'
+        try:
+            df_ivt, aligned_num_ivt = read_basecall_bam(args.control, args.pos, args.ref, args.len, args.chrom, args.strand, args.sig_move_offset, args.kmer_length,
+                                                    subsample_ratio, args.norm, str(args.cpu),
+                                                    args.rna)
+            df_ivt['Group'] = 'Control'
+
+            df = pd.concat([df_wt, df_ivt])
+            category = pd.api.types.CategoricalDtype(categories=['Sample', "Control"], ordered=True)
+            df['Group'] = df['Group'].astype(category)
+
+            title = title + '   Sample:' + str(aligned_num_wt) + '  Control:' + str(aligned_num_ivt)
+        except:
+            single_mode = True
+        if args.control is None:
+            single_mode = True
     if single_mode:
         df = df_wt
         df_wt['Group'] = 'Single'
@@ -143,17 +178,21 @@ if __name__ == '__main__':
     # save result table
     df_copy = copy.deepcopy(df)
     df_copy['Position'] = df_copy['Position'].astype(int) + 1
-    df_copy.to_csv(results_path + '/current_feature.csv', index=False)
+    df_copy.to_csv(results_path + '/current_feature.csv', index=None)
     print("Feature file saved  in " + results_path + '/current_feature.csv')
     # draw current feature
-    current_plot(df, results_path, args.pos, base_list, title)
+    current_plot(df, results_path, args.pos, base_list, title,filter=True)
     if not single_mode:
+        if args.rna:
+            kmer_size = 3
+        else:
+            kmer_size = 3
         # draw PCA
-        feature_matrix, label = extract_kmer_feature(df_copy,3, args.pos + 1)
+        feature_matrix, label = extract_kmer_feature(df_copy,kmer_size, args.pos + 1)
         plot_PCA(feature_matrix, label, results_path)
 
         # draw p_value
-        new_df = calculate_MANOVA_result( args.pos+1,df_copy,500,args.len,3)
+        new_df = calculate_MANOVA_result( args.pos+1,df_copy,args.len,500,args.len,kmer_size)
         MANOVA_plot(new_df, results_path,3)
     print('Finished')
 

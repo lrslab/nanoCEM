@@ -63,7 +63,7 @@ SIG_PCTL_RANGE = [0.01,0.99]
 #         plot.save(filename=results_path + "/" + item + "_violin.pdf", dpi=300)
 # print(plot)
 
-def current_plot(df, results_path, pos, base_list, title):
+def current_plot(df, results_path, pos, base_list, title,filter):
     print("Start to plot current feature ...")
     item_list = ['Mean', 'STD', 'Median', 'Dwell time']
     len_plot = (len(base_list)-1)//2

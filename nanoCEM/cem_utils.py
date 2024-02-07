@@ -39,11 +39,11 @@ def identify_file_path(file_path):
         raise FileNotFoundError("File do not exist! Please check your path : " + file_path)
 
 
-def generate_bam_file(fastq_file, reference, cpu,subsample_ratio):
-    bam_file = '.'.join(fastq_file.split('.')[:-1]) + '.bam'
+def generate_bam_file(fastq_file, reference, cpu,subsample_ratio=1):
+    bam_file = '.'.join(fastq_file.split('.')[:-1]) + '_aligned.bam'
     if not os.path.exists(bam_file):
         cmds = 'minimap2 -ax map-ont -t ' + cpu + ' --MD ' + reference + ' ' + fastq_file + ' | samtools view -hbS -F ' + str(
-            3328) + '  - | samtools sort -@ ' + cpu + ' -o ' + bam_file
+            3332) + '  - | samtools sort -@ ' + cpu + ' -o ' + bam_file
         print('Start to alignment ...')
         os.system(cmds)
         print('bam file is saved in ' + bam_file)
@@ -61,13 +61,13 @@ def generate_bam_file(fastq_file, reference, cpu,subsample_ratio):
     cmds = 'samtools index ' + bam_file
     os.system(cmds)
 
-    new_fastq_file = '.'.join(bam_file.split('.')[:-1]) + '_aligned.fastq'
+    new_fastq_file = '.'.join(bam_file.split('.')[:-1]) + '.fastq'
     if not os.path.exists(new_fastq_file):
         cmds = 'samtools bam2fq ' + bam_file + ' > '+ new_fastq_file
         os.system(cmds)
     return new_fastq_file,bam_file
 
-def generate_paf_file(fastq_file, blow5_file,bam_file,fasta_file,pore,rna):
+def generate_paf_file(fastq_file, blow5_file,bam_file,fasta_file,pore,rna,cpu):
     paf_file =  '.'.join(fastq_file.split('.')[:-1]) + '.paf'
     if not os.path.exists(paf_file):
         cmds = 'slow5tools index ' + blow5_file
@@ -76,7 +76,7 @@ def generate_paf_file(fastq_file, blow5_file,bam_file,fasta_file,pore,rna):
         cmds = 'f5c index --slow5 ' +blow5_file+' '+ fastq_file
         os.system(cmds)
 
-        cmds = 'f5c eventalign -r '+ fastq_file +" -g "+fasta_file+ ' --slow5 ' + blow5_file + ' --pore '+ pore+' -b ' + bam_file +' -c --min-mapq 0'
+        cmds = 'f5c eventalign -r '+ fastq_file +" -g "+fasta_file+ ' --slow5 ' + blow5_file + ' --pore '+ pore+' -b ' + bam_file +' -c --min-mapq 0' + ' -t ' + str(cpu)
         print()
         if rna:
             cmds =cmds +' --rna'
@@ -88,6 +88,21 @@ def generate_paf_file(fastq_file, blow5_file,bam_file,fasta_file,pore,rna):
     else:
         print(paf_file + ' existed. Will skip the f5c eventalign ... ')
     return paf_file
+
+def prepare_move_table_file(bam_file, reference, cpu,sig_move_offset,kmer_length):
+    paf_file = '.'.join(bam_file.split('.')[:-1]) + '.paf'
+    fastq_file = '.'.join(bam_file.split('.')[:-1]) + '.fastq'
+    cmds = 'samtools index ' + bam_file
+    os.system(cmds)
+    print('Start to generate paf file  ...')
+    cmds = 'squigualiser reform --sig_move_offset '+sig_move_offset+' --kmer_length '+kmer_length+' -c --bam ' + bam_file +' -o ' + paf_file
+    print(cmds)
+    os.system(cmds)
+    print("Start alignment ...")
+    cmds = 'samtools bam2fq '+bam_file+' >' + fastq_file
+    os.system(cmds)
+    aligned_fastq,aligned_bam = generate_bam_file(fastq_file, reference, cpu)
+    return aligned_bam,paf_file
 
 
 def run_samtools(fastq_file, location, reference, result_path, group, cpu):
@@ -264,12 +279,13 @@ def save_fasta_dict(fasta_dict, path):
             f.write(value[i * 80:(i + 1) * 80] + '\n')
         f.close()
 
-def calculate_MANOVA_result(position,df,subsample_num=500,windows_len=10,kmer=3):
+def calculate_MANOVA_result(position,df,length_size,subsample_num=500,windows_len=10,kmer=3):
     print("Start to run the MANOVA analysis on target region ...")
     from statsmodels.multivariate.manova import MANOVA
     from sklearn.decomposition import PCA
+    import umap
     kmer_size =(kmer-1)//2
-    methylation_list=list(range( position- 10 + kmer_size ,position + 11-kmer_size))
+    methylation_list=list(range( position- length_size + kmer_size ,position + length_size +1-kmer_size))
     result_list=[]
     for item in methylation_list:
         # subsample the reads
@@ -283,7 +299,8 @@ def calculate_MANOVA_result(position,df,subsample_num=500,windows_len=10,kmer=3)
         feature,label = extract_kmer_feature(df,kmer,item)
         pca = PCA(n_components=2,whiten=True)
         new_df = pd.DataFrame(pca.fit_transform(feature))
-
+        # reducer = umap.UMAP(n_components=2)  # Create a UMAP object with 2 dimensions
+        # new_df = reducer.fit_transform(feature)
         new_df = pd.concat([pd.DataFrame(new_df),label], axis =1)
         new_df.columns=['PC1','PC2','Group']
         if np.sum(new_df['Group']=='Sample') > 10 and np.sum(new_df['Group']=='Control') > 10:
