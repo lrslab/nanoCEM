@@ -78,6 +78,7 @@ def extract_feature(line,strand,position,windows_length,base_shift=2,norm=True):
         ref_start = line[8]
         start_position = np.max([line[8], position - windows_length]) - ref_start
         end_position = np.min([line[7], position + windows_length]) - ref_start
+
     else:
         ref_start = line[7]
         start_position = np.max([line[7], position - windows_length]) - ref_start
@@ -85,15 +86,16 @@ def extract_feature(line,strand,position,windows_length,base_shift=2,norm=True):
 
     # base shift
     if (nucleotide_type == 'RNA' and strand == '+') or (nucleotide_type == 'DNA' and strand == '-'):
-        end_pos = line[10] - start_position + base_shift - 1
-        start_pos = line[10] - end_position + base_shift - 1
+        end_pos = line[10] - start_position - 1 + base_shift
+        start_pos = line[10] - end_position - 1 + base_shift
+
     else:
         end_pos = end_position - base_shift
         start_pos = start_position - base_shift
+
     end_pos = np.min([end_pos, line[10] - 1])
     # extract raw signal by event length and event start
     total_feature_per_reads = []
-
     raw_signal_every = [signal[event_starts[x]:event_starts[x] + event_length[x]] for x in
                         range(start_pos,end_pos+1)]
     if (nucleotide_type == 'RNA' and strand == '+') or (nucleotide_type == 'DNA' and strand == '-'):
@@ -138,14 +140,15 @@ def read_blow5(path,position,reference,length,chrom,strand,pore,subsample_ratio=
     identify_file_path(slow5_file)
 
     if base_shift:
-        if pore == 'r9' and not rna and strand=='-':
-            base_shift = 3
-        elif rna or (pore == 'r9' and not rna):
+        if rna or (pore == 'r9' and not rna):
             base_shift = 2
         else:
             base_shift = 4
     else:
         base_shift = 0
+    if strand =='-' and not rna and pore == 'r9':
+        base_shift = 3
+
     fastq_file, bam_file = generate_bam_file(fastq_file, reference, cpu, subsample_ratio)
     paf_file = generate_paf_file(fastq_file,slow5_file,bam_file,reference,pore,rna,cpu)
 

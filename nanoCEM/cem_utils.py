@@ -283,7 +283,7 @@ def calculate_MANOVA_result(position,df,length_size,subsample_num=500,windows_le
     print("Start to run the MANOVA analysis on target region ...")
     from statsmodels.multivariate.manova import MANOVA
     from sklearn.decomposition import PCA
-    import umap
+    # import umap
     kmer_size =(kmer-1)//2
     methylation_list=list(range( position- length_size + kmer_size ,position + length_size +1-kmer_size))
     result_list=[]
@@ -293,8 +293,8 @@ def calculate_MANOVA_result(position,df,length_size,subsample_num=500,windows_le
         if control.shape[0] > subsample_num*(2*windows_len+1):
             control=control.iloc[0:subsample_num*(2*windows_len+1), :]
         sample = df[df['Group'] == 'Sample']
-        if sample.shape[0] > control.shape[0] * 2:
-            sample = sample.iloc[0:control.shape[0],:]
+        # if sample.shape[0] > control.shape[0] * 2:
+        #     sample = sample.iloc[0:control.shape[0],:]
         df = pd.concat([control,sample],axis=0).reset_index(drop=True)
         feature,label = extract_kmer_feature(df,kmer,item)
         pca = PCA(n_components=2,whiten=True)
@@ -308,12 +308,13 @@ def calculate_MANOVA_result(position,df,length_size,subsample_num=500,windows_le
             # 执行多元方差分析
             results = manova.mv_test()
             pvalue = results.summary().tables[3].iloc[0,5]
-            result_list.append([item,pvalue])
+            mean_differ = feature[label[0]=='Sample'][4].median() - feature[label[0]=='Control'][4].median()
+            result_list.append([item,pvalue,mean_differ])
         else:
             result_list.append([item, None])
     new_df = pd.DataFrame(result_list)
     new_df[1] = np.log10(new_df[1]) * (-1)
-    new_df.columns = ['Position', 'P value(-log10)']
+    new_df.columns = ['Position', 'P value(-log10)','Norm_differ']
     return new_df
 
 # fasta=read_fasta_to_dic("../example/data/23S_rRNA.fasta")

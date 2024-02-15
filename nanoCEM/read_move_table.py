@@ -48,7 +48,6 @@ def extract_feature(line,strand,sig_move_offset,norm=True):
     start_index = line[2]
     end_index = line[3]
     event_length = np.array(event_length)
-    base_shift = 2
     # assert len_raw_signal in paf and blow5
 
     if read is None :
