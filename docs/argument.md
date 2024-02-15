@@ -21,49 +21,74 @@ alignment_magnifier
 
 current_events_magnifier 
 =============
-These are some differences in parameters when using "current_events_magnifier" with `tombo` and `f5c` tools.
-For tombo, you can view it for 
+These are some differences in parameters when using "current_events_magnifier" with `f5c`,`tombo` and `move_table` tools.
+
+For `f5c`, the argument is as below,
+
+    current_events_magnifier f5c -h
+
+| Argument name      | Required | Description                                                     |
+|--------------------|----------|-----------------------------------------------------------------|
+| -i, --input        | Yes       | the input files' prefix                            |
+| -c, --control      | No       | the control files' prefix, will run as single-mode if missing          |
+| -o, --output       | No       | output_file (Default:nanoCEM_result)               |
+| --ref              | Yes       |reference file (fasta/fna/fa)          |
+| --chrom            | Yes       | gene/transcript or chromosome name (header of your reference file)              |
+| --pos              | Yes       | site of your interest   (**1-based**)          |
+| --len              | No       | region around the position (Default:10)                          |
+| -t, --cpu          | No       | num of process (Default:8)                                       |
+| -s, --subsample-ratio | No       |  ratio of reads will be used to plot (Default:1)                 |
+| --strand           | No       | strand of your interest (Default:+)   |
+| --rna              | No       | turn on the RNA mode       (Default:False)                                     |
+| --norm             | No       | turn on the normalization      (Default:False)                  |
+| --base_shift       | No       |  for shifting the result from f5c      (Default:False)                  |
+| --pore             | No       |  type of pore choose from `r9` and `r10` (Default: `r9`)                |
+| -h, --help         | No       | Show this help message and exit                                  |
+
+For `tombo`, you can view it for 
 
     current_events_magnifier tombo -h
 
-|  Argument  name            | Required | Description                                                     |
-|---------------------------------|----------|-----------------------------------------------------------------|
-| -i , --fast5          | Yes       | the input single-format fast5's folder                            |
-| -c , --control_fast5 | No       | the control single-format fast5's folder, will run as single-mode if missing              |
-| -o , --output       | No       | output_file (Default:nanoCEM_result)                                                     |
-| --ref                        | Yes       |reference file (fasta/fna/fa)          |
-| --chrom                    | Yes       | gene/transcript or chromosome name (headdf of your fasta file)               |
-| --pos                        | Yes       | site of your interest        (**1-based**)          |
-| --len                        | No       | region around the position (Default:10)                          |
-| -t, --cpu                | No       | num of process (Default:8)                                       |
-| --subsample-ratio | No       |  ratio of reads will be used to plot (Default:1)                 |
-| --strand                  | No       | strand of your interest (Default:+)   |
-| --rna                           | No       | turn on the RNA mode       (Default:False)                                      |
-| --norm                          | No       | turn on the normalization      (Default:False)                  |
-| --basecall_group                | No       | re-squiggle result index information into.(Default:RawGenomeCorrected_000)           |
-| --basecall_subgroup             | No       | basecall sequence inforamtion into.  (Default:BaseCalled_template) |
-| -h, --help                      | No       | Show this help message and exit                                  |
+| Argument  name    | Required | Description                                                     |
+|-------------------|----------|-----------------------------------------------------------------|
+| -i, --fast5       | Yes       | the input single-format fast5's folder                            |
+| -c, --control_fast5 | No       | the control single-format fast5's folder, will run as single-mode if missing              |
+| -o, --output      | No       | output_file (Default:nanoCEM_result)                                                     |
+| --ref             | Yes       |reference file (fasta/fna/fa)          |
+| --chrom           | Yes       | gene/transcript or chromosome name (headdf of your fasta file)               |
+| --pos             | Yes       | site of your interest        (**1-based**)          |
+| --len             | No       | region around the position (Default:10)                          |
+| -t, --cpu         | No       | num of process (Default:8)                                       |
+| -s,--subsample-ratio | No       |  ratio of reads will be used to plot (Default:1)                 |
+| --strand          | No       | strand of your interest (Default:+)   |
+| --rna             | No       | turn on the RNA mode       (Default:False)                                      |
+| --norm            | No       | turn on the normalization      (Default:False)                  |
+| --basecall_group  | No       | re-squiggle result index information into.(Default:RawGenomeCorrected_000)           |
+| --basecall_subgroup | No       | basecall sequence inforamtion into.  (Default:BaseCalled_template) |
+| -h, --help        | No       | Show this help message and exit                                  |
 
-And f5c
-    current_events_magnifier f5c -h
+And `move_table`,
 
-|  Argument name            | Required | Description                                                     |
-|---------------------------------|----------|-----------------------------------------------------------------|
-| -i , --input          | Yes       | the input files' prefix                            |
-| -c , --control | No       | the control files' prefix, will run as single-mode if missing           |
-| -o , --output       | No       | output_file (Default:nanoCEM_result)               |
-| --ref                        | Yes       |reference file (fasta/fna/fa)          |
-| --chrom                    | Yes       | gene/transcript or chromosome name (header of your reference file)               |
-| --pos                        | Yes       | site of your interest   (**1-based**)          |
-| --len                        | No       | region around the position (Default:10)                          |
-| -t, --cpu                | No       | num of process (Default:8)                                       |
-| --subsample-ratio | No       |  ratio of reads will be used to plot (Default:1)                 |
-| --strand                  | No       | strand of your interest (Default:+)   |
-| --rna                           | No       | turn on the RNA mode       (Default:False)                                      |
-| --norm                          | No       | turn on the normalization      (Default:False)                  |
-| --base_shift                          | No       |  for shifting the result from f5c      (Default:2)                  |
-| --pore | No       |  type of pore choose from `r9` and `r10` (Default: `r9`)                 |
-| -h, --help                      | No       | Show this help message and exit                                  |
+    current_events_magnifier move_table -h
+
+| Argument name      | Required | Description                                                        |
+|--------------------|----------|--------------------------------------------------------------------|
+| -i, --input        | Yes       | the input files' prefix                                            |
+| -c, --control      | No       | the control files' prefix, will run as single-mode if missing      |
+| -o, --output       | No       | output_file (Default:nanoCEM_result)                               |
+| --ref              | Yes       | reference file (fasta/fna/fa)                                      |
+| --chrom            | Yes       | gene/transcript or chromosome name (header of your reference file) |
+| -m, --sig_move_offset |Yes| sig_move_offset for squigualiser reform                            |
+| -k, --kmer_length  | Yes| kmer_length for squigualiser reform                                |
+| --pos              | Yes       | site of your interest   (**1-based**)          |
+| --len              | No       | region around the position (Default:10)                          |
+| -t, --cpu          | No       | num of process (Default:8)                                       |
+| -s, --subsample-ratio | No       |  ratio of reads will be used to plot (Default:1)                 |
+| --strand           | No       | strand of your interest (Default:+)   |
+| --rna              | No       | turn on the RNA mode       (Default:False)                                     |
+| --norm             | No       | turn on the normalization      (Default:False)                  |
+| --base_shift       | No       |  for shifting the result from f5c      (Default:False)                  |
+| -h, --help         | No       | Show this help message and exit                                  |
 
 extract_sub_fast5_from_bam
 ==================
@@ -71,11 +96,11 @@ extract_sub_fast5_from_bam
  If you do not input an interest region, all the reads that have been aligned will be saved in the new folder.
 
 | Argument name| Required | Description                                       |
-|-------------------|----------|---------------------------------------------------|
-| -f , --fast5  | Yes  | path to single-format fast5 files                           |
-| -b , --bam  | Yes    | path to bam file                                  |
-| -o , --output  | No  | output file   (Default:subsample_single)        |
-| -t CPU, --cpu  | No       | number of processes  (Default:4)    |
-| --chrom      | No       | gene/transcript or chromosome name (header of your reference file)|
-| --pos          | No       | site of your interest    (**1-based**)         |
-| -h, --help        | No       | show this help message and exit                    |
+|---------------|----------|---------------------------------------------------|
+| -f, --fast5 | Yes  | path to single-format fast5 files                           |
+| -b, --bam | Yes    | path to bam file                                  |
+| -o, --output | No  | output file   (Default:subsample_single)        |
+| -t, --cpu | No       | number of processes  (Default:4)    |
+| --chrom    | No       | gene/transcript or chromosome name (header of your reference file)|
+| --pos       | No       | site of your interest    (**1-based**)         |
+| -h, --help    | No       | show this help message and exit                    |

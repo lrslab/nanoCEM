@@ -10,7 +10,7 @@ If you want to view single read signal or raw signal, [Squigualiser](https://git
 
 ## Installation
 
-Before pip install, make sure you have installed the `samtools`(>=1.16) , `f5c`(>=1.2), `slow5tools`(>=1.1.0) and `minimap2`(>=2.17),
+Before pip install, make sure you have installed the `samtools`(>=1.16) , `f5c`(>=1.3), `slow5tools`(>=1.1.0) and `minimap2`(>=2.17),
 
     conda install samtools=1.16 minimap2 f5c=1.3 slow5tools -c conda-forge -c bioconda
 

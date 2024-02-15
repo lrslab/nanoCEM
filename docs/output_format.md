@@ -36,8 +36,9 @@ The `current_feature.csv` file will be output and current feature information wi
 
 The `MANOVA_result.csv` file records the significant level indicating the difference between two groups
 
-| Column name       |Description|
-|------------|------------|
-| Position | position in transcript/chrome or gene id (**1-based**)
+| Column name     |Description|
+|-----------------|------------|
+| Position        | position in transcript/chrome or gene id (**1-based**)
 | P value(-log10) | P value from MANOVA applying on the PCA result. (Recommend cutoff : `2` for f5c)
-| Result  | whether it is significant after dividing according to the recommended cutoff.
+| Norm difference | difference of normlized mean value of two groups
+| Result          | whether it is significant after dividing according to the recommended cutoff.

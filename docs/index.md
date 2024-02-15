@@ -10,7 +10,7 @@ A Python command-line tool designed to  visualize and analyse multiple statistic
 
 ## Installation
 
-Before pip install, make sure you have installed the `samtools`(>=1.16) , `f5c`(>=1.2), `slow5tools`(>=1.1.0) and `minimap2`(>=2.17),
+Before pip install, make sure you have installed the `samtools`(>=1.16) , `f5c`(>=1.3), `slow5tools`(>=1.1.0) and `minimap2`(>=2.17),
 
     conda install samtools=1.16 minimap2 f5c=1.3 slow5tools -c conda-forge -c bioconda 
 
@@ -18,12 +18,15 @@ To install the latest nanoCEM
 
     pip install nanoCEM
 
-See our Installation page for details. 
+And install from the resource
+
+    git clone https://github.com/lrslab/nanoCEM.git
+    cd nanoCEM/
+    pip install .
 
 To check the version of nanoCEM, run:
 
     pip list | grep nanoCEM
-
 
 
 
