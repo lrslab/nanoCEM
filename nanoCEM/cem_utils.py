@@ -106,7 +106,7 @@ def prepare_move_table_file(bam_file, reference, cpu,sig_move_offset,kmer_length
 
 
 def run_samtools(fastq_file, location, reference, result_path, group, cpu):
-    bam_file = generate_bam_file(fastq_file, reference, cpu)
+    _,bam_file = generate_bam_file(fastq_file, reference, cpu)
     cmds = 'samtools mpileup ' + bam_file + ' -r ' + location + ' --no-output-ins --no-output-del -B -Q 0 -f ' + reference + ' -o ' + result_path + 'temp.txt'
     os.system(cmds)
     temp_file = pd.read_csv(result_path + 'temp.txt', sep='\t', header=None)
