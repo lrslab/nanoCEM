@@ -7,8 +7,8 @@ from tqdm import tqdm
 from nanoCEM.normalization import normalize_signal,normalize_signal_with_lim
 from nanoCEM.cem_utils import generate_bam_file,identify_file_path,generate_paf_file
 # from nanoCEM.plot import draw_signal
-import os
-import argparse
+# import os
+# import argparse
 score_dict={}
 nucleotide_type=None
 

@@ -166,7 +166,8 @@ if __name__ == '__main__':
             df['Group'] = df['Group'].astype(category)
 
             title = title + '   Sample:' + str(aligned_num_wt) + '  Control:' + str(aligned_num_ivt)
-        except:
+        except Exception as e:
+            print(e)
             single_mode = True
         if args.control is None:
             single_mode = True

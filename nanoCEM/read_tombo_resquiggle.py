@@ -8,6 +8,7 @@ from tqdm import tqdm
 import random
 # from ._stats import c_new_mean_stds
 from nanoCEM.normalization import normalize_signal,normalize_signal_with_lim
+from nanoCEM.cem_utils import run_cmd
 
 
 
@@ -204,13 +205,13 @@ def create_read_list_file(path,results_path):
     if path[-1] == '/':
         path = path[:-1]
     total_fl = []
-    os.system("find " + path + " -name \"*.fast5\" >" + results_path + "/files.txt")
+    run_cmd("find " + path + " -name \"*.fast5\" >" + results_path + "/files.txt")
     read_name_list_file = results_path + '/files.txt'
     print("Generated fast5 list file: ", read_name_list_file)
     for i in open(read_name_list_file, "r"):
         total_fl.append(i.rstrip())
     cmd='rm '+read_name_list_file
-    os.system(cmd)
+    run_cmd(cmd)
     return total_fl
 
 

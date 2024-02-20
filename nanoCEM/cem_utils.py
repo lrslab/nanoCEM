@@ -1,7 +1,7 @@
 import os
 import time
 from collections import OrderedDict
-
+import subprocess
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
@@ -9,6 +9,18 @@ import multiprocessing
 import warnings
 warnings.filterwarnings("ignore", category=FutureWarning)
 
+
+def run_cmd(cmd):
+    try:
+        # 执行命令并捕获输出
+        output = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
+
+        # 处理命令输出
+        print(output)
+    except subprocess.CalledProcessError as e:
+        # 处理命令执行错误
+        print("Command execution failed:", e)
+        raise RuntimeError('There are some errors in the cmd as below, please check your env\n'+cmd)
 def read_fasta_to_dic(filename):
     """
     function used to parser small fasta
@@ -45,7 +57,7 @@ def generate_bam_file(fastq_file, reference, cpu,subsample_ratio=1):
         cmds = 'minimap2 -ax map-ont -t ' + cpu + ' --MD ' + reference + ' ' + fastq_file + ' | samtools view -hbS -F ' + str(
             3332) + '  - | samtools sort -@ ' + cpu + ' -o ' + bam_file
         print('Start to alignment ...')
-        os.system(cmds)
+        run_cmd(cmds)
         print('bam file is saved in ' + bam_file)
     else:
         print(bam_file + ' existed. Will skip the minimap2 ... ')
@@ -54,27 +66,27 @@ def generate_bam_file(fastq_file, reference, cpu,subsample_ratio=1):
         new_bam = '.'.join(fastq_file.split('.')[:-1]) + '_sub.bam'
         cmds = "samtools view -hbS -s " +str(subsample_ratio) +' ' + bam_file +' > ' + new_bam
         print(cmds)
-        os.system(cmds)
+        run_cmd(cmds)
         bam_file = new_bam
 
     # if not os.path.exists(bam_file+'.bai'):
     cmds = 'samtools index ' + bam_file
-    os.system(cmds)
+    run_cmd(cmds)
 
     new_fastq_file = '.'.join(bam_file.split('.')[:-1]) + '.fastq'
     if not os.path.exists(new_fastq_file):
         cmds = 'samtools bam2fq ' + bam_file + ' > '+ new_fastq_file
-        os.system(cmds)
+        run_cmd(cmds)
     return new_fastq_file,bam_file
 
 def generate_paf_file(fastq_file, blow5_file,bam_file,fasta_file,pore,rna,cpu):
     paf_file =  '.'.join(fastq_file.split('.')[:-1]) + '.paf'
     if not os.path.exists(paf_file):
         cmds = 'slow5tools index ' + blow5_file
-        os.system(cmds)
+        run_cmd(cmds)
 
         cmds = 'f5c index --slow5 ' +blow5_file+' '+ fastq_file
-        os.system(cmds)
+        run_cmd(cmds)
 
         cmds = 'f5c eventalign -r '+ fastq_file +" -g "+fasta_file+ ' --slow5 ' + blow5_file + ' --pore '+ pore+' -b ' + bam_file +' -c --min-mapq 0' + ' -t ' + str(cpu)
         print()
@@ -83,7 +95,7 @@ def generate_paf_file(fastq_file, blow5_file,bam_file,fasta_file,pore,rna,cpu):
         cmds =cmds +' > '+ paf_file
         print(cmds)
         print('Start to eventalign ...')
-        os.system(cmds)
+        run_cmd(cmds)
         print('Generated paf file : ' + paf_file)
     else:
         print(paf_file + ' existed. Will skip the f5c eventalign ... ')
@@ -93,14 +105,14 @@ def prepare_move_table_file(bam_file, reference, cpu,sig_move_offset,kmer_length
     paf_file = '.'.join(bam_file.split('.')[:-1]) + '.paf'
     fastq_file = '.'.join(bam_file.split('.')[:-1]) + '.fastq'
     cmds = 'samtools index ' + bam_file
-    os.system(cmds)
+    run_cmd(cmds)
     print('Start to generate paf file  ...')
     cmds = 'squigualiser reform --sig_move_offset '+sig_move_offset+' --kmer_length '+kmer_length+' -c --bam ' + bam_file +' -o ' + paf_file
     print(cmds)
-    os.system(cmds)
+    run_cmd(cmds)
     print("Start alignment ...")
     cmds = 'samtools bam2fq '+bam_file+' >' + fastq_file
-    os.system(cmds)
+    run_cmd(cmds)
     aligned_fastq,aligned_bam = generate_bam_file(fastq_file, reference, cpu)
     return aligned_bam,paf_file
 
@@ -108,10 +120,10 @@ def prepare_move_table_file(bam_file, reference, cpu,sig_move_offset,kmer_length
 def run_samtools(fastq_file, location, reference, result_path, group, cpu):
     _,bam_file = generate_bam_file(fastq_file, reference, cpu)
     cmds = 'samtools mpileup ' + bam_file + ' -r ' + location + ' --no-output-ins --no-output-del -B -Q 0 -f ' + reference + ' -o ' + result_path + 'temp.txt'
-    os.system(cmds)
+    run_cmd(cmds)
     temp_file = pd.read_csv(result_path + 'temp.txt', sep='\t', header=None)
     temp_file['Group'] = group
-    os.system('rm ' + result_path + 'temp.txt')
+    run_cmd('rm ' + result_path + 'temp.txt')
     return temp_file
 
 

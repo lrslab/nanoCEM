@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 import pysam
 from tqdm import tqdm
-
+from nanoCEM.cem_utils import run_cmd
 
 def create_result_folder(output_path):
     print("Try to build generate the result path: " + output_path)
@@ -41,7 +41,7 @@ def copy2new_path(line, results_path):
     except FileExistsError:
         1
     finally:
-        os.system('cp ' + line[0] + ' ' + results_path + '/single/' + fold_name)
+        run_cmd('cp ' + line[0] + ' ' + results_path + '/single/' + fold_name)
 
 
 def process_line(line, results_path):
@@ -101,7 +101,7 @@ def main(args):
 
     # READ FAST5 FILE LIST
     print("Collecting fast5 files ... ")
-    os.system("find " + fast5_path + " -name \"*.fast5\" >" + results_path + "/files.txt")
+    run_cmd("find " + fast5_path + " -name \"*.fast5\" >" + results_path + "/files.txt")
     fast5_file = results_path + "/files.txt"
     print("Generated fast5 list file: ", fast5_file)
 
