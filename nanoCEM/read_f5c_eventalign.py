@@ -5,7 +5,7 @@ import pyslow5
 import pysam
 from tqdm import tqdm
 from nanoCEM.normalization import normalize_signal,normalize_signal_with_lim
-from nanoCEM.cem_utils import generate_bam_file,identify_file_path,generate_paf_file
+from nanoCEM.cem_utils import generate_bam_file,identify_file_path,generate_paf_file_eventalign
 # from nanoCEM.plot import draw_signal
 # import os
 # import argparse
@@ -104,7 +104,7 @@ def extract_feature(line,strand,position,windows_length,base_shift=2,norm=True):
     for i, element in enumerate(raw_signal_every):
         if len(element)==0:
             continue
-        temp = [read_id,np.mean(element), np.std(element), np.median(element), len(element),str(start_position+ref_start+i)]
+        temp = [read_id,np.mean(element), np.std(element), np.median(element), len(element), str(start_position+ref_start+i)]
         total_feature_per_reads.append(temp)
     return total_feature_per_reads
 
@@ -150,7 +150,7 @@ def read_blow5(path,position,reference,length,chrom,strand,pore,subsample_ratio=
         base_shift = 3
 
     fastq_file, bam_file = generate_bam_file(fastq_file, reference, cpu, subsample_ratio)
-    paf_file = generate_paf_file(fastq_file,slow5_file,bam_file,reference,pore,rna,cpu)
+    paf_file = generate_paf_file_eventalign(fastq_file,slow5_file,bam_file,reference,pore,rna,cpu)
 
     bam_file = pysam.AlignmentFile(bam_file,'rb')
 

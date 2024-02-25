@@ -33,7 +33,6 @@ def select_sub_reads(line):
 
 
 def copy2new_path(line, results_path):
-    global pbar
     fold_name = line[0].split('/')[-2]
     try:
         if not os.path.exists(results_path + '/single/' + fold_name):
@@ -41,7 +40,7 @@ def copy2new_path(line, results_path):
     except FileExistsError:
         1
     finally:
-        run_cmd('cp ' + line[0] + ' ' + results_path + '/single/' + fold_name)
+        os.system('cp ' + line[0] + ' ' + results_path + '/single/' + fold_name)
 
 
 def process_line(line, results_path):

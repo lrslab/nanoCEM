@@ -8,7 +8,29 @@ from tqdm import tqdm
 import multiprocessing
 import warnings
 warnings.filterwarnings("ignore", category=FutureWarning)
+from scipy import stats
+import copy
 
+ker_model_size ={
+    'r9+RNA': 5,
+    'r9+DNA': 6,
+    'r10+DNA': 9,
+}
+
+def caculate_base_shift_size(kmer_model,strand):
+    def is_odd(number):
+        if number % 2 == 0:
+            return False
+        else:
+            return True
+    if kmer_model<=1:
+        return 0
+    if is_odd(kmer_model):
+        return int((kmer_model-1)/2)
+    elif strand=='+':
+        return int((kmer_model ) / 2)-1
+    else:
+        return int((kmer_model) / 2)
 
 def run_cmd(cmd):
     try:
@@ -79,8 +101,8 @@ def generate_bam_file(fastq_file, reference, cpu,subsample_ratio=1):
         run_cmd(cmds)
     return new_fastq_file,bam_file
 
-def generate_paf_file(fastq_file, blow5_file,bam_file,fasta_file,pore,rna,cpu):
-    paf_file =  '.'.join(fastq_file.split('.')[:-1]) + '.paf'
+def generate_paf_file_eventalign(fastq_file, blow5_file,bam_file,fasta_file,pore,rna,cpu):
+    paf_file =  '.'.join(fastq_file.split('.')[:-1]) + '_ev.paf'
     if not os.path.exists(paf_file):
         cmds = 'slow5tools index ' + blow5_file
         run_cmd(cmds)
@@ -99,6 +121,25 @@ def generate_paf_file(fastq_file, blow5_file,bam_file,fasta_file,pore,rna,cpu):
         print('Generated paf file : ' + paf_file)
     else:
         print(paf_file + ' existed. Will skip the f5c eventalign ... ')
+    return paf_file
+
+def generate_paf_file_resquiggle(fastq_file, blow5_file,pore,rna,cpu):
+    paf_file =  '.'.join(fastq_file.split('.')[:-1]) + '_re.paf'
+    if not os.path.exists(paf_file):
+        cmds = 'slow5tools index ' + blow5_file
+        run_cmd(cmds)
+
+        cmds = 'f5c index --slow5 ' +blow5_file+' '+ fastq_file
+        run_cmd(cmds)
+
+        cmds = 'f5c resquiggle -c ' + fastq_file + ' ' + blow5_file + ' --pore ' + pore + ' -o ' + paf_file +' -t '+ str(cpu)
+        if rna:
+            cmds =cmds +' --rna'
+        print('Start to f5c resquiggle ...')
+        run_cmd(cmds)
+        print('Generated paf file : ' + paf_file)
+    else:
+        print(paf_file + ' existed. Will skip the f5c resquiggle ... ')
     return paf_file
 
 def prepare_move_table_file(bam_file, reference, cpu,sig_move_offset,kmer_length):
@@ -143,8 +184,8 @@ def reverse_fasta(ref):
     reverse_fasta = list(reversed(''.join(ref)))
     return ''.join(reverse_fasta)
 
-def extract_kmer_feature(df, kmer, position):
-
+def extract_kmer_feature(df_input, kmer, position):
+    df = copy.deepcopy(df_input)
     def is_odd(number):
         if number % 2 == 1:
             return True
@@ -154,11 +195,17 @@ def extract_kmer_feature(df, kmer, position):
         raise Exception("The kmer should be an odd number and greater than zero.")
 
     kmer_size = (kmer-1)//2
+    # df.loc[:, 'Dwell time'] = np.log10(df['Dwell time'])
+    # df.loc[:, 'Dwell time'] = stats.zscore(df['Dwell time'])
     df = df[(df['Position'] >= position-kmer_size) & (df['Position'] <= position+kmer_size)]
     df = df.sort_values(['Read ID', 'Position'], ascending=True)
-    df =df.reset_index(drop=True)
+    df = df.reset_index(drop=True)
+    df.loc[:, 'Dwell time'] = np.log10(df['Dwell time'])
+    # df.loc[:, 'Dwell time'] = stats.zscore(df['Dwell time'])
+    # df.loc[:, 'STD'] = stats.zscore(df['STD'])
     grouped_df = df.groupby('Read ID')
-    df.loc[:,'Dwell time'] = np.log10(df['Dwell time'])
+    # df = df.apply(stats.zscore, axis=0)
+
     result_list=[]
     label_list=[]
     for key,temp in grouped_df:
@@ -297,20 +344,23 @@ def calculate_MANOVA_result(position,df,length_size,subsample_num=500,windows_le
     from sklearn.decomposition import PCA
     # import umap
     kmer_size =(kmer-1)//2
-    methylation_list=list(range( position- length_size + kmer_size ,position + length_size +1-kmer_size))
+    methylation_list=list(range( position - length_size + kmer_size ,position + length_size +1-kmer_size))
     result_list=[]
     for item in methylation_list:
         # subsample the reads
         control = df[df['Group']=='Control']
-        if control.shape[0] > subsample_num*(2*windows_len+1):
-            control=control.iloc[0:subsample_num*(2*windows_len+1), :]
+        # if control.shape[0] > subsample_num*(2*windows_len+1):
+        #     control=control.iloc[0:subsample_num*(2*windows_len+1), :]
         sample = df[df['Group'] == 'Sample']
         # if sample.shape[0] > control.shape[0] * 2:
         #     sample = sample.iloc[0:control.shape[0],:]
         df = pd.concat([control,sample],axis=0).reset_index(drop=True)
         feature,label = extract_kmer_feature(df,kmer,item)
         pca = PCA(n_components=2,whiten=True)
-        new_df = pd.DataFrame(pca.fit_transform(feature))
+        try:
+            new_df = pd.DataFrame(pca.fit_transform(feature))
+        except Exception as e:
+            print(1)
         # reducer = umap.UMAP(n_components=2)  # Create a UMAP object with 2 dimensions
         # new_df = reducer.fit_transform(feature)
         new_df = pd.concat([pd.DataFrame(new_df),label], axis =1)

@@ -3,15 +3,12 @@ import numpy as np
 from matplotlib import pyplot as plt
 import pandas as pd
 import xgboost
-import shap
 from nanoCEM.cem_utils import  extract_kmer_feature
 plt.rcParams['pdf.fonttype'] = 42
 results_path='f5c_result_rna'
 df = pd.read_csv(results_path+'/current_feature.csv')
 
-
-
-feature_matrix, label = extract_kmer_feature( df, 5, 2030)
+feature_matrix, label = extract_kmer_feature( df, 7, 2030)
 
 label[0] = label[0].apply(lambda x: 1 if x == 'Sample' else 0)
 
@@ -98,7 +95,8 @@ plot = p9.ggplot(prediction_df, p9.aes(fill='y_test', x="y_pred")) \
 print(plot)
 
 plot.save(filename=results_path + "/prediction_distribution.pdf", dpi=300)
-from sklearn.decomposition import PCA
+
+
 
 # 示例数据
 

@@ -46,7 +46,16 @@ def init_parser():
     add_public_argument(parser_tombo)
 
     # f5c subparser
-    parser_f5c = subparsers.add_parser('f5c', help='tackle f5c re-squiggle')
+    parser_f5c = subparsers.add_parser('f5c_ev', help='tackle f5c eventalign')
+    parser_f5c.add_argument("-i", "--input", required=True,
+                            help="blow5_path")
+    parser_f5c.add_argument('-c', "--control",
+                            help="control_blow5_path")
+    parser_f5c.add_argument('--base_shift', action='store_true', help='Turn on the base shift')
+    parser_f5c.add_argument('--pore', choices=['r9', 'r10'], help='Select pore type', default='r9')
+    add_public_argument(parser_f5c)
+
+    parser_f5c = subparsers.add_parser('f5c_re', help='tackle f5c re-squiggle')
     parser_f5c.add_argument("-i", "--input", required=True,
                             help="blow5_path")
     parser_f5c.add_argument('-c', "--control",
@@ -60,8 +69,8 @@ def init_parser():
                             help="blow5_path")
     parser_f5c.add_argument('-c', "--control",
                             help="control_blow5_path")
-    parser_f5c.add_argument('-m','--sig_move_offset', type=int, help='sig_move_offset for squigualiser reform')
-    parser_f5c.add_argument('-k','--kmer_length', type=int, help='kmer_length for squigualiser reform')
+    parser_f5c.add_argument('-m','--sig_move_offset', type=int, required=True, help='sig_move_offset for squigualiser reform')
+    parser_f5c.add_argument('-k','--kmer_length', type=int, required=True, help='kmer_length for squigualiser reform')
     add_public_argument(parser_f5c)
     return parser
 
@@ -93,7 +102,8 @@ if __name__ == '__main__':
     results_path = args.output
     build_out_path(results_path)
     subsample_ratio = args.subsample_ratio
-    single_mode =False
+    single_mode = False
+
     if args.function == 'tombo':
         from nanoCEM.read_tombo_resquiggle import create_read_list_file, extract_group
 
@@ -104,24 +114,48 @@ if __name__ == '__main__':
             ivt_file = create_read_list_file(args.control_fast5, results_path)
             df_ivt, aligned_num_ivt = extract_group(args, ivt_file, subsample_ratio)
             df_ivt['Group'] = 'Control'
-            df = pd.concat([df_wt, df_ivt])
-            title = title + '   Sample:' + str(aligned_num_wt) + '  Control:' + str(aligned_num_ivt)
-            category = pd.api.types.CategoricalDtype(categories=['Sample', "Control"], ordered=True)
-            df['Group'] = df['Group'].astype(category)
         except:
             single_mode = True
         if args.control_fast5 is None:
             single_mode = True
 
-    elif args.function == 'f5c':
-        from nanoCEM.read_f5c_resquiggle import read_blow5
+    elif args.function == 'f5c_ev':
+        from nanoCEM.read_f5c_eventalign import read_blow5
+        df_wt, aligned_num_wt, nucleotide_type = read_blow5(args.input, args.pos,args.ref, args.len, args.chrom, args.strand, args.pore,
+                                                            subsample_ratio, args.base_shift, args.norm, str(args.cpu),args.rna)
+        df_wt['Group'] = 'Sample'
+        if nucleotide_type == 'RNA' and not args.rna:
+            raise RuntimeError("You need to add --rna to turn on the rna mode")
+        try:
+            df_ivt, aligned_num_ivt, _ = read_blow5(args.control, args.pos,args.ref, args.len, args.chrom, args.strand, args.pore,
+                                                            subsample_ratio, args.base_shift, args.norm, str(args.cpu),args.rna)
+            df_ivt['Group'] = 'Control'
+            df = pd.concat([df_wt, df_ivt])
+        except:
+            single_mode =True
+        if args.control is None:
+            single_mode =True
+    elif args.function == 'move_table':
+        from nanoCEM.read_move_table import read_basecall_bam
+        df_wt, aligned_num_wt = read_basecall_bam(args.input, args.pos, args.ref, args.len, args.chrom,
+                                                            args.strand, args.sig_move_offset, args.kmer_length,
+                                                            subsample_ratio, args.norm, str(args.cpu),
+                                                            args.rna)
+        df_wt['Group'] = 'Sample'
+        try:
+            df_ivt, aligned_num_ivt = read_basecall_bam(args.control, args.pos, args.ref, args.len, args.chrom, args.strand, args.sig_move_offset, args.kmer_length,
+                                                    subsample_ratio, args.norm, str(args.cpu),
+                                                    args.rna)
+            df_ivt['Group'] = 'Control'
 
-        # if args.base_shift < 0:
-        #     raise RuntimeError("base_shift should not less than 0")
-        # if (args.rna and args.strand=='+') or (not args.rna and args.strand=='-'):
-        #     args.pos = args.pos + args.base_shift
-        # else:
-        #     args.pos = args.pos - args.base_shift
+
+        except Exception as e:
+            print(e)
+            single_mode = True
+        if args.control is None:
+            single_mode = True
+    elif args.function == 'f5c_re':
+        from nanoCEM.read_f5c_resquiggle import read_blow5
 
         df_wt, aligned_num_wt, nucleotide_type = read_blow5(args.input, args.pos,args.ref, args.len, args.chrom, args.strand, args.pore,
                                                             subsample_ratio, args.base_shift, args.norm, str(args.cpu),args.rna)
@@ -134,47 +168,21 @@ if __name__ == '__main__':
             df_ivt['Group'] = 'Control'
 
             df = pd.concat([df_wt, df_ivt])
-            category = pd.api.types.CategoricalDtype(categories=['Sample', "Control"], ordered=True)
-            df['Group'] = df['Group'].astype(category)
-
-            title = title + '   Sample:' + str(aligned_num_wt) + '  Control:' + str(aligned_num_ivt)
         except:
             single_mode =True
         if args.control is None:
             single_mode =True
-    elif args.function == 'move_table':
-        from nanoCEM.read_move_table import read_basecall_bam
-
-        # if (args.rna and args.strand=='+') or (not args.rna and args.strand=='-'):
-        #     args.pos = args.pos + args.base_shift
-        # else:
-        #     args.pos = args.pos - args.base_shift
-
-        df_wt, aligned_num_wt = read_basecall_bam(args.input, args.pos, args.ref, args.len, args.chrom,
-                                                            args.strand, args.sig_move_offset, args.kmer_length,
-                                                            subsample_ratio, args.norm, str(args.cpu),
-                                                            args.rna)
-        df_wt['Group'] = 'Sample'
-        try:
-            df_ivt, aligned_num_ivt = read_basecall_bam(args.control, args.pos, args.ref, args.len, args.chrom, args.strand, args.sig_move_offset, args.kmer_length,
-                                                    subsample_ratio, args.norm, str(args.cpu),
-                                                    args.rna)
-            df_ivt['Group'] = 'Control'
-
-            df = pd.concat([df_wt, df_ivt])
-            category = pd.api.types.CategoricalDtype(categories=['Sample', "Control"], ordered=True)
-            df['Group'] = df['Group'].astype(category)
-
-            title = title + '   Sample:' + str(aligned_num_wt) + '  Control:' + str(aligned_num_ivt)
-        except Exception as e:
-            print(e)
-            single_mode = True
-        if args.control is None:
-            single_mode = True
+    else:
+        raise  RuntimeError("Wrong option")
     if single_mode:
         df = df_wt
         df_wt['Group'] = 'Single'
         title = title + '   Sample:' + str(aligned_num_wt)
+    else:
+        df = pd.concat([df_wt, df_ivt])
+        title = title + '   Sample:' + str(aligned_num_wt) + '  Control:' + str(aligned_num_ivt)
+        category = pd.api.types.CategoricalDtype(categories=['Sample', "Control"], ordered=True)
+        df['Group'] = df['Group'].astype(category)
 
     # save result table
     df_copy = copy.deepcopy(df)
@@ -189,9 +197,10 @@ if __name__ == '__main__':
         else:
             kmer_size = 3
         # draw PCA
+
+        # df_copy.loc[:, 'Position'] = df_copy['Position'].astype(int)
         feature_matrix, label = extract_kmer_feature(df_copy,kmer_size, args.pos + 1)
         plot_PCA(feature_matrix, label, results_path)
-
         # draw p_value
         new_df = calculate_MANOVA_result( args.pos+1,df_copy,args.len,500,args.len,kmer_size)
         MANOVA_plot(new_df, results_path,3)
