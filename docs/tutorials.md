@@ -234,4 +234,4 @@ For example,
 
 And the single mode will output the feature table and feature plot like blow,
 
-<center>![f5c_single_mode](single_mode.png "single_mode") </center>
+<center>![f5c_single_mode](single_mode.bmp "single_mode") </center>

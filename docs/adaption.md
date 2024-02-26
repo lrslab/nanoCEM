@@ -1,4 +1,4 @@
-# Adaption for preprocessing methods
+# ![logo](logo_tiny.png "nanoCEM") Adaption for preprocessing methods
 
 ## Introduction
 nanoCEM now supports four alignment methods for nanopore signal: `f5c resquiggle`, `f5c eventalign`, `move_table`, and `tombo resquiggle`.
