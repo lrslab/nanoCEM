@@ -14,8 +14,8 @@ nucleotide_type=None
 def extract_feature(line,strand,sig_move_offset,norm=True):
     pbar.update(1)
     read_id = line[0]
-    # if read_id !='562eeb47-2b86-4fc7-abfc-5dce62f511ed':
-    #     return None
+    if read_id =='dd49b363-ab1e-45c0-ae06-7d7a06452f4c':
+        print(1)
     if read_id not in info_dict:
         return None
     # tackle moves tag
@@ -44,14 +44,14 @@ def extract_feature(line,strand,sig_move_offset,norm=True):
         else:
             event_length.append(int(item))
     # build event_length from move table
+    read_ids, num_reads = s5.get_read_ids()
+    if read_id not in read_ids:
+        return None
     read = s5.get_read(read_id, aux=["read_number", "start_mux"],pA=True)
     start_index = line[2]
     end_index = line[3]
     event_length = np.array(event_length)
     # assert len_raw_signal in paf and blow5
-
-    if read is None :
-        return None
 
     try:
         assert read['len_raw_signal'] == line[1]
