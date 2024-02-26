@@ -210,7 +210,7 @@ for the other basecall model or not mentioned in the precomputed table , users c
 #### current_events_magnifier
 Afterwards, you can run the `current_event_magnifier` function in the `move_table` mode to achieve the same functionality.
 
-    # run tombo mode
+    # run move_table mode
     current_events_magnifier move_table -i data/wt/basecall -c data/ivt/basecall \
     --chrom NR_103073.1 --strand + --pos 2030 \
     --sig_move_offset 0 --kmer_length 1 \
