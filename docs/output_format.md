@@ -2,7 +2,7 @@
 
 ## Result file from alignment_magnifier
 
-The `alignment_feature.csv` file will be output and mismatch information will be recorded.
+The **alignment_feature.csv** file will be output and mismatch information will be recorded.
 
 | Column name       |Description|
 |------------|------------|
@@ -21,7 +21,7 @@ The `alignment_feature.csv` file will be output and mismatch information will be
 
 ## Result file from current_event_magnifier
 
-The `current_feature.csv` file will be output and current feature information will be recorded.
+The **current_feature.csv** file will be output and current feature information will be recorded.
 
 | Column name       |Description|
 |------------|------------|
@@ -34,7 +34,7 @@ The `current_feature.csv` file will be output and current feature information wi
 | Group |represent the group from `Sample` or `Control`. The `Sample` is the input in argument, and `Control` belongs to the control group.
 
 
-The `MANOVA_result.csv` file records the significant level indicating the difference between two groups
+The **MANOVA_result.csv** file records the significant level indicating the difference between two groups
 
 | Column name     |Description|
 |-----------------|------------|

@@ -2,7 +2,7 @@
 
 After observing significant differences in the results of Principal Component Analysis (PCA), 
 it is possible to train models specifically on the features of interest. Here, I will provide 
-an example of training a model using **XGBoost** for the `current_feature.csv` from **nanoCEM**.
+an example of training a model using **XGBoost** for the **current_feature.csv** from **nanoCEM**.
 
 ## Prepare the data feature
 
