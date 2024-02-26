@@ -38,5 +38,6 @@ To check the version of nanoCEM, run:
 * [Data preparation from raw reads](preparation.md)
 * [Command line arguments](argument.md)
 * [Description of statistical features](statistics.md)
+* [Adaption for preprocessing methods](adaption.md)
 * [An example for application](example.md)
 * [Contacts](contact.md)

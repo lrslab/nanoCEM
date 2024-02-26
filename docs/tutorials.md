@@ -4,11 +4,10 @@ This quick start guide outlines the steps to use the nanoCEM command line for an
 of the _E. coli_ 23S rRNA around a known m6A site (A2030). nanoCEM will calculate alignment features and current event
 features within this target region.
 
- Our default mode is `f5c`, so our framework integrated the `f5c` commands.
-In addition, nanoCEM also supports preprocessing result from  [`tombo`](#tombo-support) and  [`move_table`](#move_table-support) from nanopore basecaller.
+ Our default mode is based on `f5c resquiggle`, so our framework integrated the `f5c` commands.
+In addition, nanoCEM also supports preprocessing result from [`f5c eventalign`](#f5c-eventalign-support), [`tombo`](#tombo-support) and  [`move_table`](#move_table-support)from nanopore basecaller.
 
- **Notes:**  For `tombo`, although we have added support for it, you will need to set up the additional `tombo` environment 
- and run tombo resquiggle command. 
+ **Notes:**  For `tombo`, although we have added support for it, you will need to set up the additional `tombo` environment and run **tombo resquiggle** command. 
 
 ## Download the example data
 
@@ -60,7 +59,7 @@ script using our test data to visualize the alignment feature,
     # get alignment visualization 
     alignment_magnifier -i data/wt/file.fastq  -c data/ivt/file.fastq  \
     --chrom NR_103073.1 --pos 2030 --len 10 --strand + \
-    --rna --ref data/23S_rRNA.fasta --output nanoCEM_result 
+    --rna --ref data/23S_rRNA.fasta --output nanoCEM_result
 
 Then nanoCEM will output the alignment feature table called [`alignment_feature.csv`](output_format.md#result-file-from-alignment_magnifier) and figure in
 your target region as below, `Sample` is from `-i` and `Control` is  `-c`
@@ -71,9 +70,13 @@ your target region as below, `Sample` is from `-i` and `Control` is  `-c`
 For the current event feature,  `current_events_magnifier` script is provided to visualize and analyse related feature.
 ### f5c support (Default)
 
+#### Introduction
+There are two modes in f5c, namely `resquiggle` and `eventalign`. 
+We have adapted both modes for our analysis and utilized the `f5c resquiggle`  as our default preprocessing method.
+
 #### Dataprep
 
-We support `f5c`, please make sure that the prefix of `fastq`, `blow5` should be the same
+Please make sure that the prefix of `fastq`, `blow5` should be the same
 for each group (Sample and Control) just like below,
 
     root
@@ -87,10 +90,10 @@ for each group (Sample and Control) just like below,
 #### current_events_magnifier
 We have already organized our sample data, so we just need to run the `current_events_magnifier` script as below,
 
-    # run f5c mode
-    current_events_magnifier f5c -i data/wt/file -c data/ivt/file \
+    # run f5c resquiggle mode
+    current_events_magnifier f5c_re -i data/wt/file -c data/ivt/file \
     --chrom NR_103073.1 --strand + --pos 2030 \
-    --ref data/23S_rRNA.fasta -o nanoCEM_result \
+    --ref data/23S_rRNA.fasta -o nanoCEM_result_f5c_re \
     --base_shift --rna --norm
 
  **Notes:** 
@@ -115,6 +118,17 @@ the results of PCA and determine the presence of statistically significant diffe
 output path.
 
 <center>![manova](RNA_pval.png "manova") </center>
+
+#### f5c eventalign support
+
+The data preparation and command for applied the preprocing method `f5c eventalign` are exactly the same as for `f5c resquiggle`, 
+except that the `f5c_ev` option needs to be used as below,
+
+    # run f5c eventalign mode
+    current_events_magnifier f5c_ev -i data/wt/file -c data/ivt/file \
+    --chrom NR_103073.1 --strand + --pos 2030 \
+    --ref data/23S_rRNA.fasta -o nanoCEM_result_f5c_ev \
+    --base_shift --rna --norm
 
 ### tombo support
 
@@ -152,7 +166,7 @@ Afterwards, you can run the `current_event_magnifier` function in the `tombo` mo
     # run tombo mode
     current_events_magnifier tombo -i data/wt/single -c data/ivt/single \
     --chrom NR_103073.1 --strand + --pos 2030 \
-    --ref data/23S_rRNA.fasta -o nanoCEM_result \
+    --ref data/23S_rRNA.fasta -o nanoCEM_result_tombo \
     --rna --cpu 4 --norm
 
 Then nanoCEM will output the current feature called [`current_feature.csv`](output_format.md)  and related figures as same as above figures of your target region
@@ -199,7 +213,7 @@ Afterwards, you can run the `current_event_magnifier` function in the `move_tabl
     current_events_magnifier move_table -i data/wt/basecall -c data/ivt/basecall \
     --chrom NR_103073.1 --strand + --pos 2030 \
     --sig_move_offset 0 --kmer_length 1 \
-    --ref data/23S_rRNA.fasta -o nanoCEM_result \
+    --ref data/23S_rRNA.fasta -o nanoCEM_result_move_table \
     --rna --cpu 4 --norm
 
 Then nanoCEM will output the current feature called [`current_feature.csv`](output_format.md)  and related figures mentioned above of your target region
@@ -207,7 +221,7 @@ Then nanoCEM will output the current feature called [`current_feature.csv`](outp
 ## Single mode
 
 If you have only one sample and want to view specific regions of features, nanoCEM also provides a single mode, which supported all three
-preprocessing method `f5c`,`tombo` and `move_table`.
+preprocessing method `f5c resquiggle`, `f5c eventalign`, `tombo` and `move_table`.
 
 For example,
 

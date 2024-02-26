@@ -2,17 +2,16 @@
 
 ## Raw data from Oxford Nanopore Technologies sequencing
 
-With the introduction of R10.4.1 flow cell, the diversity of ONT data formats has increased. 
-These now include the original single and multiple fast5 format, the newer pod5 format,
-and the community-driven slow5/blow5 formats. The relationship between conversion tools 
+With the introduction of **R10.4.1** flow cell, the diversity of ONT data formats has increased. 
+These now include the original single and multiple **fast5** format, the newer **pod5** format,
+and the community-driven **slow5/blow5** formats. The relationship between conversion tools 
 and these different data formats is as below.
 
  <center>![data format](data_format.jpg "data_format") </center>
 
-nanoCEM only supports single-format `fast5` and `blow5`; please transfer the data format before usage.
-Since we support `tombo` and `f5c`, where `tombo` only supports single format `fast5` and `f5c` supports `blow5`,
-you only need to choose one from them.
-Here are some advice commands if your original data is multi-format fast5.
+nanoCEM only supports single-format **fast5** and **blow5**; please transfer the data format before usage.
+Since we support `tombo`, `move_table` and `f5c`, while `tombo` only supports single format **fast5** and our `f5c` and `move_table` mode supports **blow5**.
+Here are some advice commands if your original data is multi-format **fast5**.
 
     # pod5 to blow5
     blue-crab p2s file.pod5 -o file.blow5
@@ -22,10 +21,9 @@ Here are some advice commands if your original data is multi-format fast5.
     slow5tools cat </path/to/blow5_dir> -o file.blow5
 
 
-
 ## Basecall your raw reads
 After obtaining raw reads files, the first step is to basecall them.
-Here is an example script to run Guppy and Dorado basecaller. You can find more details about basecalling at ONT:
+Here is an example script to run **Guppy** and **Dorado** basecaller. You can find more details about basecalling at ONT:
 
     # Guppy basecaller
     guppy_basecaller -i <path/to/fastt> -s <path/to/fastq> --config <config file> --device auto -r
@@ -39,13 +37,15 @@ The alignment of DNA is relatively simple, but for RNA, it becomes more complex 
 alternative splicing and multiple isoforms in eukaryotic organisms. 
 
 The alignment process is already embedded in nanoCEM. For general analysis, if you use RNA mode,
-it is advisable to use `transcript` as the reference, while for DNA, the reference would be the `genome`.
+it is advisable to use **transcriptome** as the reference, while for DNA, the reference would be the **genome**.
 
 ## Re-squiggle process
-nanoCEM supports the re-squiggle results of both `tombo` and `f5c`.
-### f5c
-f5c is a software that supports re-squiggle and also supports the new R10 data. 
-Since f5c has already been integrated into our script, `tombo` users will need to install the required environment on their own.
+
+nanoCEM supports the re-squiggle results of both `tombo` and `f5c`, 
+while f5c has already been integrated into our script, 
+`tombo` users will need to install the required environment on their own.
+Due to Tombo being an older tool and no longer receiving active updates, 
+it presents challenges for seamless integration into our pipeline.
 
 ### tombo
 
