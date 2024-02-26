@@ -9,7 +9,7 @@ Thus,these basecalled sequence methods require additional adaptions to index the
 
 ## Basecalled sequence methods adaption
 
-### Signal index File Acquisition
+### Signal index file acquisition
 For `f5c resquiggle`, a `PAF` (Pairwise Alignment Format) file is generated, 
 which records the alignment information and indices corresponding to the basecalled sequence. 
 
@@ -17,9 +17,11 @@ On the other hand, the `move_table` is stored in the `BAM` file generated from t
 and the related decoding and indexing is [more complex](https://github.com/hiruna72/squigualiser/blob/main/docs/move_table.md).
 To address this issue, we utilized the `resquigualiser reform` tool available in the repository [here](https://github.com/hiruna72/squigualiser/blob/main/docs/reform.md)  to generate the `PAF` file.
 
-### Re-indexing on the Reference Sequence
+### Re-indexing on the reference sequence
 For such methods, we align the basecalled sequence to the reference by using the `CIGAR values` from the `BAM` file to generate a `index table`. 
 This process involves discarding `insertions` and `deletions` while preserving `mismatches` to accurately map the basecalled sequence onto the reference.
+
+<center>![adaption](adaption.bmp "adaption") </center>
 
 ## Base shift (only for f5c)
 

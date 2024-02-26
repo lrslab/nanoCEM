@@ -226,9 +226,11 @@ preprocessing method `f5c resquiggle`, `f5c eventalign`, `tombo` and `move_table
 For example,
 
     # run f5c mode
-    current_events_magnifier f5c -i data/wt/file\
+    current_events_magnifier f5c_ev -i data/wt/file\
     --chrom NR_103073.1 --strand + --pos 2030 \
     --ref data/23S_rRNA.fasta -o nanoCEM_result \
     --base_shift --rna --norm
 
 And the single mode will output the feature table and feature plot like blow,
+
+<center>![f5c_single_mode](single_mode.png "single_mode") </center>
