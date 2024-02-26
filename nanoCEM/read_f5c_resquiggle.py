@@ -7,7 +7,7 @@ from tqdm import tqdm
 from nanoCEM.normalization import normalize_signal,normalize_signal_with_lim
 from nanoCEM.cem_utils import generate_bam_file,identify_file_path,generate_paf_file_resquiggle,ker_model_size,caculate_base_shift_size
 # from nanoCEM.plot import draw_signal
-from read_move_table import  extract_pairs_pos
+from nanoCEM.read_move_table import  extract_pairs_pos
 # import os
 # import argparse
 score_dict={}
