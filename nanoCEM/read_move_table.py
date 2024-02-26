@@ -14,8 +14,8 @@ nucleotide_type=None
 def extract_feature(line,strand,sig_move_offset,norm=True):
     pbar.update(1)
     read_id = line[0]
-    if read_id =='dd49b363-ab1e-45c0-ae06-7d7a06452f4c':
-        print(1)
+    # if read_id =='dd49b363-ab1e-45c0-ae06-7d7a06452f4c':
+    #     print(1)
     if read_id not in info_dict:
         return None
     # tackle moves tag
@@ -44,7 +44,7 @@ def extract_feature(line,strand,sig_move_offset,norm=True):
         else:
             event_length.append(int(item))
     # build event_length from move table
-    read_ids, num_reads = s5.get_read_ids()
+
     if read_id not in read_ids:
         return None
     read = s5.get_read(read_id, aux=["read_number", "start_mux"],pA=True)
@@ -125,7 +125,7 @@ def extract_pairs_pos(bam_file,position,length,chromosome,strand):
 
 
 def read_basecall_bam(path,position,reference,length,chrom,strand,sig_move_offset,kmer_length,subsample_ratio=1,norm=True,cpu=4,rna=True):
-    global info_dict, s5,pbar,nucleotide_type
+    global info_dict, s5,pbar,nucleotide_type,read_ids
     slow5_file = path + ".blow5"
     bam_file = path + ".bam"
     identify_file_path(bam_file)
@@ -144,7 +144,7 @@ def read_basecall_bam(path,position,reference,length,chrom,strand,sig_move_offse
     info_df = pd.DataFrame(list(info_dict.keys()))
 
     s5 = pyslow5.Open(slow5_file, 'r')
-
+    read_ids, num_reads = s5.get_read_ids()
     df=pd.read_csv(paf_file,sep='\t',header=None)
     df=pd.merge(df,info_df,how='inner',on=0)
     if df.shape[0] == 0:
