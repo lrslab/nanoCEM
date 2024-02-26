@@ -10,8 +10,6 @@ import random
 from nanoCEM.normalization import normalize_signal,normalize_signal_with_lim
 from nanoCEM.cem_utils import run_cmd
 
-
-
 def matrix_append(total_matrix,new_matrix,index):
     if new_matrix.shape[0]==0:
         return total_matrix

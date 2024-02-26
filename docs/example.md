@@ -87,5 +87,3 @@ For example, in the figure below:
 ![prediction](prediction.png "prediction")
 
 
-
-    
