@@ -27,7 +27,7 @@ The path to the downloaded data is as follows:
     │   └── single/  # single-format fast5 files for tombo re-squiggle
     └── 23S_rRNA.fasta  # reference fasta file
 
-## Data preparation
+## Data format preparation
 
 [comment]: <> (Before utilizing NanoCEM, it is required to convert the raw data format to the appropriate format &#40;single-format `fast5`)
 
