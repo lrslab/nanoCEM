@@ -1,8 +1,7 @@
 # ![logo](logo_tiny.png "nanoCEM")Command line arguments
 We provide 3  scripts to run the analysis and visualize nanopore data as the following.
 
-alignment_magnifier
-=============
+##alignment_magnifier
 
 
 | Argument name                       | Required | Description                                     |
@@ -19,8 +18,7 @@ alignment_magnifier
 | --rna                           | No       | turn on the RNA mode (Default:False)       |
 | -h, --help                      | No       | show this help message and exit          |
 
-current_events_magnifier 
-=============
+##current_events_magnifier
 These are some differences in parameters when using "current_events_magnifier" with `f5c`,`tombo` and `move_table` tools.
 
 For `f5c`, the argument is as below,
@@ -90,8 +88,8 @@ And `move_table`,
 | --base_shift       | No       |  for shifting the result from f5c      (Default:False)                  |
 | -h, --help         | No       | Show this help message and exit                                  |
 
-extract_sub_fast5_from_bam
-==================
+##extract_sub_fast5_from_bam
+
  To extract a subset of a single-format fast5 and saved in new folder.
  If you do not input an interest region, all the reads that have been aligned will be saved in the new folder.
 

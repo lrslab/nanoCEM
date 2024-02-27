@@ -101,7 +101,8 @@ We have already organized our sample data, so we just need to run the `current_e
 If you want to work with DNA data, please remember to remove the `--rna` option from your commands.
 To use the r10 mode instead of the default `r9` mode, add the `--pore r10` option.
 Additionally, you can enable base shift and normalization by using the `--base_shift` and `--norm` options.
-For more details, you can refer to the [command documentation](argument.md).
+For more details, you can refer to the [command documentation](argument.md#current_events_magnifier).
+And the introduction about **base_shift**, please refer it [here](adaption.md#base-shift-only-for-f5c)
 
 
 Then nanoCEM will output the current feature called [**current_feature.csv**](output_format.md#result-file-from-current_event_magnifier) of your target region
