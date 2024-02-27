@@ -1,10 +1,10 @@
 # ![logo](logo_tiny.png "nanoCEM") Adaption for preprocessing methods
 
 ## Introduction
-nanoCEM now supports four alignment methods for nanopore signal: `f5c resquiggle`, `f5c eventalign`, `move_table`, and `tombo resquiggle`.
+nanoCEM now supports four alignment methods for nanopore signal: `f5c resquiggle`, `f5c eventalign`, `move_table` from basecaller, and `tombo resquiggle`.
 
 While `tombo resquiggle` and `f5c eventalign` align the signals to the reference sequence,
-`f5c resquiggle` and `move_table` are alignment methods applied to the basecalled sequence.
+`f5c resquiggle` and `move_table` from basecaller are alignment methods applied to the basecalled sequence.
 Thus,these basecalled sequence methods require additional adaptions to index the reference sequence.
 
 ## Basecalled sequence methods adaption
@@ -13,8 +13,8 @@ Thus,these basecalled sequence methods require additional adaptions to index the
 For `f5c resquiggle`, a **paf** (Pairwise Alignment Format) file is generated, 
 which records the alignment information and indices corresponding to the basecalled sequence. 
 
-On the other hand, the `move_table` is stored in the **bam** file generated from the basecalled sequence, 
-and the related decoding and indexing is [more complex](https://github.com/hiruna72/squigualiser/blob/main/docs/move_table.md).
+On the other hand, the `move_table` is stored in the **bam** file generated from the basecaller, 
+for the related decoding and indexing methods, detailed description is [here](https://github.com/hiruna72/squigualiser/blob/main/docs/move_table.md).
 To address this issue, we utilized the `squigualiser reform` tool available in the repository [**here**](https://github.com/hiruna72/squigualiser/blob/main/docs/reform.md)  to generate the `PAF` file.
 
 ### Re-indexing on the reference sequence
