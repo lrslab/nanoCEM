@@ -16,7 +16,7 @@ def extract_feature(line,strand,kmer_model,base_shift,norm=True):
     global nucleotide_type
     pbar.update(1)
     read_id = line[0]
-    # if read_id =='a3f64d91-bdd6-4744-8afc-eb9a9a1b00d6':
+    # if read_id =='94c4929a-8630-4fd0-89d5-21f6bc399165':
     #     print(1)
     if read_id not in info_dict:
         return None
@@ -88,7 +88,7 @@ def extract_feature(line,strand,kmer_model,base_shift,norm=True):
     if base_shift != 0:
         aligned_pair[1] = aligned_pair[1] + base_shift
 
-
+    aligned_pair = aligned_pair[(aligned_pair[0]>=0)&(aligned_pair[0]<len(event_length))]
     if aligned_pair.shape[0]==0:
         return None
     read_pos = aligned_pair[0].values
@@ -102,7 +102,8 @@ def extract_feature(line,strand,kmer_model,base_shift,norm=True):
         # if aligned_pair.shape[0] < 11:
         #     draw_signal(signal[event_starts[read_pos[0]]:event_starts[read_pos[-1]+1]], event_starts[read_pos[0]:read_pos[-1]+1]-event_starts[read_pos[0]], base_list)
     except Exception as e:
-        print(1)
+        print(e)
+        return None
     # calculate mean median and dwell time
     for i, element in enumerate(raw_signal_every):
         if event_length[read_pos[i]] == 0:

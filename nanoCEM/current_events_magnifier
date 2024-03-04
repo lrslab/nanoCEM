@@ -2,7 +2,6 @@
 import argparse
 import copy
 import warnings
-
 import pandas as pd
 from plotnine.exceptions import PlotnineWarning
 
@@ -23,6 +22,7 @@ def init_parser():
         parser_input.add_argument('-s', "--subsample_ratio", default=1, type=float,
                                   help="Subsample ratio to select reads")
         parser_input.add_argument('--rna', action='store_true', help='Turn on the RNA mode')
+        parser_input.add_argument('--kmer-size',  type=int,default=3, help="kmer length for PCA and MANOVA analysis")
         parser_input.add_argument('-o', "--output", default="nanoCEM_result", help="output_file")
 
     # Define the argument parser
@@ -192,12 +192,10 @@ if __name__ == '__main__':
     # draw current feature
     current_plot(df, results_path, args.pos, base_list, title,filter=True)
     if not single_mode:
-        if args.rna:
-            kmer_size = 3
-        else:
-            kmer_size = 3
+        if args.kmer_size is None:
+            args.kmer_size = 3
         # draw PCA
-
+        kmer_size = args.kmer_size
         # df_copy.loc[:, 'Position'] = df_copy['Position'].astype(int)
         feature_matrix, label = extract_kmer_feature(df_copy,kmer_size, args.pos + 1)
         plot_PCA(feature_matrix, label, results_path)

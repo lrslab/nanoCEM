@@ -191,16 +191,17 @@ def extract_kmer_feature(df_input, kmer, position):
             return True
         else:
             return False
-    if not is_odd(kmer) or kmer < 0:
+    if not is_odd(kmer) or kmer <= 0:
         raise Exception("The kmer should be an odd number and greater than zero.")
 
     kmer_size = (kmer-1)//2
     # df.loc[:, 'Dwell time'] = np.log10(df['Dwell time'])
     # df.loc[:, 'Dwell time'] = stats.zscore(df['Dwell time'])
     df = df[(df['Position'] >= position-kmer_size) & (df['Position'] <= position+kmer_size)]
-    df = df.sort_values(['Read ID', 'Position'], ascending=True)
-    df = df.reset_index(drop=True)
+    # df = df.sort_values(['Read ID', 'Position'], ascending=True)
+    # df = df.reset_index(drop=True)
     df.loc[:, 'Dwell time'] = np.log10(df['Dwell time'])
+    #df['Dwell time'] = np.log10(df['Dwell time'])
     # df.loc[:, 'Dwell time'] = stats.zscore(df['Dwell time'])
     # df.loc[:, 'STD'] = stats.zscore(df['STD'])
     grouped_df = df.groupby('Read ID')
