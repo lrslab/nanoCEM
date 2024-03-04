@@ -21,7 +21,7 @@ We provide 3  scripts to run the analysis and visualize nanopore data as the fol
 ##current_events_magnifier
 These are some differences in parameters when using "current_events_magnifier" with `f5c_re`, `f5c_ev`, `tombo` and `move_table` tools.
 
-For `f5c_re` and `f5c_re`, the argument is same,
+For `f5c_re` and `f5c_ev`, the argument is same,
 
     current_events_magnifier f5c_re -h
     current_events_magnifier f5c_ev -h
