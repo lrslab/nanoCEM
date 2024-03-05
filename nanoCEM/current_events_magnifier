@@ -2,6 +2,7 @@
 import argparse
 import copy
 import warnings
+
 import pandas as pd
 from plotnine.exceptions import PlotnineWarning
 
@@ -22,7 +23,7 @@ def init_parser():
         parser_input.add_argument('-s', "--subsample_ratio", default=1, type=float,
                                   help="Subsample ratio to select reads")
         parser_input.add_argument('--rna', action='store_true', help='Turn on the RNA mode')
-        parser_input.add_argument('--kmer-size',  type=int,default=3, help="kmer length for PCA and MANOVA analysis")
+        parser_input.add_argument('--kmer-size',  type=int,default=3, help="kmer size for PCA and MANOVA analysis")
         parser_input.add_argument('-o', "--output", default="nanoCEM_result", help="output_file")
 
     # Define the argument parser
@@ -52,7 +53,7 @@ def init_parser():
     parser_f5c.add_argument('-c', "--control",
                             help="control_blow5_path")
     parser_f5c.add_argument('--base_shift', action='store_true', help='Turn on the base shift')
-    parser_f5c.add_argument('--pore', choices=['r9', 'r10'], help='Select pore type', default='r9')
+    parser_f5c.add_argument('--pore', choices=['r9', 'r10','rna004'], help='Select pore type', default='r9')
     add_public_argument(parser_f5c)
 
     parser_f5c = subparsers.add_parser('f5c_re', help='tackle f5c re-squiggle')
@@ -61,7 +62,7 @@ def init_parser():
     parser_f5c.add_argument('-c', "--control",
                             help="control_blow5_path")
     parser_f5c.add_argument('--base_shift', action='store_true', help='Turn on the base shift')
-    parser_f5c.add_argument('--pore', choices=['r9', 'r10'], help='Select pore type', default='r9')
+    parser_f5c.add_argument('--pore', choices=['r9', 'r10','rna004'], help='Select pore type', default='r9')
     add_public_argument(parser_f5c)
 
     parser_f5c = subparsers.add_parser('move_table', help='tackle move_table from basecaller')
@@ -91,7 +92,8 @@ if __name__ == '__main__':
     # build title
     base_list = fasta[args.chrom][args.pos - args.len:args.pos + args.len + 1].upper()
     title = args.chrom + ':' + str(args.pos - args.len + 1) + '-' + str(args.pos + args.len + 1) + ':' + args.strand
-    if args.rna:
+    if args.rna or args.pore == 'rna004':
+        args.rna =True
         base_list = base_list.replace("T", "U")
         print("Running RNA mode ...")
         title = 'RNA  ' + title

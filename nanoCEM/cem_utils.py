@@ -15,6 +15,7 @@ ker_model_size ={
     'r9+RNA': 5,
     'r9+DNA': 6,
     'r10+DNA': 9,
+    'rna004+RNA': 9
 }
 
 def caculate_base_shift_size(kmer_model,strand):

@@ -24,7 +24,10 @@ And install from the resource
     git clone https://github.com/lrslab/nanoCEM.git
     cd nanoCEM/
     pip install .
+To install nanoCEM from docker,
 
+    docker pull zhihaguo/nanocem_env
+    
 To check the version of nanoCEM, run:
 
     pip list | grep nanoCEM
