@@ -19,7 +19,7 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.7,<=3.11',
+    python_requires='>=3.7.0,<=3.11.7',
     install_requires=[
         'h5py>=3.8.0',
         'numpy>=1.23.0',

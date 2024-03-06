@@ -32,6 +32,16 @@ To check the version of nanoCEM, run:
 
     pip list | grep nanoCEM
 
+## Notes
+Although it does not affect the functionality, the issue of possible missing header files caused by **samtools** installation by conda can be resolved with the following command.
+
+    conda install -c conda-forge ncurses
+
+The potential **vbz** format compression issue when reading **fast5** files.
+
+    conda install -c bioconda ont_vbz_hdf_plugin
+
+
 
 ## Content
 
