@@ -42,6 +42,7 @@ For `f5c_re` and `f5c_ev`, the argument is same,
 | --norm             | No       | turn on the normalization      (Default:False)                  |
 | --base_shift       | No       |  for shifting the result from f5c      (Default:False)                  |
 | --pore             | No       |  type of pore choose from `r9` and `r10` (Default: `r9`)                |
+| --kmer_size             | No       |  kmer size for the PCA and MANOVA analysis   (Default:3)  |
 | -h, --help         | No       | Show this help message and exit                                  |
 
 For `tombo`, you can view it for 
@@ -64,6 +65,7 @@ For `tombo`, you can view it for
 | --norm            | No       | turn on the normalization      (Default:False)                  |
 | --basecall_group  | No       | re-squiggle result index information into.(Default:RawGenomeCorrected_000)           |
 | --basecall_subgroup | No       | basecall sequence inforamtion into.  (Default:BaseCalled_template) |
+| --kmer_size             | No       |  kmer size for the PCA and MANOVA analysis   (Default:3)  |
 | -h, --help        | No       | Show this help message and exit                                  |
 
 And `move_table`,
@@ -87,6 +89,7 @@ And `move_table`,
 | --rna              | No       | turn on the RNA mode       (Default:False)                                     |
 | --norm             | No       | turn on the normalization      (Default:False)                  |
 | --base_shift       | No       |  for shifting the result from f5c      (Default:False)                  |
+| --kmer_size             | No       |  kmer size for the PCA and MANOVA analysis   (Default:3)  |
 | -h, --help         | No       | Show this help message and exit                                  |
 
 ##extract_sub_fast5_from_bam

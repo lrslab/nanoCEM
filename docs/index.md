@@ -11,9 +11,9 @@ A Python command-line tool designed to  visualize and analyse multiple statistic
 ## Installation
 <a href="https://pypi.python.org/pypi/nanoCEM" rel="pypi">![PyPI](https://img.shields.io/pypi/v/nanoCEM?color=green) </a>
 
-Before pip install, make sure you have installed the `samtools`(>=1.16) , `f5c`(>=1.3), `slow5tools`(>=1.1.0) and `minimap2`(>=2.17),
+Before pip install, make sure you have installed the `samtools`(>=1.16) , `f5c`(>=1.4), `slow5tools`(>=1.1.0) and `minimap2`(>=2.17),
 
-    conda install samtools=1.16 minimap2 f5c=1.3 slow5tools -c conda-forge -c bioconda 
+    conda install samtools=1.16 minimap2 f5c=1.4 slow5tools -c conda-forge -c bioconda 
 
 To install the latest nanoCEM
 
@@ -31,7 +31,6 @@ To install nanoCEM from docker,
 To check the version of nanoCEM, run:
 
     pip list | grep nanoCEM
-
 
 
 ## Content

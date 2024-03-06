@@ -32,3 +32,11 @@ To make their results as consistent as possible and enable comparisons,
 we introduced `--base_shift` option to align the result closer to the **middle** of the k-mer. 
 For example, in R10 DNA sequence whose k-mer is 9-mer, if the basecalled sequence is ACACTACA**C** (9 nt), `f5c` will return only 1 event index of the last **C**.
 But after turn on the **base_shift**, it will be shifted to the middle **T**(ACAC**T**ACAC)
+
+
+| kit    | type | k-mer model  |base shift number |example |
+|--------|----------|-------|-------|-------|
+| R9    | DNA | 6 |2 |CTACA**C** → CTA**C**AC |
+| R10    | DNA | 9 |4 |ACACTACA**C** → ACAC**T**ACAC |
+| R9    | RNA002 | 5 |2 |TACA**C** → TA**C**AC |
+| R9    | RNA004 | 9 |4 |ACACUACA**C** → ACAC**U**ACAC |
