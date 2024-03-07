@@ -227,7 +227,7 @@ Then nanoCEM will output the current feature called [**current_feature.csv**](ou
 
 ## Single mode
 
-If you have only one sample and want to view specific regions of features, nanoCEM also provides a single mode, which supported all three
+If you have only one sample and want to view specific regions of features, nanoCEM also provides a single mode, which supported all four
 preprocessing method `f5c resquiggle`, `f5c eventalign`, `tombo` and `move_table`.
 
 For example,
