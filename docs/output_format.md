@@ -40,5 +40,5 @@ The **MANOVA_result.csv** file records the significant level indicating the diff
 |-----------------|------------|
 | Position        | position in transcript/chrome or gene id (**1-based**)
 | P value(-log10) | P value from MANOVA applying on the PCA result. (Recommend cutoff : **3** )
-| Norm difference | difference of normlized mean value of two groups
+| Norm difference | difference of normalized mean value of two groups
 | Result          | whether it is significant after dividing according to the recommended cutoff.
