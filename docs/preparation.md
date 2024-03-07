@@ -47,7 +47,7 @@ while f5c has already been integrated into our script,
 Due to Tombo being an older tool and no longer receiving active updates, 
 it presents challenges for seamless integration into our pipeline.
 
-### tombo
+### Tombo
 
 **Optional:**
 We provide a python script `extract_sub_fast5_from_bam` to assist in sampling reads aligned to your region of interest to reduce re-squiggle time.
