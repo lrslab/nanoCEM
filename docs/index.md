@@ -32,7 +32,7 @@ To check the version of nanoCEM, run:
 
     pip list | grep nanoCEM
 
-## Notes
+## Solutions for some potential environment problem
 Although it does not affect the functionality, the issue of possible missing header files caused by **samtools** installation by conda can be resolved with the following command.
 
     conda install -c conda-forge ncurses

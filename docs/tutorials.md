@@ -185,6 +185,10 @@ The `move table` records the index of events in basecalling.
 In the resulting **bam** file from basecalling, this information is stored in the tags **ns**, **ts** and **mv**.
 You can obtain this information using the following basecalling commands.
 
+**Notes:** For dorado, recommend to use Dorado 0.4.3 to generate basecalled **bam** files with move_table, 
+due to differences between event index length in **bam** and signal length in **pod5** from Dorado 0.5.2. 
+This issue has been reported on their [GitHub](https://github.com/nanoporetech/dorado/issues/614) and expected to address in the following updates. 
+
     # dorado basecaller 
     dorado basecaller [basecall model] [INPUT POD5] --moves_out> basecall.bam
     # guppy basecaller
@@ -192,6 +196,7 @@ You can obtain this information using the following basecalling commands.
     samtools merge pass\*.bam -o basecall.bam
     # slow5-dorado basecaller 
     slow5-dorado basecaller [basecall model] [INPUT BLOW5] --emit-moves > basecall.bam
+
 
 For **Sample** and **Control** group,  files should be as below,
 
