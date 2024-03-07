@@ -7,7 +7,7 @@ These now include the original single and multiple **fast5** format, the newer *
 and the community-driven **slow5/blow5** formats. The relationship between conversion tools 
 and these different data formats is as below.
 
- <center>![data format](data_format.jpg "data_format") </center>
+ <center>![data format](data_format.png "data_format") </center>
 
 nanoCEM only supports single-format **fast5** and **blow5**; please transfer the data format before usage.
 Since we support `tombo`, `move_table` and `f5c`, while `tombo` only supports single format **fast5** and our `f5c` and `move_table` mode supports **blow5**.
