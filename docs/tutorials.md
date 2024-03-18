@@ -14,13 +14,13 @@ The path to the downloaded data is as follows:
 
     data/
     ├── wt/
-    │   └── file.blow5  # blow5 file for f5c eventalign
+    │   └── file.blow5  # blow5 file for f5c 
     │   └── file.fastq # basecall result file
     │   └── basecall.blow5  # blow5 file for move_table
     │   └── basecall.bam  # blow5 file for move_table
     │   └── single/  # single-format fast5 files for tombo re-squiggle
     ├── ivt/
-    │   └── file.blow5  # blow5 file for f5c eventalign
+    │   └── file.blow5  # blow5 file for f5c 
     │   └── file.fastq # basecall result file
     │   └── basecall.blow5  # blow5 file for move_table
     │   └── basecall.bam  # blow5 file for move_table
