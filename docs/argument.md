@@ -55,7 +55,7 @@ For `tombo`, you can view it for
 | -c, --control_fast5 | No       | the control single-format fast5's folder, will run as single-mode if missing              |
 | -o, --output      | No       | output_file (Default:nanoCEM_result)                                                     |
 | --ref             | Yes       |reference file (fasta/fna/fa)          |
-| --chrom           | Yes       | gene/transcript or chromosome name (headdf of your fasta file)               |
+| --chrom           | Yes       | gene/transcript or chromosome name (header of your fasta file)               |
 | --pos             | Yes       | site of your interest        (**1-based**)          |
 | --len             | No       | region around the position (Default:10)                          |
 | -t, --cpu         | No       | num of process (Default:8)                                       |
