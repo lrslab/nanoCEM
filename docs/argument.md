@@ -41,7 +41,7 @@ For `f5c_re` and `f5c_ev`, the argument is same,
 | --rna              | No       | turn on the RNA mode       (Default:False)                                     |
 | --norm             | No       | turn on the normalization      (Default:False)                  |
 | --base_shift       | No       |  for shifting the result from f5c      (Default:False)                  |
-| --pore             | No       |  type of pore choose from `r9` and `r10` (Default: `r9`)                |
+| --pore             | No       |  type of pore choose from `r9`, `r10`, `rna004` (Default: `r9`)                |
 | --kmer_size             | No       |  kmer size for the PCA and MANOVA analysis   (Default:3)  |
 | -h, --help         | No       | Show this help message and exit                                  |
 
