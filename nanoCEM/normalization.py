@@ -1,5 +1,5 @@
 import numpy as np
-OUTLIER_THRESH = 3.0
+OUTLIER_THRESH = 5.0
 MAX_POINTS_FOR_THEIL_SEN = 1000
 
 def normalize_signal_with_lim(raw_signal, lower_lim=-OUTLIER_THRESH, upper_lim=OUTLIER_THRESH):
