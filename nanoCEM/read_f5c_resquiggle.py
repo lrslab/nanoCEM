@@ -81,7 +81,7 @@ def extract_feature(line,strand,kmer_model,base_shift,norm=True):
     # assert len(event_length) + kmer_model - 1 == qlen
 
     # correct index about DNA and RNA
-    if (nucleotide_type == 'RNA' and strand == '+') or (nucleotide_type == 'DNA' and strand == '-'):
+    if nucleotide_type == 'RNA' :
         aligned_pair[0] = qlen - aligned_pair[0] - 1
         aligned_pair[0] = aligned_pair[0] - kmer_model + 1
 
