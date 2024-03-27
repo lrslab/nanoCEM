@@ -25,17 +25,17 @@ This process involves discarding **insertions** and **deletions** while preservi
 
 ## Base shift (only for f5c)
 
-For `f5c` (both for `resquiggle and eventalign`), during nanopore signal alignment, it utilizes a **k-mer model** and assigns the alignment result to the **last base**. 
+For `f5c` (both for `resquiggle and eventalign`), during nanopore signal alignment, it utilizes a **k-mer model** and assigns the alignment result to the **first base**. 
 However, this is not the case for `tombo resquiggle` and `move_table`. To make their results as consistent as possible and enable comparisons with them, 
 we applied a simple strategy to shift f5c's result and introduced `--base_shift` option to align the result closer to the **middle** of the k-mer. 
 
-For example, in R10 DNA sequence whose k-mer is 9-mer, if the basecalled sequence is ACACTACA**C** (9 nt), `f5c` will return only 1 event index of the last **C**.
+For example, in R10 DNA sequence whose k-mer is 9-mer, if the basecalled sequence is **A**CACTACAC (9 nt), `f5c` will return only 1 event index of the first **A**.
 But after turn on the **base_shift** mode, it will be shifted to the middle **T**(ACAC**T**ACAC)
 
 
 | kit    | type | k-mer model  |base shift number |example |
 |--------|----------|-------|-------|-------|
-| R9    | DNA | 6 |2 |CTACA**C** → CTA**C**AC |
-| R10    | DNA | 9 |4 |ACACTACA**C** → ACAC**T**ACAC |
-| R9    | RNA002 | 5 |2 |UACA**C** → UA**C**AC |
-| R9    | RNA004 | 9 |4 |ACACUACA**C** → ACAC**U**ACAC |
+| R9    | DNA | 6 |2 |**C**TACAC → CT**A**CAC |
+| R10    | DNA | 9 |4 |**A**CACTACAC → ACAC**T**ACAC |
+| R9    | RNA002 | 5 |2 |**U**ACAC → UA**C**AC |
+| R9    | RNA004 | 9 |4 |**A**CACUACAC → ACAC**U**ACAC |
