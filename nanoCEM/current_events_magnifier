@@ -52,7 +52,7 @@ def init_parser():
                             help="blow5_path")
     parser_f5c.add_argument('-c', "--control",
                             help="control_blow5_path")
-    parser_f5c.add_argument('--base_shift', action='store_true', help='Turn on the base shift')
+    parser_f5c.add_argument('--base_shift',choices=['auto',0,-1,-2,-3,-4,-5,-6,-7,-8],default='auto', help='base shift option')
     parser_f5c.add_argument('--pore', choices=['r9', 'r10','rna004'], help='Select pore type', default='r9')
     add_public_argument(parser_f5c)
 
