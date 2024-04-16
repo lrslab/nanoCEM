@@ -25,7 +25,7 @@ This process involves discarding **insertions** and **deletions** while preservi
 
 ## Base shift (only for f5c)
 
-For `f5c` (both for `resquiggle and eventalign`), during nanopore signal alignment, it utilizes a **k-mer model** and assigns the alignment result to the **last base**. However, this is not the case for `tombo resquiggle` and `move_table`.
+For `f5c` (both for `resquiggle and eventalign`), during nanopore signal alignment, it utilizes a **k-mer model** and assigns the alignment result to the **first base**. However, this is not the case for `tombo resquiggle` and `move_table`.
 Their developers noticed this issue and applied a complicated strategy to tackle it in this [link](https://github.com/hiruna72/squigualiser/blob/main/docs/base_shift_and_eventalignment.md).
 
 But in nanoCEM, to make their results as consistent as possible and enable comparisons with `tombo` and `move_table`, 
