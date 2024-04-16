@@ -127,7 +127,7 @@ def read_blow5(path, position, reference, length, chrom, strand, pore, subsample
         nucleotide_type = 'RNA'
     else:
         nucleotide_type = 'DNA'
-    kmer_model = ker_model_size[pore+'+'+nucleotide_type]
+    kmer_model = ker_model_size[pore+nucleotide_type]
     if base_shift == 'auto':
         base_shift = base_shift_dict[pore + nucleotide_type + strand]
     else:
