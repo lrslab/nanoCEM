@@ -5,7 +5,7 @@ import pyslow5
 import pysam
 from tqdm import tqdm
 from nanoCEM.normalization import normalize_signal,normalize_signal_with_lim
-from nanoCEM.cem_utils import generate_bam_file,identify_file_path,generate_paf_file_eventalign
+from nanoCEM.cem_utils import generate_bam_file,identify_file_path,generate_paf_file_eventalign,base_shift_dict
 # from nanoCEM.plot import draw_signal
 # import os
 # import argparse
@@ -16,8 +16,10 @@ def extract_feature(line,strand,position,windows_length,base_shift=2,norm=True):
     global nucleotide_type
     pbar.update(1)
     read_id = line[0]
-    if read_id == '0a017d09-5c09-456d-8875-635f4c2c1380':
-        print(1)
+    # if read_id == '0a017d09-5c09-456d-8875-635f4c2c1380':
+    #     print(1)
+    if line[4] != strand:
+        return None
     # tackle moves tag
     moves_string = line[14]
     moves_string = re.sub('ss:Z:', '', moves_string)
@@ -70,35 +72,28 @@ def extract_feature(line,strand,position,windows_length,base_shift=2,norm=True):
     event_starts = event_length.cumsum()
     event_starts = np.insert(event_starts, 0, 0)[:-1]
 
+    # base shift
+    ref_start = np.min([line[7],line[8]])
+    ref_end = np.max([line[7], line[8]])
+    ref_start = ref_start - base_shift
+    ref_end = ref_end - base_shift
+    start_position = np.max([ref_start, position - windows_length]) - ref_start
+    end_position = np.min([ref_end, position + windows_length]) - ref_start
 
     # index query and reference map index
-    if nucleotide_type == 'RNA' :
-        # signal = np.flip(signal)
-        # event_length = np.flip(event_length)
-        ref_start = line[8]
-        start_position = np.max([line[8], position - windows_length]) - ref_start
-        end_position = np.min([line[7], position + windows_length]) - ref_start
-
+    if (nucleotide_type == 'RNA' and strand=='+') or (nucleotide_type == 'DNA' and strand=='-'):
+        end_pos = line[10] - start_position - 1
+        start_pos = line[10] - end_position - 1
     else:
-        ref_start = line[7]
-        start_position = np.max([line[7], position - windows_length]) - ref_start
-        end_position = np.min([line[8], position + windows_length]) - ref_start
-
-    # base shift
-    if nucleotide_type == 'RNA':
-        end_pos = line[10] - start_position - 1 + base_shift
-        start_pos = line[10] - end_position - 1 + base_shift
-
-    else:
-        end_pos = end_position - base_shift
-        start_pos = start_position - base_shift
+        end_pos = end_position
+        start_pos = start_position
 
     end_pos = np.min([end_pos, line[10] - 1])
     # extract raw signal by event length and event start
     total_feature_per_reads = []
     raw_signal_every = [signal[event_starts[x]:event_starts[x] + event_length[x]] for x in
                         range(start_pos,end_pos+1)]
-    if nucleotide_type == 'RNA':
+    if (nucleotide_type == 'RNA' and strand=='+') or (nucleotide_type == 'DNA' and strand=='-'):
         raw_signal_every.reverse()
     # calculate mean median and dwell time
     for i, element in enumerate(raw_signal_every):
@@ -118,8 +113,8 @@ def extract_pairs_pos(bam_file,position,length,chromosome,strand):
             continue
         if strand == '-' and not read.is_reverse:
             continue
-        if read.qname == 'db71b047-e073-42cf-833b-a3ccdd9459b3':
-            print(1)
+        # if read.qname == 'db71b047-e073-42cf-833b-a3ccdd9459b3':
+        #     print(1)
         start_position=read.reference_start
         end_position=read.reference_end
         if position < start_position or position > end_position:
@@ -130,25 +125,20 @@ def extract_pairs_pos(bam_file,position,length,chromosome,strand):
         result_dict[read.qname] = temp
     return result_dict
 
-
-
-def read_blow5(path,position,reference,length,chrom,strand,pore,subsample_ratio=1,base_shift=True,norm=True,cpu=4,rna=True):
+def read_blow5(path,position,reference,length,chrom,strand,pore,subsample_ratio=1,base_shift='auto',norm=True,cpu=4,rna=True):
     global s5,pbar
     slow5_file = path + ".blow5"
     fastq_file = path + ".fastq"
     identify_file_path(fastq_file)
     identify_file_path(slow5_file)
-
-    if base_shift:
-        if rna or (pore == 'r9' and not rna):
-            base_shift = 2
-        else:
-            base_shift = 4
+    if rna:
+        nucleotide_type = "RNA"
     else:
-        base_shift = 0
-    if strand =='-' and not rna and pore == 'r9':
-        base_shift = 3
-
+        nucleotide_type = 'DNA'
+    if base_shift == 'auto':
+        base_shift = base_shift_dict[pore+nucleotide_type+strand]
+    else:
+        base_shift = base_shift
     fastq_file, bam_file = generate_bam_file(fastq_file, reference, cpu, subsample_ratio)
     paf_file = generate_paf_file_eventalign(fastq_file,slow5_file,bam_file,reference,pore,rna,cpu)
 

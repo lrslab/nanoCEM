@@ -25,19 +25,11 @@ This process involves discarding **insertions** and **deletions** while preservi
 
 ## Base shift (only for f5c)
 
-For `f5c` (both for `resquiggle and eventalign`), during nanopore signal alignment, it utilizes a **k-mer model** and assigns the alignment result to the **first base**. However, this is not the case for `tombo resquiggle` and `move_table`.
-Their developers noticed this problem and applied a complicated strategy to tackle it in this [link](https://github.com/hiruna72/squigualiser/blob/main/docs/base_shift_and_eventalignment.md).
+For `f5c` (both for `resquiggle and eventalign`), during nanopore signal alignment, it utilizes a **k-mer model** and assigns the alignment result to the **last base**. However, this is not the case for `tombo resquiggle` and `move_table`.
+Their developers noticed this issue and applied a complicated strategy to tackle it in this [link](https://github.com/hiruna72/squigualiser/blob/main/docs/base_shift_and_eventalignment.md).
 
-But in nanoCEM, to make their results as consistent as possible and enable comparisons with them, 
-we applied a simple strategy to shift f5c's result and introduced `--base_shift` option to align the result closer to the **middle** of the k-mer. 
+But in nanoCEM, to make their results as consistent as possible and enable comparisons with `tombo` and `move_table`, 
+we introduced `--base_shift` option to align the result closer to the most contributing base, and shift num is recorded [here](https://github.com/hiruna72/squigualiser/blob/main/docs/profiles.md)
 
-For example, in R10 DNA sequence whose k-mer is 9-mer, if the basecalled sequence is **A**CACTACAC (9 nt), `f5c` will return only 1 event index of the first **A**.
-But after turn on the **base_shift** mode, it will be shifted to the middle **T**(ACAC**T**ACAC)
-
-
-| kit    | type | k-mer model  |base shift number |example |
-|--------|----------|-------|-------|-------|
-| R9    | DNA | 6 |2 |**C**TACAC → CT**A**CAC |
-| R10    | DNA | 9 |4 |**A**CACTACAC → ACAC**T**ACAC |
-| R9    | RNA002 | 5 |2 |**U**ACAC → UA**C**AC |
-| R9    | RNA004 | 9 |4 |**A**CACUACAC → ACAC**U**ACAC |
+The default value for --base_shift is **auto**. However, if you want to disable it, you can use **--base_shift 0**. If you want to shift by a different number, please enter a negative value, for example,
+**--base_shift -3**. Please note that for RNA mode, the shift will be from **3'** to **5'**, so the value should also be a **negative number**.

@@ -7,15 +7,26 @@ import pandas as pd
 from tqdm import tqdm
 import multiprocessing
 import warnings
+
 warnings.filterwarnings("ignore", category=FutureWarning)
-from scipy import stats
 import copy
 
 ker_model_size ={
-    'r9+RNA': 5,
-    'r9+DNA': 6,
-    'r10+DNA': 9,
-    'rna004+RNA': 9
+    'r9RNA': 5,
+    'r9DNA': 6,
+    'r10DNA': 9,
+    'rna004RNA': 9
+}
+
+base_shift_dict ={
+    'r9RNA+': -1,
+    'r9RNA-': -3,
+    'r9DNA+': -2,
+    'r9DNA-': -3,
+    'r10DNA+': -6,
+    'r10DNA-': -2,
+    'rna004RNA+': -6,
+    'rna004RNA-': -2,
 }
 
 def caculate_base_shift_size(kmer_model,strand):
@@ -385,3 +396,4 @@ def calculate_MANOVA_result(position,df,length_size,subsample_num=500,windows_le
 # for key,value in fasta.items():
 #     fasta[key]=reverse_fasta(value)
 # save_fasta_dict(fasta,'../example/data/23S_rRNA_re.fasta')
+

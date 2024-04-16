@@ -23,7 +23,7 @@ def init_parser():
         parser_input.add_argument('-s', "--subsample_ratio", default=1, type=float,
                                   help="Subsample ratio to select reads")
         parser_input.add_argument('--rna', action='store_true', help='Turn on the RNA mode')
-        parser_input.add_argument('--kmer_size', choices=[3,5,7],default=3, type=int,  help="kmer size for PCA and MANOVA analysis")
+        parser_input.add_argument('--kmer_size', choices=[3,5,7],default=3, help="kmer size for PCA and MANOVA analysis")
         parser_input.add_argument('-o', "--output", default="nanoCEM_result", help="output_file")
 
     # Define the argument parser
@@ -41,6 +41,8 @@ def init_parser():
                               help="input_fast5_file")
     parser_tombo.add_argument('-c', "--control_fast5",
                               help="control_fast5_file")
+    # parser_tombo.add_argument('-b', "--bam", help="bam file to help index to speed up")
+
 
     add_public_argument(parser_tombo)
 
@@ -59,7 +61,7 @@ def init_parser():
                             help="blow5_path")
     parser_f5c.add_argument('-c', "--control",
                             help="control_blow5_path")
-    parser_f5c.add_argument('--base_shift', action='store_true', help='Turn on the base shift')
+    parser_f5c.add_argument('--base_shift',choices=['auto',0,-1,-2,-3,-4,-5,-6,-7,-8],default='auto', help='base shift option')
     parser_f5c.add_argument('--pore', choices=['r9', 'r10','rna004'], help='Select pore type', default='r9')
     add_public_argument(parser_f5c)
 
@@ -71,6 +73,7 @@ def init_parser():
     parser_f5c.add_argument('-m','--sig_move_offset', type=int, required=True, help='sig_move_offset for squigualiser reform')
     parser_f5c.add_argument('-k','--kmer_length', type=int, required=True, help='kmer_length for squigualiser reform')
     add_public_argument(parser_f5c)
+
     return parser
 
 if __name__ == '__main__':
@@ -148,6 +151,7 @@ if __name__ == '__main__':
                                                     args.rna)
             df_ivt['Group'] = 'Control'
 
+
         except Exception as e:
             print(e)
             single_mode = True
@@ -193,8 +197,6 @@ if __name__ == '__main__':
     if not single_mode:
         if args.kmer_size is None:
             args.kmer_size = 3
-        if args.kmer_size > args.len:
-            raise RuntimeError("kmer_size is larger than windows size, please re-choose len of kmer_size")
         # draw PCA
         kmer_size = args.kmer_size
         # df_copy.loc[:, 'Position'] = df_copy['Position'].astype(int)
