@@ -72,22 +72,19 @@ def extract_feature(line,strand,position,windows_length,base_shift=2,norm=True):
     event_starts = event_length.cumsum()
     event_starts = np.insert(event_starts, 0, 0)[:-1]
 
-    # index query and reference map index
-    if nucleotide_type == 'RNA' :
-        # signal = np.flip(signal)
-        # event_length = np.flip(event_length)
-        ref_start = line[8] - base_shift
-        ref_end = line[7] - base_shift
+    # base shift
+    ref_start = np.min([line[7],line[8]])
+    ref_end = np.max([line[7], line[8]])
+    ref_start = ref_start - base_shift
+    ref_end = ref_end - base_shift
+    start_position = np.max([ref_start, position - windows_length]) - ref_start
+    end_position = np.min([ref_end, position + windows_length]) - ref_start
 
-        start_position = np.max([ref_start, position - windows_length]) - ref_start
-        end_position = np.min([ref_end, position + windows_length]) - ref_start
+    # index query and reference map index
+    if (nucleotide_type == 'RNA' and strand=='+') or (nucleotide_type == 'DNA' and strand=='-'):
         end_pos = line[10] - start_position - 1
         start_pos = line[10] - end_position - 1
-
     else:
-        ref_start = line[7] + base_shift
-        start_position = np.max([line[7], position - windows_length]) - ref_start
-        end_position = np.min([line[8], position + windows_length]) - ref_start
         end_pos = end_position
         start_pos = start_position
 
@@ -96,7 +93,7 @@ def extract_feature(line,strand,position,windows_length,base_shift=2,norm=True):
     total_feature_per_reads = []
     raw_signal_every = [signal[event_starts[x]:event_starts[x] + event_length[x]] for x in
                         range(start_pos,end_pos+1)]
-    if nucleotide_type == 'RNA':
+    if (nucleotide_type == 'RNA' and strand=='+') or (nucleotide_type == 'DNA' and strand=='-'):
         raw_signal_every.reverse()
     # calculate mean median and dwell time
     for i, element in enumerate(raw_signal_every):

@@ -15,7 +15,7 @@ from nanoCEM.read_move_table import extract_pairs_pos
 score_dict = {}
 nucleotide_type = None
 
-def extract_feature(line,kmer_model, base_shift, norm=True):
+def extract_feature(line,kmer_model,strand,base_shift, norm=True):
     global nucleotide_type
     pbar.update(1)
     read_id = line[0]
@@ -84,7 +84,7 @@ def extract_feature(line,kmer_model, base_shift, norm=True):
     # assert len(event_length) + kmer_model - 1 == qlen
 
     # correct index about DNA and RNA
-    if nucleotide_type == 'RNA':
+    if (nucleotide_type == 'RNA' and strand=='+') or (nucleotide_type == 'DNA' and strand=='-'):
         aligned_pair[0] = qlen - aligned_pair[0] - 1
         aligned_pair[1] = aligned_pair[1] - kmer_model - base_shift + 1
     else:
@@ -149,7 +149,7 @@ def read_blow5(path, position, reference, length, chrom, strand, pore, subsample
     if df.shape[0] / info_df.shape[0] < 0.8:
         print('There are ' + str(info_df.shape[0] - df.shape[0]) + " reads not found in your paf file ...")
     pbar = tqdm(total=df.shape[0], position=0, leave=True)
-    df["feature"] = df.apply(extract_feature,kmer_model=kmer_model, base_shift=base_shift, norm=norm, axis=1)
+    df["feature"] = df.apply(extract_feature,kmer_model=kmer_model, strand = strand,base_shift=base_shift, norm=norm, axis=1)
     pbar.close()
 
     df.dropna(inplace=True)

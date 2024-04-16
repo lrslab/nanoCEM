@@ -77,9 +77,8 @@ def extract_feature(line,strand,sig_move_offset,norm=True):
         print("Warning: 1 read's length of event is not equal between bam and paf file")
         return None
     # correct index about DNA and RNA
-    if nucleotide_type == 'RNA' :
+    if (nucleotide_type == 'RNA' and strand == '+') or (nucleotide_type == 'DNA' and strand == '-'):
         aligned_pair[0] = qlen - aligned_pair[0] - 1
-
 
     if aligned_pair.shape[0]==0:
         return None
