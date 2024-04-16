@@ -95,7 +95,7 @@ We have already organized our sample data, so we just need to run the `current_e
     current_events_magnifier f5c_re -i data/wt/file -c data/ivt/file \
     --chrom NR_103073.1 --strand + --pos 2030 \
     --ref data/23S_rRNA.fasta -o nanoCEM_result_f5c_re \
-    --base_shift --rna --norm
+    --rna --norm
 
  **Notes:** 
 If you want to work with DNA data, please remember to remove the `--rna` option from your commands.
@@ -130,7 +130,7 @@ except that the `f5c_ev` option needs to be used as below,
     current_events_magnifier f5c_ev -i data/wt/file -c data/ivt/file \
     --chrom NR_103073.1 --strand + --pos 2030 \
     --ref data/23S_rRNA.fasta -o nanoCEM_result_f5c_ev \
-    --base_shift --rna --norm
+    --rna --norm
 
 ### tombo support
 
@@ -236,7 +236,7 @@ For example,
     current_events_magnifier f5c_ev -i data/wt/file\
     --chrom NR_103073.1 --strand + --pos 2030 \
     --ref data/23S_rRNA.fasta -o nanoCEM_result \
-    --base_shift --rna --norm
+    --rna --norm
 
 And the single mode will output the feature table and feature plot like blow,
 

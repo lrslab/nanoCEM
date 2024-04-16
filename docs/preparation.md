@@ -39,11 +39,13 @@ alternative splicing and multiple isoforms in eukaryotic organisms.
 The alignment process is already embedded in nanoCEM. For general analysis, if you use RNA mode,
 it is advisable to use **transcriptome** as the reference, while for DNA, the reference would be the **genome**.
 
-## Re-squiggle process
+## Signal Mapping Refinement 
 
-nanoCEM supports the re-squiggle results of both `tombo` and `f5c`, 
-while f5c has already been integrated into our script, 
-`tombo` users will need to install the required environment on their own.
+This aligns signal with sequence via a table of expected signal levels. 
+After a signal mapping has been refined it becomes more comparable to other reads enabling powerful downstream analyses.
+nanoCEM supports the re-squiggle results of `f5c resquiggle`, `f5c eventalign`, `move_table` and `tombo`.
+while **f5c** has already been integrated into our script, 
+`tombo` users will need to install the required environment on their own env and `move_table` requires the additional option in basecaller to output more tags in the **bam** file.
 Due to Tombo being an older tool and no longer receiving active updates, 
 it presents challenges for seamless integration into our pipeline.
 
@@ -62,3 +64,21 @@ the generation of re-squiggle.
 
 **Notes:**  Since the re-squiggle process in tombo can be time-consuming, we recommend using an SSD (Solid State Drive) 
 to reduce processing time. 
+
+### move_table
+
+The `move table` records the index of events in basecalling.
+In the resulting **bam** file from basecalling, this information is stored in the tags **ns**, **ts** and **mv**.
+You can obtain this information using the following basecalling commands.
+
+**Notes:** For dorado, recommend to use Dorado 0.4.3 to generate basecalled **bam** files with move_table, 
+due to differences between event index length in **bam** and signal length in **pod5** from Dorado 0.5.2. 
+This issue has been reported on their [GitHub](https://github.com/nanoporetech/dorado/issues/614) and expected to address in the following updates. 
+
+    # dorado basecaller 
+    dorado basecaller [basecall model] [INPUT POD5] --moves_out> basecall.bam
+    # guppy basecaller
+    guppy_basecaller -c [basecall model] -i [INPUT FAST5 ] --moves_out --bam_out --save_path [OUTPUT]
+    samtools merge pass\*.bam -o basecall.bam
+    # slow5-dorado basecaller 
+    slow5-dorado basecaller [basecall model] [INPUT BLOW5] --emit-moves > basecall.bam

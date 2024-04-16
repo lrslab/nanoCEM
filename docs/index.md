@@ -41,7 +41,9 @@ The potential **vbz** format compression issue when reading **fast5** files.
 
     conda install -c bioconda ont_vbz_hdf_plugin
 
+## Further issues
 
+Please feel free to raise an issue on our [GitHub repository](https://github.com/lrslab/nanoCEM)
 
 ## Content
 
