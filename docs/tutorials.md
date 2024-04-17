@@ -55,7 +55,7 @@ script using our test data to visualize the alignment feature,
     # get alignment visualization 
     alignment_magnifier -i data/wt/file.fastq  -c data/ivt/file.fastq  \
     --chrom NR_103073.1 --pos 2030 --len 10 --strand + \
-    --rna --ref data/23S_rRNA.fasta --output nanoCEM_result
+    --rna --ref data/23S_rRNA.fasta --output nanoCEM_alignment_result
 
 Then nanoCEM will output the alignment feature table called [**alignment_feature.csv**](output_format.md#result-file-from-alignment_magnifier) and figure in
 your target region as below, **Sample** is from `-i` and **Control** is  `-c`
