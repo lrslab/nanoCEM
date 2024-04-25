@@ -116,8 +116,9 @@ def generate_bam_file(fastq_file, reference, cpu,subsample_ratio=1):
 def generate_paf_file_eventalign(fastq_file, blow5_file,bam_file,fasta_file,pore,rna,cpu):
     paf_file =  '.'.join(fastq_file.split('.')[:-1]) + '_ev.paf'
     if not os.path.exists(paf_file):
-        cmds = 'slow5tools index ' + blow5_file
-        run_cmd(cmds)
+        if not os.path.exists(blow5_file+'.idx'):
+            cmds = 'slow5tools index ' + blow5_file
+            run_cmd(cmds)
 
         cmds = 'f5c index --slow5 ' +blow5_file+' '+ fastq_file
         run_cmd(cmds)
@@ -138,8 +139,9 @@ def generate_paf_file_eventalign(fastq_file, blow5_file,bam_file,fasta_file,pore
 def generate_paf_file_resquiggle(fastq_file, blow5_file,pore,rna,cpu):
     paf_file =  '.'.join(fastq_file.split('.')[:-1]) + '_re.paf'
     if not os.path.exists(paf_file):
-        cmds = 'slow5tools index ' + blow5_file
-        run_cmd(cmds)
+        if not os.path.exists(blow5_file + '.idx'):
+            cmds = 'slow5tools index ' + blow5_file
+            run_cmd(cmds)
 
         cmds = 'f5c index --slow5 ' +blow5_file+' '+ fastq_file
         run_cmd(cmds)
