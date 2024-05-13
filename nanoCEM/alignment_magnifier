@@ -46,7 +46,7 @@ if __name__ == '__main__':
     cpu = str(args.cpu)
     # check input file
     identify_file_path(input_fastq)
-
+    identify_file_path(ref)
     # prepare title
     location = args.chrom + ':' + str(args.pos - args.len) + '-' + str(args.pos + args.len)
     title = location + ':' + args.strand

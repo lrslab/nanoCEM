@@ -25,8 +25,8 @@ base_shift_dict ={
     'r9DNA-': -3,
     'r10DNA+': -6,
     'r10DNA-': -2,
-    'rna004RNA+': -6,
-    'rna004RNA-': -2,
+    'rna004RNA+': -2,
+    'rna004RNA-': -6,
 }
 
 def caculate_base_shift_size(kmer_model,strand):
@@ -103,9 +103,9 @@ def generate_bam_file(fastq_file, reference, cpu,subsample_ratio=1):
         run_cmd(cmds)
         bam_file = new_bam
 
-    # if not os.path.exists(bam_file+'.bai'):
-    cmds = 'samtools index ' + bam_file
-    run_cmd(cmds)
+    if not os.path.exists(bam_file+'.bai'):
+        cmds = 'samtools index ' + bam_file
+        run_cmd(cmds)
 
     new_fastq_file = '.'.join(bam_file.split('.')[:-1]) + '.fastq'
     if not os.path.exists(new_fastq_file):
@@ -116,14 +116,14 @@ def generate_bam_file(fastq_file, reference, cpu,subsample_ratio=1):
 def generate_paf_file_eventalign(fastq_file, blow5_file,bam_file,fasta_file,pore,rna,cpu):
     paf_file =  '.'.join(fastq_file.split('.')[:-1]) + '_ev.paf'
     if not os.path.exists(paf_file):
-        cmds = 'slow5tools index ' + blow5_file
-        run_cmd(cmds)
+        if not os.path.exists(blow5_file+'.idx'):
+            cmds = 'slow5tools index ' + blow5_file
+            run_cmd(cmds)
 
         cmds = 'f5c index --slow5 ' +blow5_file+' '+ fastq_file
         run_cmd(cmds)
 
         cmds = 'f5c eventalign -r '+ fastq_file +" -g "+fasta_file+ ' --slow5 ' + blow5_file + ' --pore '+ pore+' -b ' + bam_file +' -c --min-mapq 0' + ' -t ' + str(cpu)
-        print()
         if rna:
             cmds =cmds +' --rna'
         cmds =cmds +' > '+ paf_file
@@ -138,8 +138,9 @@ def generate_paf_file_eventalign(fastq_file, blow5_file,bam_file,fasta_file,pore
 def generate_paf_file_resquiggle(fastq_file, blow5_file,pore,rna,cpu):
     paf_file =  '.'.join(fastq_file.split('.')[:-1]) + '_re.paf'
     if not os.path.exists(paf_file):
-        cmds = 'slow5tools index ' + blow5_file
-        run_cmd(cmds)
+        if not os.path.exists(blow5_file + '.idx'):
+            cmds = 'slow5tools index ' + blow5_file
+            run_cmd(cmds)
 
         cmds = 'f5c index --slow5 ' +blow5_file+' '+ fastq_file
         run_cmd(cmds)
