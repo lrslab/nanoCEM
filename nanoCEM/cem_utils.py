@@ -124,7 +124,6 @@ def generate_paf_file_eventalign(fastq_file, blow5_file,bam_file,fasta_file,pore
         run_cmd(cmds)
 
         cmds = 'f5c eventalign -r '+ fastq_file +" -g "+fasta_file+ ' --slow5 ' + blow5_file + ' --pore '+ pore+' -b ' + bam_file +' -c --min-mapq 0' + ' -t ' + str(cpu)
-        print()
         if rna:
             cmds =cmds +' --rna'
         cmds =cmds +' > '+ paf_file
