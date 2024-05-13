@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="nanoCEM",
-    version="0.0.5.8",
+    version="0.0.5.9",
     author="GUO Zhihao",
     author_email="qhuozhihao@icloud.com",
     description='A simple tool designed to visualize the features that distinguish between two groups of ONT data at the site level.\
