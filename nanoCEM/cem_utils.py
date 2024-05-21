@@ -102,6 +102,8 @@ def generate_bam_file(fastq_file, reference, cpu,subsample_ratio=1):
         print(cmds)
         run_cmd(cmds)
         bam_file = new_bam
+        cmds = 'samtools index ' + bam_file
+        run_cmd(cmds)
 
     if not os.path.exists(bam_file+'.bai'):
         cmds = 'samtools index ' + bam_file
