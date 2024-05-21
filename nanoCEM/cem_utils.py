@@ -25,8 +25,8 @@ base_shift_dict ={
     'r9DNA-': -3,
     'r10DNA+': -6,
     'r10DNA-': -2,
-    'rna004RNA+': -2,
-    'rna004RNA-': -6,
+    'rna004RNA+': -3,
+    'rna004RNA-': -5,
 }
 
 def caculate_base_shift_size(kmer_model,strand):
@@ -102,6 +102,8 @@ def generate_bam_file(fastq_file, reference, cpu,subsample_ratio=1):
         print(cmds)
         run_cmd(cmds)
         bam_file = new_bam
+        cmds = 'samtools index ' + bam_file
+        run_cmd(cmds)
 
     if not os.path.exists(bam_file+'.bai'):
         cmds = 'samtools index ' + bam_file
