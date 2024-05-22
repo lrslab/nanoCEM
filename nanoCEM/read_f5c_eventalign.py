@@ -163,8 +163,6 @@ def read_blow5(path,position,reference,length,chrom,strand,pore,subsample_ratio=
 
     df.dropna(inplace=True)
     num_aligned = df.shape[0]
-    if subsample_ratio<1:
-        df=df.sample(frac=subsample_ratio)
     final_feature=[]
     for item in df["feature"]:
         final_feature.extend(item)
