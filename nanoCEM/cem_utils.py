@@ -386,7 +386,8 @@ def calculate_MANOVA_result(position,df,length_size,subsample_num=500,windows_le
             # 执行多元方差分析
             results = manova.mv_test()
             pvalue = results.summary().tables[3].iloc[0,5]
-            mean_differ = feature[label[0]=='Sample'][4].median() - feature[label[0]=='Control'][4].median()
+            kmer_center = int((kmer -1)/2)
+            mean_differ = feature[label[0]=='Sample'][kmer_center*4].median() - feature[label[0]=='Control'][kmer_center*4].median()
             result_list.append([item,pvalue,mean_differ])
         else:
             result_list.append([item, None])
