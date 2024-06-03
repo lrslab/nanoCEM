@@ -49,5 +49,8 @@ For the data we used and related commands in our paper, please view our [wiki](h
 ## Documents
 Full documentation is available at https://nanocem.readthedocs.io/
 
+## Publication
+Our paper is online [here](https://academic.oup.com/nargab/article/6/2/lqae052/7676831) now
+
 ## Workflow
 ![workflow](docs/Workflow.png)
