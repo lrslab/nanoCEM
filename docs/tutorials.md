@@ -121,6 +121,8 @@ output path.
 
 <center>![manova](RNA_pval.png "manova") </center>
 
+**Notes**: After extensive testing in various scenarios, we believe MANOVA may not always provide an appropriate significance level under certain circumstances. Firstly, it is influenced by sequencing depth; the deeper the data, the more likely it becomes significant. Additionally, unequal coverage can also impact the results. Therefore, we recommend using alternative statistical methods to test for differences in means based on the features in the feature table [**current_feature.csv**](output_format.md#result-file-from-current_event_magnifier).
+
 #### f5c eventalign support
 
 The data preparation and command for applied the preprocing method `f5c eventalign` are exactly the same as for `f5c resquiggle`, 
