@@ -93,7 +93,7 @@ if __name__ == '__main__':
     # build title
     base_list = fasta[args.chrom][args.pos - args.len:args.pos + args.len + 1].upper()
     title = args.chrom + ':' + str(args.pos - args.len + 1) + '-' + str(args.pos + args.len + 1) + ':' + args.strand
-    if args.rna or args.pore == 'rna004':
+    if args.rna:
         args.rna =True
         base_list = base_list.replace("T", "U")
         print("Running RNA mode ...")

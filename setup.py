@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="nanoCEM",
-    version="0.0.6.1",
+    version="0.0.6.3",
     author="GUO Zhihao",
     author_email="qhuozhihao@icloud.com",
     description='A simple tool designed to visualize the features that distinguish between two groups of ONT data at the site level.\
@@ -22,7 +22,7 @@ setup(
     python_requires='>=3.7.0,<=3.11.7',
     install_requires=[
         'h5py>=3.8.0',
-        'numpy>=1.23.0',
+        'numpy>=1.23.0,<2.0',
         'pandas>=1.5.0',
         'plotnine==0.12.4',
         'tqdm>=4.62.0',
