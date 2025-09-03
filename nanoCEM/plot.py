@@ -85,7 +85,7 @@ def current_plot(df, results_path, pos, base_list, title,filter):
     plot = p9.ggplot(new_df, p9.aes(x='Position', y="value", fill='Group')) \
            + p9.theme_bw() \
            + p9.scale_fill_manual(values={"Sample": "#F57070", "Control": "#9F9F9F", "Single": "#a3abbd"}) \
-           + p9.scale_x_discrete(breaks=pos_list, labels=base_list) \
+           + p9.scale_x_discrete(limits=pos_list,breaks=pos_list, labels=base_list) \
            + p9.theme(
         figure_size=(8, 8),
         panel_grid_minor=p9.element_blank(),
