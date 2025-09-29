@@ -163,9 +163,10 @@ def prepare_move_table_file(bam_file, reference, cpu,sig_move_offset,kmer_length
     cmds = 'samtools index ' + bam_file
     run_cmd(cmds)
     print('Start to generate paf file  ...')
-    cmds = 'squigualiser reform --sig_move_offset '+sig_move_offset+' --kmer_length '+kmer_length+' -c --bam ' + bam_file +' -o ' + paf_file
-    print(cmds)
-    run_cmd(cmds)
+    if not os.path.exists(paf_file):
+        cmds = 'squigualiser reform --sig_move_offset '+sig_move_offset+' --kmer_length '+kmer_length+' -c --bam ' + bam_file +' -o ' + paf_file
+        print(cmds)
+        run_cmd(cmds)
     print("Start alignment ...")
     cmds = 'samtools bam2fq '+bam_file+' >' + fastq_file
     run_cmd(cmds)
