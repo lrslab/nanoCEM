@@ -25,8 +25,8 @@ def init_parser():
         parser_input.add_argument('--rna', action='store_true', help='Turn on the RNA mode')
         parser_input.add_argument('--kmer_size', choices=['1','3','5','7'],default='3', help="kmer size for PCA and MANOVA analysis")
         parser_input.add_argument('-o', "--output", default="nanoCEM_result", help="output_file")
-        parser_input.add_argument('--sample_paf', default="sample paf file if exited", help="sample PAF file")
-        parser_input.add_argument('--control_paf', default="control paf file if exited", help="control PAF file")
+        parser_input.add_argument('--sample_aligned_file', help="suffix of sample paf file and bam file if exited")
+        parser_input.add_argument('--control_aligned_file', help="suffix of control paf file and bam file  if exited")
     # Define the argument parser
     parser = argparse.ArgumentParser(
         description='A sample tool designed to visualize the features that distinguish between two groups of ONT data at the site level. It supports two re-squiggle pipeline(Tombo and f5c).')
