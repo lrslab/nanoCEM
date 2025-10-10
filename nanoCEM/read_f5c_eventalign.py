@@ -125,11 +125,10 @@ def extract_pairs_pos(bam_file,position,length,chromosome,strand):
         result_dict[read.qname] = temp
     return result_dict
 
-def read_blow5(path,position,reference,length,chrom,strand,pore,subsample_ratio=1,base_shift='auto',norm=True,cpu=4,rna=True):
+def read_blow5(path,position,reference,length,chrom,strand,pore,aligned_file,subsample_ratio=1,base_shift='auto',norm=True,cpu=4,rna=True):
     global s5,pbar
     slow5_file = path + ".blow5"
     fastq_file = path + ".fastq"
-    identify_file_path(fastq_file)
     identify_file_path(slow5_file)
     if rna:
         nucleotide_type = "RNA"
@@ -139,9 +138,16 @@ def read_blow5(path,position,reference,length,chrom,strand,pore,subsample_ratio=
         base_shift = base_shift_dict[pore+nucleotide_type+strand]
     else:
         base_shift = base_shift
-    fastq_file, bam_file = generate_bam_file(fastq_file, reference, cpu, subsample_ratio)
-    paf_file = generate_paf_file_eventalign(fastq_file,slow5_file,bam_file,reference,pore,rna,cpu)
-
+    if aligned_file is None:
+        identify_file_path(fastq_file)
+        fastq_file, bam_file = generate_bam_file(fastq_file, reference, cpu, subsample_ratio)
+        paf_file = generate_paf_file_eventalign(fastq_file,slow5_file,bam_file,reference,pore,rna,cpu)
+    else:
+        print("Detected that a PAF file already exists,will skip the eventalign step")
+        bam_file = aligned_file+'.bam'
+        paf_file = aligned_file+'.paf'
+        identify_file_path(bam_file)
+        identify_file_path(paf_file)
     bam_file = pysam.AlignmentFile(bam_file,'rb')
 
     info_dict = extract_pairs_pos(bam_file,position,length,chrom,strand)
@@ -184,59 +190,3 @@ def read_blow5(path,position,reference,length,chrom,strand,pore,subsample_ratio=
 
     return final_feature,num_aligned,nucleotide_type
 
-# if __name__ == '__main__':
-#     parser = argparse.ArgumentParser()
-#     parser.add_argument("-i","--input", default='/data/Ecoli_23s/data/L_rep2/file',
-#                         help="blow5_path")
-#     parser.add_argument('-c',"--control", default='/data/Ecoli_23s/data/IVT_negative/file',
-#                         help="control_blow5_path")
-#     parser.add_argument('-o',"--output", default="/data/Ecoli_23s/f5c_results_2030_plus", help="output_file")
-#     parser.add_argument("--chrom", default='NR_103073.1',help="Gene or chromosome name(head of your fasta file)")
-#     parser.add_argument("--pos", default=2030, type=int, help="site of your interest")
-#     parser.add_argument("--len", default=5, type=int, help="region around the position")
-#     parser.add_argument("--strand", default="+", help="Strand of your interest")
-#     parser.add_argument("--ref", default="/data/Ecoli_23s/23S_rRNA.fasta", help="fasta file")
-#     parser.add_argument("--overplot-number", default=500, type=int, help="Number of read will be used to plot")
-#     args = parser.parse_args()
-#     args.pos = args.pos - 1
-#     fasta=read_fasta_to_dic(args.ref)
-#     base_list = fasta[args.chrom][args.pos-args.len:args.pos+args.len+1]
-#     if args.strand == '-':
-#         base_list="".join(list(reversed(base_list)))
-#         base_list=reverse_fasta(base_list)
-#     results_path = args.output
-#     if not os.path.exists(results_path):
-#         os.mkdir(results_path)
-#     subsample_num = args.overplot_number
-#
-#     title = args.chrom + ':' + str(args.pos - args.len + 1) + '-' + str(args.pos + args.len + 2) + ':' + args.strand
-#     df_wt,aligned_num_wt=read_blow5(args.input,args.pos,args.len,args.chrom,args.strand,subsample_num)
-#
-#     df_wt['type']='Sample'
-#     try:
-#         df_ivt,aligned_num_ivt=read_blow5(args.control,args.pos ,args.len,args.chrom,args.strand,subsample_num)
-#         df_ivt['type'] = 'Control'
-#
-#         df=pd.concat([df_wt,df_ivt])
-#         category = pd.api.types.CategoricalDtype(categories=['Sample',"Control"], ordered=True)
-#         df['type'] = df['type'].astype(category)
-#
-#         title = title + '   Sample:' + str(aligned_num_wt) + '  Control:' + str(aligned_num_ivt)
-#     except:
-#         args.control=None
-#     if args.control is None:
-#         df = df_wt
-#         df_wt['type'] = 'Single'
-#         title = title + '   Sample:' + str(aligned_num_wt)
-#
-#     category_data = [str(args.pos + x) for x in range(-args.len, args.len + 1)]
-#     category = pd.api.types.CategoricalDtype(categories=category_data, ordered=True)
-#     df['position'] = df['position'].astype(category)
-#
-#
-#     # df['Dwell_time'] = np.log10(df['Dwell_time'].values)
-#
-#     signal_plot(df, results_path, args.pos, base_list, title, 'merged')
-#     signal_plot(df, results_path, args.pos, base_list, title,'boxplot')
-#     signal_plot(df, results_path, args.pos, base_list, title, 'violin_plot')
-#     print('\nsaved as ', args.output)

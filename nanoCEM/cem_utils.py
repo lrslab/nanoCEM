@@ -89,7 +89,7 @@ def generate_bam_file(fastq_file, reference, cpu,subsample_ratio=1):
     bam_file = '.'.join(fastq_file.split('.')[:-1]) + '_aligned.bam'
     if not os.path.exists(bam_file):
         cmds = 'minimap2 -ax map-ont -t ' + cpu + ' --MD ' + reference + ' ' + fastq_file + ' | samtools view -hbS -F ' + str(
-            3332) + '  - | samtools sort -@ ' + cpu + ' -o ' + bam_file
+            3332) + '  -q 1 - | samtools sort -@ ' + cpu + ' -o ' + bam_file
         print('Start to alignment ...')
         run_cmd(cmds)
         print('bam file is saved in ' + bam_file)

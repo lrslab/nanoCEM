@@ -25,7 +25,8 @@ def init_parser():
         parser_input.add_argument('--rna', action='store_true', help='Turn on the RNA mode')
         parser_input.add_argument('--kmer_size', choices=['1','3','5','7'],default='3', help="kmer size for PCA and MANOVA analysis")
         parser_input.add_argument('-o', "--output", default="nanoCEM_result", help="output_file")
-
+        parser_input.add_argument('--sample_paf', default="sample paf file if exited", help="sample PAF file")
+        parser_input.add_argument('--control_paf', default="control paf file if exited", help="control PAF file")
     # Define the argument parser
     parser = argparse.ArgumentParser(
         description='A sample tool designed to visualize the features that distinguish between two groups of ONT data at the site level. It supports two re-squiggle pipeline(Tombo and f5c).')
@@ -126,13 +127,13 @@ if __name__ == '__main__':
         from nanoCEM.read_f5c_eventalign import read_blow5
         if args.base_shift !='auto':
             args.base_shift = int(args.base_shift)
-        df_wt, aligned_num_wt, nucleotide_type = read_blow5(args.input, args.pos,args.ref, args.len, args.chrom, args.strand, args.pore,
+        df_wt, aligned_num_wt, nucleotide_type = read_blow5(args.input, args.pos,args.ref, args.len, args.chrom, args.strand, args.pore,args.sample_aligned_file,
                                                             subsample_ratio, args.base_shift, args.norm, str(args.cpu),args.rna)
         df_wt['Group'] = 'Sample'
         if nucleotide_type == 'RNA' and not args.rna:
             raise RuntimeError("You need to add --rna to turn on the rna mode")
         try:
-            df_ivt, aligned_num_ivt, _ = read_blow5(args.control, args.pos,args.ref, args.len, args.chrom, args.strand, args.pore,
+            df_ivt, aligned_num_ivt, _ = read_blow5(args.control, args.pos,args.ref, args.len, args.chrom, args.strand, args.pore,args.control_aligned_file,
                                                             subsample_ratio, args.base_shift, args.norm, str(args.cpu),args.rna)
             df_ivt['Group'] = 'Control'
             df = pd.concat([df_wt, df_ivt])
