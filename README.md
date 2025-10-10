@@ -9,28 +9,28 @@ It supports two re-squiggle pipeline(`Tombo` and `f5c`) and support `R9` and `R1
 If you want to view single read signal or raw signal, [Squigualiser](https://github.com/hiruna72/squigualiser) is recommended.
 
 ## Installation
+```
+python setup.py install
+```
 
-Before pip install, make sure you have installed the `samtools`(>=1.16) , `f5c`(>=1.4), `slow5tools`(>=1.1.0) and `minimap2`(>=2.17),
+## file requirement
 
-    conda install samtools=1.16 minimap2 f5c=1.4 slow5tools -c conda-forge -c bioconda 
+    data/
+    ├── wt/
+    │   └── file.blow5  # blow5 fil
+    │   └── file_aligned.bam  # BAM file
+    │   └── file_aligned.paf  # PAF file 
+    ├── ivt/
+    │   └── file.blow5  # blow5 fil
+    │   └── file_aligned.bam  # BAM file
+    │   └── file_aligned.paf  # PAF file 
+    └── 23S_rRNA.fasta  # reference fasta file
 
-To install the latest nanoCEM
-
-    pip install nanoCEM
-
-And install from the resource
-
-    git clone https://github.com/lrslab/nanoCEM.git
-    cd nanoCEM/
-    pip install .
-To install nanoCEM from docker,
-
-    docker pull zhihaguo/nanocem_env
-    
-To check the version of nanoCEM, run:
-
-    pip list | grep nanoCEM
-
+## Test
+```
+cd example
+current_events_magnifier f5c_ev -i data/wt/file -c data/ivt/file --chrom NR_103073.1 --strand + --pos 2030 --ref data/23S_rRNA.fasta -o nanoCEM_result_f5c_ev_test --rna --norm --sample_aligned_file data/wt/file_aligned --control_aligned_file data/ivt/file_aligned
+```
 
 ## Solutions for some potential environment problem
 Although it does not affect the functionality, the issue of possible missing header files caused by **samtools** installation by conda can be resolved with the following command.
