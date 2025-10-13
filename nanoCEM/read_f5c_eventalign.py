@@ -37,10 +37,7 @@ def extract_feature(line,strand,position,windows_length,base_shift=2,norm=True):
             for i in range(deletion):
                 event_length.append(0)
         elif 'I' in item:
-            if i == 0 :
-                continue
-            else:
-                return None
+            continue
         else:
             event_length.append(int(item))
     # build event_length from move table
