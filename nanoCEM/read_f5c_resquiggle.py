@@ -40,10 +40,7 @@ def extract_feature(line,kmer_model,strand,base_shift, norm=True):
             for i in range(deletion):
                 event_length.append(0)
         elif 'I' in item:
-            if i == 0:
-                continue
-            else:
-                return None
+            continue
         elif '=' in item:
             return None
         else:
