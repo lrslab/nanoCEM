@@ -30,8 +30,7 @@ setup(
         "pyslow5>=1.0.0",
         "vbz_h5py_plugin>=1.0.1",
         "biopython>=1.80",
-        "scikit-learn>=1.2.2",
-        'squigualiser==0.5.1'
+        "scikit-learn>=1.2.2"
     ],
     scripts=['nanoCEM/current_events_magnifier','nanoCEM/extract_sub_fast5_from_bam','nanoCEM/alignment_magnifier']
 )
